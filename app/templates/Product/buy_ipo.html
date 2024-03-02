@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy IPO</title>
+</head>
+<body>
+    <h1>Available IPOs:</h1>
+    <ul>
+        {% for product in products %}
+            <li>
+                {{ product.name }} -
+                <a href="{{ url_for('dashboard', product_id=product.id) }}">Buy</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <p><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+</body>
+</html>

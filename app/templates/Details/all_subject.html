@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
+
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-4 mb-4">{{ title }} ({{ all_pans }})</h1>
+        </div>
+    </div>
+    <!-- End of page title -->
+
+    <!-- List of all pans -->
+    <div class="row pans">
+        <div class="col-md-12">
+            <!-- pan list -->
+            <div class="table-responsive">
+                <table id="data" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Select <input type="checkbox"  id="select-all"> </th>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Pan</th>
+                            <th>DP id</th>
+                            {% if current_user.type == "admin" %}
+                            <th>Timestamp</th>
+                            <th>Seller</th> <!-- New column for actions -->
+                            {% endif %}
+                            <th>Actions</th> <!-- New column for actions -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Get all pans from the database -->
+                        {% for pan in pans %}
+                        <tr>
+                            <td><input type="checkbox" name="ID"></td>
+                            <td>{{ pan.id }}</td>
+                            <td>{{ pan.name }}</td>
+                            <td>{{ pan.pan_number }}</td>
+                            <td>{{ pan.dp_id }}</td>
+                            {% if current_user.type == "admin" %}
+                            <td>{{ moment(pan.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
+                            <th> {{ pan.seller.first_name.title() }} {{ pan.seller.last_name.title() }} </th>
+                            {% endif %}
+                            <!-- New column for actions -->
+                            <td>
+                                <a href="{{ url_for('edit_pan', id=pan.id) }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ url_for('delete_pan', id=pan.id) }}"
+                                    class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <!-- End of getting all pans from the database -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End of list of all pans -->
+</div>
+{% endblock %}
+
+{% block current_user_scripts %}
+<script>
+    $(document).ready(function () {
+        var table = $('#data').DataTable();
+    });
+</script>
+
+{% endblock %}

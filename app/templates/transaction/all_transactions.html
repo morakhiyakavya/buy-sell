@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
+
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-4 mb-4">{{ title }} ({{ all_transactions }})</h1>
+        </div>
+    </div>
+    <!-- End of page title -->
+
+    <!-- List of all transactions -->
+    <div class="row transactions">
+        <div class="col-md-12">
+            <!-- transaction list -->
+            <div class="table-responsive">
+                <table id="data" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Ipo</th>
+                            <th>Subject</th>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Timestamp</th>
+                            {% if current_user.type == "admin" %}
+                            <th>Seller</th> <!-- New column for actions -->
+                            {% endif %}
+                            <th>Actions</th> <!-- New column for actions -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Get all transactions from the database -->
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ transaction.id }}</td>
+                            <td>{{ transaction.product.name }}</td>
+                            <td>{{ transaction.details.subject }}</td>
+                            <td>{{ transaction.details.formtype }}</td>
+                            <td>{{ transaction.details.price }}</td>
+                            <td><a href="{{ url_for('available_pans',transaction_id = transaction.id ) }}">{{ transaction.details.quantity }}</a></td>
+                            <td>{{ moment(transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
+                            {% if current_user.type == "admin" %}
+                            <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }} </th>
+                            {% endif %}
+                            <!-- New column for actions -->
+                            <td>
+                                <a href="{{ url_for('edit_pan', id=transaction.id) }}" class="btn btn-primary">Edit</a>
+                                <a href="{{ url_for('delete_pan', id=transaction.id) }}"
+                                    class="btn btn-danger">Delete</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <!-- End of getting all transactions from the database -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End of list of all transactions -->
+</div>
+{% endblock %}
+
+{% block current_user_scripts %}
+<script>
+    $(document).ready(function () {
+        var table = $('#data').DataTable();
+    });
+</script>
+
+{% endblock %}

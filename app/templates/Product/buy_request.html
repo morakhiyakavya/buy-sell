@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Request</title>
+</head>
+<body>
+    <h1>Buy Request for {{ product.ipo_name }}</h1>
+    <form method="post" action="{{ url_for('buy_request', product_id=product.id) }}">
+        <label for="form_type">Form Type:</label>
+        <input type="text" name="form_type" required><br>
+        <label for="amt">Amount:</label>
+        <input type="number" name="amt" required><br>

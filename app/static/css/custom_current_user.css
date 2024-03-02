@@ -1,0 +1,524 @@
+
+/* =========================================== */
+/* DASHBOARD */
+/* =========================================== */
+
+
+/*
+    DEMO STYLE
+*/
+
+@import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
+body {
+    font-family: 'Poppins', sans-serif;
+    background: #fafafa;
+}
+
+p {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1em;
+    font-weight: 300;
+    line-height: 1.7em;
+    color: #7a488a;
+}
+
+a,
+a:hover,
+a:focus {
+    color: inherit;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.navbar {
+    padding: 15px 10px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin-bottom: 40px;
+    box-shadow: 1px 1px 3px #0000001a;
+}
+
+.navbar-btn {
+    box-shadow: none;
+    outline: none !important;
+    border: none;
+}
+
+.line {
+    width: 100%;
+    height: 1px;
+    border-bottom: 1px dashed #ddd;
+    margin: 40px 0;
+}
+
+/* ---------------------------------------------------
+    SIDEBAR STYLE
+----------------------------------------------------- */
+
+.wrapper {
+    display: flex;
+    width: 100%;
+}
+
+#sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 999;
+    background: orange;
+    color: #fff;
+    transition: all 0.3s;
+}
+
+#sidebar.active {
+    margin-left: -250px;
+}
+
+#sidebar .sidebar-header {
+    padding: 20px;
+    background: orange;
+}
+
+#sidebar ul.components {
+    padding: 20px 0;
+    border-bottom: 1px solid orange;
+}
+
+#sidebar ul p {
+    color: #fff;
+    padding: 10px;
+}
+
+#sidebar ul li a {
+    padding: 10px;
+    font-size: 1.1em;
+    display: block;
+    text-decoration: none;
+}
+
+#sidebar ul li a:hover {
+    color: orange;
+    background: #fff;
+}
+
+#sidebar ul li.active>a,
+a[aria-expanded="true"] {
+    color: #fff;
+    background: #ab8132;
+}
+
+a[data-toggle="collapse"] {
+    position: relative;
+}
+
+.dropdown-toggle::after {
+    display: block;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+}
+
+ul ul a {
+    font-size: 0.9em !important;
+    padding-left: 30px !important;
+    background: #e9c176;
+}
+
+ul.CTAs {
+    padding: 20px;
+}
+
+ul.CTAs a {
+    text-align: center;
+    font-size: 0.9em !important;
+    display: block;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+a.download {
+    background: #fff;
+    color: orange;
+}
+
+a.article {
+    background: #7a488a !important;
+    color: #fff !important;
+}
+a.article:hover {
+    background: #a76c00 !important;
+    color: white !important;
+}
+
+/* ---------------------------------------------------
+    CONTENT STYLE
+----------------------------------------------------- */
+
+#content {
+    width: calc(100% - 250px);
+    padding: 40px;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+#content.active {
+    width: 100%;
+}
+
+/* ---------------------------------------------------
+    MEDIAQUERIES
+----------------------------------------------------- */
+
+@media (max-width: 768px) {
+    #sidebar {
+        margin-left: -250px;
+    }
+    #sidebar.active {
+        margin-left: 0;
+    }
+    #content {
+        width: 100%;
+    }
+    #content.active {
+        width: calc(100% - 250px);
+    }
+    #sidebarCollapse span {
+        display: none;
+    }
+}
+
+/* =============================== */
+/* === Center Contents in Page === */
+/* =============================== */
+@media screen and (max-width: 576px) {
+    .index-content {
+        margin:0 auto;
+        position:absolute;
+        left:3%;
+        top:20%;
+        margin-left:-10px;
+        margin-top:-10px;
+    }
+    .index-content h1 {
+        font-size: 20px;
+        line-height: 23px;
+    }
+    p {
+        font-size: 13px;
+    }
+    small {
+        font-size: 10px;
+    }
+}
+@media screen and (min-width: 576px) and (max-width: 992px) {
+    /* Index page content */
+    .index-content {
+        margin:0 auto;
+        position:absolute;
+        left:20%;
+        top:30%;
+        margin-left:-150px;
+        margin-top:-150px;
+    }
+    .index-content h1 {
+        font-size: 55px;
+        line-height: 50px;
+    }
+    .index-image {
+        padding-top: 50px;
+    }
+    p {
+        padding-top: 10px;
+        font-size: 25px;
+    }
+    small {
+        font-size: 15px;
+    }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1200px) {
+    /* Index page content */
+    .index-content {
+        margin:0 auto;
+        position:absolute;
+        left:20%;
+        top: 55%;
+        margin-left:-150px;
+        margin-top:-150px;
+    }
+    .index-content h1 {
+        font-size: 40px;
+        line-height: 50px;
+    }
+    .index-image {
+        top: 80px;
+    }
+    p {
+        padding-top: 10px;
+        font-size: 15px;
+    }
+    small {
+        font-size: 10px;
+    }
+}
+
+@media screen and (min-width: 1200px) and (max-width: 1300px) {
+    .index-content {
+        margin:0 auto;
+        position:absolute;
+        left: 20%;
+        top:40%;
+        right: 10%;
+        margin-left:-150px;
+        margin-top:-150px;
+    }
+    .index-content h1 {
+        font-size: 60px;
+        line-height: 60px;
+    }
+    .index-image {
+        padding-top: 40px;
+    }
+    p {
+        padding-top: 10px;
+        font-size: 20px;
+    }
+    small {
+        font-size: 15px;
+    }
+}
+
+@media screen and (min-width: 1300px) {
+    .index-content {
+        margin:0 auto;
+        position:absolute;
+        left: 20%;
+        top:37%;
+        right: 10%;
+        margin-left:-150px;
+        margin-top:-150px;
+    }
+    .index-content h1 {
+        font-size: 60px;
+        line-height: 60px;
+    }
+    .index-image {
+        padding-top: 40px;
+    }
+    p {
+        padding-top: 10px;
+        font-size: 20px;
+    }
+    small {
+        font-size: 15px;
+    }
+}
+
+/* ------------------------------------------------- */
+/* CONTENT STYLE */
+/* ------------------------------------------------- */
+.users {
+    margin-bottom: 25px;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: #63636333 0px 2px 8px 0px;
+}
+.users:hover {
+    box-shadow: #0000003d 0px 3px 8px;
+}
+.danger {
+    border: 1px solid #fcd9d9;
+    background-color: #fcd9d9;
+    box-shadow: #fcd9d9 0px 3px 8px;
+    border-radius: 5px;
+}
+.success {
+    border: 1px solid #cdb4db;
+    background-color: #cdb4db;
+    box-shadow: #cdb4db 0px 3px 8px;
+    border-radius: 5px;
+}
+.success:hover {
+    box-shadow: #a97ac4 0px 2px 8px 0px;
+}
+.danger:hover {
+    box-shadow: #f5b0b0 0px 2px 8px 0px;
+}
+.attendance {
+    margin: 5px;
+}
+.profile, .danger-profile {
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: #92929233 0px 2px 8px 0px;
+}
+.profile:hover, .danger-profile:hover {
+    box-shadow: #2727273d 0px 3px 8px;
+}
+
+
+/* ------------------------------------------------- */
+/*  Forms  */
+/* ------------------------------------------------- */
+.my-form {
+    border: 1px solid rgb(236, 236, 236);
+    border-radius: 5px;
+    padding: 20px;
+}
+
+/* ------------------------------------------------- */
+/*  Links */
+/* ------------------------------------------------- */
+.link_disabled {
+    pointer-events: none;
+    color: currentColor;
+    cursor: not-allowed;
+    opacity: 0.5;
+    text-decoration: none;
+  }
+  .page-less, .page-more {
+    margin: 20px;
+  }
+
+/* ------------------------------------------------- */
+/*  Logo  */
+/* ------------------------------------------------- */
+.nav-logo {
+    width: 55px;
+    height: 55px;
+}
+
+/* ------------------------------------------------- */
+/*  Navbar */
+/* ------------------------------------------------- */
+.navbar-brand {
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    color: gray;
+}
+.navbar-brand:hover {
+    text-decoration: none;
+    font-weight: 800;
+    color: #686d99;
+}
+
+/* ------------------------------------------------- */
+/*  Button  */
+/* ------------------------------------------------- */
+
+.btn {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 0.5;
+    color: #575555;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    background-color: #c2c2c2;
+    border: 1px solid transparent;
+    padding: 0.8rem 0.8rem;
+    font-size: 1.1em;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.register {
+    background-color: red;
+}
+
+/* ------------------------------------------------- */
+/*  Email  */
+/* ------------------------------------------------- */
+.email {
+    padding: 20px;
+    margin-bottom: 10px;
+    box-shadow: #43475545 0px 0px 0.25em, #5a7dbc0d 0px 0.25em 1em;
+  }
+  .email:hover {
+    box-shadow: #00000026 0px 5px 15px 0px;
+  }
+
+/* ------------------------------------------------- */
+/*  Labels  */
+/* ------------------------------------------------- */
+.label {
+    display: inline-block;
+    font-weight: 400;
+    line-height: 0.5;
+    text-align: center;
+    text-decoration: none;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    background-color: #e2e2e2;
+    border: 1px solid transparent;
+    padding: 0.4rem 0.4rem;
+    font-size: 1.1em;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+.label-info {
+    background-color: #8fabbe;
+}
+.label-success {
+    background-color: #aac7aa;
+}
+.label-warning {
+    background-color: #bebe89;
+}
+.label-danger {
+    background-color: #bd6b76;
+}
+.label-info, .label-success, .label-warning, .label-danger,
+.label-info:hover, .label-success:hover, .label-warning:hover, .label-danger:hover {
+    color: white;
+}
+
+
+
+
+/* =========================================== */
+/* DASHBOARD */
+/* =========================================== */
+
+
+blockquote {
+    background-color: #e7e7e7;
+    padding: 10px;
+    border-radius: 5px;
+}
+pre {
+    margin-top: 10px;
+    margin-bottom: 10pxx;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+}
+.chapter a {
+    text-decoration: none;
+    margin-bottom: 10px;
+}
+.code-title{
+    margin-bottom: -4px;
+    background-color: #e6e6e6;
+    padding-left: 10px;
+    padding-bottom: 4px;
+}
+img {
+    box-shadow: #63636333 0px 2px 8px 0px;
+}

@@ -1,0 +1,170 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+    {% include '_flash_message.html' %}
+    <h1 class="mt-4">{{ title }}</h1><br>
+    <div class="row">
+        <div class="col-md-12 profile mb-4">
+            <h3 class="mb-4">Personal Information</h3>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Buyer</th>
+                            <th>Registration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ current_user.first_name }} {{ current_user.last_name }}</td>
+                            <td>
+                                {{ current_user.username }}
+                                <!-- Icon trigger modal -->
+                                <a href="#" data-toggle="modal" data-target="#exampleModalCenter">Edit</a>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog"
+                                    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="exampleModalLongTitle">Update Your Username
+                                                </h3>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>
+                                                    {{ wtf.quick_form(username_form) }}
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of username modal -->
+                            </td>
+                            <td>
+                                {{ current_user.email }}
+                                <!-- Icon trigger modal -->
+                                <a href="#" data-toggle="modal" data-target="#emailModalCenter">Edit</a>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="emailModalCenter" tabindex="-1" role="dialog"
+                                    aria-labelledby="emailModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="emailModalLongTitle">Update Your Email</h3>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>
+                                                    {{ wtf.quick_form(email_form) }}
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of email modal -->
+                            </td>
+                            <td>
+                                {{ current_user.phone_number }}
+                                <!-- Icon trigger modal -->
+                                <a href="#" data-toggle="modal" data-target="#phoneModalCenter">Edit</a>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="phoneModalCenter" tabindex="-1" role="dialog"
+                                    aria-labelledby="phoneModalCenterTitle" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h3 class="modal-title" id="phoneModalLongTitle">Update Your Phone
+                                                    Number</h3>
+                                                <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close">
+                                                    <span aria-hidden="true">&times;</span>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>
+                                                    {{ wtf.quick_form(phone_form) }}
+                                                </p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary"
+                                                    data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- End of phone modal -->
+                            </td>
+                            <td>{{ current_user.current_residence }}</td>
+                            <td>{{ current_user.buyer.first_name }} {{ current_user.buyer.last_name }}</td>
+                            <td>{{ moment(current_user.registered_at).format('lll') }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- Deactivate account -->
+    <!--
+        <div class="row">
+            <h1>Danger</h1>
+            <div class="col-md-6 danger">
+                <p>
+                    Want to deactivate your account? <br>
+                    {% if current_user.delete_account == False %}
+                        <a 
+                            class="btn" 
+                            style="background-color: red; color: white;" 
+                            href=" {{ url_for('seller_deactivate_account') }} "> 
+                                Deactivate
+                        </a>
+                    {% else %}
+                        <a 
+                            class="btn link_disabled" 
+                            style="background-color: red; color: white;" 
+                            href=" {{ url_for('seller_deactivate_account') }} "> 
+                                Deactivate 
+                        </a>
+                    {% endif %}
+                </p>
+            </div>
+            <div class="col-md-6">
+            </div>
+        </div>
+         -->
+    <div class="row">
+        <h1>Add Pan</h1>
+        <div class="col-md-6 success">
+            <p style="color: black;">
+                Want to add your pan? <br><br>
+                <a class="btn" style="background-color: #2d1b37; color: white;" href=" {{ url_for('add_pan') }} ">
+                    Add Pan
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endblock %}

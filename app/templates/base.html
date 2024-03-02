@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="eLearning App">
+  <meta name="keywords" content="Newsletter, eLearning, Python, Flask, JavaScript, Django, Twilio">
+  <meta name="author" content="Gitau Harrison">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="all,follow">
+  <!-- Favicon-->
+  <link rel="shortcut icon" href=" {{ url_for('static', filename='images/home/somaSOMA2.png') }}">
+
+  {% if title %}
+  <title>{{ title }} - KavyaArya</title>
+  {% else %}
+  <title>KavyaArya Ipo App</title>
+  {% endif %}
+
+  <!-- intl-tel-input -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/css/intlTelInput.css">
+
+  <!-- DataTable JS -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.css">
+
+  <!-- ============================================== -->
+  <!-- Anonymous user -->
+  <!-- ============================================== -->
+
+  {% if current_user.is_anonymous %}
+  <!-- Modal Video-->
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/modal-video/css/modal-video.min.css') }}"
+    alt="32 Not available at this momoent">
+  <!-- Google fonts-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&display=swap" rel="stylesheet">
+  <!-- theme stylesheet-->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}"
+    alt="38 Not available at this momoent" id="theme-stylesheet">
+  <!-- Custom stylesheet - for your changes-->
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/custom.css') }}"
+    alt="40 Not available at this momoent">
+  {% endif %}
+  <!-- ============================================== -->
+  <!-- Anonymous user -->
+  <!-- ============================================== -->
+
+
+  <!-- ============================================== -->
+  <!-- Authenticated user user -->
+  <!-- ============================================== -->
+
+  {% if current_user.is_authenticated %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/custom_current_user.css') }}"
+    alt="52 Not available at this momoent">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300&display=swap" rel="stylesheet">
+  <!-- Bootstrap CSS CDN -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css"
+    integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <!-- Scrollbar Custom CSS -->
+  <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+
+  <!-- Font Awesome JS -->
+  <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js"
+    integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous">
+    </script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js"
+    integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous">
+    </script>
+
+  <!-- Personal fontawesome Kit -->
+  <script src="https://kit.fontawesome.com/1569ae777d.js" crossorigin="anonymous"></script>
+  {% endif %}
+
+  <!-- ============================================== -->
+  <!-- End of authenticated user user -->
+  <!-- ============================================== -->
+
+
+</head>
+
+<body>
+  <!-- ============================================== -->
+  <!-- Anonymously accessed content -->
+  <!-- ============================================== -->
+
+  {% if current_user.is_anonymous %}
+  <!-- navbar-->
+  <header class="header">
+    <nav class="navbar navbar-light navbar-expand-lg fixed-top" id="navbar">
+      <div class="container"><a class="navbar-brand" href="{{ url_for('home') }}"
+          alt="102 Not available at this momoent">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <strong>
+                <span class="logo">ipo</span>kavya<span class="logo-name">arya</span>
+              </strong>
+            </li>
+          </ul>
+        </a>
+        <button class="navbar-toggler navbar-toggler-end" type="button" data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link link-scroll active" href="#hero">
+                <a href="{{ url_for('register_admin') }}" alt="125 Not available at this momoent">
+                  <button class="btn btn-primary">Register</button>
+                </a>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+  <!-- End of navbar -->
+
+  <section class="hero bg-top py-5" id="hero"
+    style="background: url({{ url_for('static', filename='images/home/banner-4.png') }}) no-repeat; background-size: 100% 80%">
+    <section class="hero bg-top py-5" id="hero">
+
+      <div class="container-fluid py-5">
+
+        <!-- Flash message -->
+        {% include '_flash_message.html' %}
+        <!-- End of flash message -->
+
+        <!-- Child templates will go here -->
+        {% block anonymous_content %}{% endblock %}
+        <!-- End of child templates -->
+      </div>
+    </section>
+
+    <!-- Scroll to the top -->
+    <a class="scroll-top-btn" id="scrollTop" href="#!"><i class="fas fa-long-arrow-alt-up"></i></a>
+    <!-- End of scroll to the top -->
+
+    <!-- Footer -->
+    <footer class="with-pattern-1 position-relative pt-5">
+      <div class="container py-5">
+        <div class="row gy-4">
+          <div class="col-lg-2">
+            <!-- empty col -->
+          </div>
+          <div class="col-lg-6">
+            <div style="margin-bottom: 10px;">
+              <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                  <strong>
+                    <span class="logo">ipo</span>Kavya<span class="logo-name">Arya</span>
+                  </strong>
+                </li>
+              </ul>
+            </div>
+            <p class="text-muted">
+              Lorem Ipsum is simply dummy text of <br> the printing and typesetting industry. <br><br>
+              <a href="https://www.instagram.com/_morakhiya_kavya/" , target="_blank"
+                alt="174 Not available at this momoent">
+                <img class="img-fluid" src="{{ url_for('static', filename='images/home/github.png') }}" alt="GitHub">
+                Find
+                Us on Instagram
+              </a>
+            </p>
+          </div>
+          <div class="col-lg-4">
+            <h2 class="h5 mb-4">Contact Info</h2>
+            <ul class="list-unstyled me-4 mb-3">
+              <li class="mb-2 text-muted">Ahmedabad Paldi Cross Road, Gujarat.</li>
+              <li class="mb-2"><a class="footer-link" href="tel:+917016184560"
+                  alt="183 Not available at this momoent">+91-7016184560</a></li>
+              <li class="mb-2"><a class="footer-link" href="mailto:morakhiyakavya@email.com"
+                  alt="184 Not available at this momoent">morakhiyakavya@email.com</a></li>
+            </ul>
+            <ul class="list-inline mb-0">
+              <li class="list-inline-item"><a class="social-link" href="#!" alt="187 Not available at this momoent"><i
+                    class="fab fa-facebook-f"></i></a></li>
+              <li class="list-inline-item"><a class="social-link" href="#!" alt="188 Not available at this momoent"><i
+                    class="fab fa-twitter"></i></a></li>
+              <li class="list-inline-item"><a class="social-link" href="#!" alt="189 Not available at this momoent"><i
+                    class="fab fa-linkedin-in"></i></a></li>
+              <li class="list-inline-item"><a class="social-link" href="#!" alt="190 Not available at this momoent"><i
+                    class="fab fa-instagram"></i></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="copyrights">
+        <div class="container text-center py-4">
+          <p class="mb-0 text-muted text-sm">&copy; {{ moment().format('YYYY') }}, <span
+              class="logo">Ipo</span>Kavya<span class="logo-name">Arya</span>.</p>
+        </div>
+      </div>
+    </footer>
+    <!-- End of footer -->
+
+    <!-- Momentjs -->
+    {{ moment.include_moment() }}
+
+    <!-- All scripts will go here -->
+    <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/swiper/swiper-bundle.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='vendor/modal-video/js/modal-video.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <!-- FontAwesome CSS - loading as last, so it doesn't block rendering-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css"
+      integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+    <!-- intl-tel-input -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/intlTelInput.min.js"></script>
+
+    <!-- Phone number -->
+    <!-- <script>
+      var wtf_phone_field = document.getElementById('phone_number');
+      wtf_phone_field.style.position = 'absolute';
+      wtf_phone_field.style.top = '-9999px';
+      wtf_phone_field.style.left = '-9999px';
+      wtf_phone_field.buyerElement.insertAdjacentHTML('beforeend', '<div><input type="tel" id="_phone"></div>');
+      var fancy_phone_field = document.getElementById('_phone');
+      var fancy_phone_iti = window.intlTelInput(fancy_phone_field, {
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/utils.js",
+      });
+      fancy_phone_iti.setNumber(wtf_phone_field.value);
+      fancy_phone_field.addEventListener('blur', function () {
+        wtf_phone_field.value = fancy_phone_iti.getNumber();
+      });
+    </script> -->
+
+    {% block anonymous_user_scripts %}{% endblock %}
+
+    {% endif %}
+    <!-- ============================================== -->
+    <!-- End of anonymously accessed content -->
+    <!-- ============================================== -->
+
+
+    <!-- ============================================== -->
+    <!-- Content accessed by logged-in user -->
+    <!-- ============================================== -->
+
+    {% if current_user.is_authenticated %}
+    {% if current_user.is_active %}
+    <div class="wrapper">
+      <!-- Sidebar  -->
+      <nav id="sidebar">
+        <div class="sidebar-header">
+          <h3>Dashboard</h3>
+          </a>
+        </div>
+
+        <ul class="list-unstyled components">
+
+          <!-- Class content can be seen by all except the buyer -->
+          {% if current_user.type != 'buyer' %}
+          {% if current_user.type == 'seller' %}
+          <li>
+            <a href="#pySubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Python</a>
+            <ul class="collapse list-unstyled" id="pySubmenu">
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1:
+                  Install/Configure Git</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2:
+                  Virtualenvwrapper</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 3: Start Flask
+                  Server</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 4: Connect to
+                  GitHub</a></li>
+            </ul>
+          </li>
+          <li class="active">
+            <a href="#jsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">JavaScript</a>
+            <ul class="collapse list-unstyled" id="jsSubmenu">
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1: Lorem
+                  Ipsum</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2: Lorem
+                  Ipsum</a></li>
+            </ul>
+          </li>
+          {% endif %}
+
+          <!-- Accessible by admins and admins only -->
+          <!-- There are no conditions set to view any of the lessons' chapters -->
+          {% if current_user.type != "seller" %}
+          <li>
+            <a href="#pySubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Flask Lessons</a>
+            <ul class="collapse list-unstyled" id="pySubmenu">
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1:
+                  Install/Configure Git</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2:
+                  Virtualenvwrapper</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 3: Start Flask
+                  Server</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 4: Connect to
+                  GitHub </a></li>
+            </ul>
+          </li>
+          <li class="active">
+            <a href="#jsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">React Lessons</a>
+            <ul class="collapse list-unstyled" id="jsSubmenu">
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1: Lorem
+                  Ipsum</a></li>
+              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2: Lorem
+                  Ipsum</a></li>
+            </ul>
+          </li>
+          {% endif %}
+          {% endif %}
+
+          <!-- Each user has their own profile page -->
+          {% if current_user.type == 'seller' %}
+          <li>
+            <a href=" {{ url_for('seller_profile') }} " alt="397 Not available at this momement">Profile</a>
+          </li>
+          {% endif %}
+          {% if current_user.type == 'admin' %}
+          <li>
+            <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Profile</a>
+          </li>
+          {% endif %}
+          {% if current_user.type == 'buyer' %}
+          <!-- Only buyer can register child/seller -->
+          <li class="active">
+            <a href=" {{ url_for('register_seller') }} " alt="397 Not available at this momement">Register Seller</a>
+          </li>
+          <li>
+            <a href=" # " alt="397 Not available at this momement">Seller Analysis</a>
+          </li>
+          <li>
+            <a href=" {{ url_for('buyer_profile') }} " alt="397 Not available at this momement">Profile</a>
+          </li>
+          {% endif %}
+          {% if current_user.type == 'admin' %}
+          <li>
+            <a href=" {{ url_for('admin_profile') }} " alt="397 Not available at this momement">Profile</a>
+          </li>
+          {% endif %}
+
+          <!-- seller and buyer cannot see the list of app users -->
+          {% if current_user.type != 'seller' and current_user.type != 'buyer' %}
+          <li class="active">
+            <a href="#usersSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Users</a>
+            <ul class="collapse list-unstyled" id="usersSubmenu">
+              <li>
+                <a href=" {{ url_for('all_sellers') }} " alt="397 Not available at this momement">All seller</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('all_buyers') }} " alt="397 Not available at this momement">All buyer</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">All admins</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('all_admins') }} " alt="397 Not available at this momement">All Admins</a>
+              </li>
+            </ul>
+          </li>
+          <li class="active">
+            <a href="#allEmailsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">In-app
+              Emails</a>
+            <ul class="collapse list-unstyled" id="allEmailsSubmenu">
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual Subscriber
+                  Emails</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual buyer
+                  Emails</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual seller
+                  Emails</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual admin
+                  Emails</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual Admin
+                  Emails</a>
+              </li>
+              <hr>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All buyer</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All seller</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All admins</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All Admins</a>
+              </li>
+            </ul>
+          </li>
+          <li class="active">
+            <a href="#sellerAnalysisSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">seller
+              Analysis</a>
+            <ul class="collapse list-unstyled" id="sellerAnalysisSubmenu">
+              <li>
+                <a href=" # " alt="397 Not available at this momement">seller Attendance</a>
+              </li>
+              <li>
+                <a href=" # " alt="397 Not available at this momement">Projects Submissions</a>
+              </li>
+              <li>
+                <a href=" # " alt="397 Not available at this momement">Assess Projects</a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
+
+          <!-- Only admins can access the links below -->
+          {% if current_user.type == 'admin' %}
+          <li class="active">
+            <a href="#registrationSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"
+              alt="406 Not available at this momoent">Registration</a>
+            <ul class="collapse list-unstyled" id="registrationSubmenu">
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="409 Not available at this momoent">Register admin</a>
+              </li>
+              <li>
+                <a href=" {{ url_for('register_admin') }} " alt="412 Not available at this momoent">Register Admin</a>
+              </li>
+            </ul>
+          </li>
+          <li>
+            <a href=" # " alt="417 Not available at this momoent">App Analytics</a>
+          </li>
+          <li class="active">
+            <a href="#newsletterSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"
+              alt="420 Not available at this momoent">Newsletter</a>
+            <ul class="collapse list-unstyled" id="newsletterSubmenu">
+              <li>
+                <a href=" {{ url_for('dashboard') }} " alt="423 Not available at this momoent">Subscribers</a>
+              </li>
+            </ul>
+          </li>
+          {% endif %}
+        </ul>
+
+        <ul class="list-unstyled CTAs">
+          <li>
+            {% if not current_user.two_factor_enabled() %}
+            <a class="nav-link article" href=" # " alt="433 Not available at this momoent">Enable 2FA</a>
+            {% else %}
+            <a class="nav-link download" href=" # " alt="435 Not available at this momoent">Disable 2FA</a>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Page Content  -->
+      <div id="content">
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <div class="container-fluid">
+
+            <button type="button" id="sidebarCollapse" class="btn btn-light">
+              <i class="fas fa-align-left"></i>
+              <span>Toggle Sidebar</span>
+            </button>
+            <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
+              data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="Toggle navigation">
+              <i class="fas fa-align-justify"></i>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item link_disabled"><a class="nav-link" href=" # "
+                    alt="457 Not available at this momoent">{{ current_user.username }}</a></li>
+                <li class="nav-item active">
+                  <a class="nav-link" href="{{ url_for('logout') }}" alt="459 Not available at this momoent">Logout</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        {% block current_user_content %}
+
+        {% endblock %}
+
+      </div>
+    </div>
+    {% endif %}
+    {% if current_user.active == False %}
+    <p>
+      Your account was deactivated. You can no longer access any services.
+      Contact KavyaArya for further assistance.
+    </p>
+    {% endif %}
+
+    <!-- Momentjs -->
+    {{ moment.include_moment() }}
+
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/custom_current_user.js') }}"></script>
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+      integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+      crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"
+      integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ"
+      crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+      crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
+      integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
+      crossorigin="anonymous"></script>
+    <!-- jQuery Custom Scroller CDN -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+    <!-- DataTableJs links -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
+    </script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js">
+    </script>
+    <!-- intl-tel-input -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/intlTelInput.min.js">
+    </script>
+
+    <script type="text/javascript">
+      $(document).ready(function () {
+        $("#sidebar").mCustomScrollbar({
+          theme: "minimal"
+        });
+
+        $('#sidebarCollapse').on('click', function () {
+          $('#sidebar, #content').toggleClass('active');
+          $('.collapse.in').toggleClass('in');
+          $('a[aria-expanded=true]').attr('aria-expanded', 'false');
+        });
+      });
+    </script>
+
+    <!-- Make image fullscreen when clicked -->
+    <script>
+      $(document).ready(function () { $("img").click(function () { this.requestFullscreen() }) });
+    </script>
+
+    <!-- Verification Phone number -->
+    <script>
+      var wtf_phone_field = document.getElementById('verification_phone');
+      wtf_phone_field.style.position = 'absolute';
+      wtf_phone_field.style.top = '-9999px';
+      wtf_phone_field.style.left = '-9999px';
+      wtf_phone_field.buyerElement.insertAdjacentHTML('beforeend', '<div><input type="tel" id="_phone"></div>');
+      var fancy_phone_field = document.getElementById('_phone');
+      var fancy_phone_iti = window.intlTelInput(fancy_phone_field, {
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/utils.js",
+      });
+      fancy_phone_iti.setNumber(wtf_phone_field.value);
+      fancy_phone_field.addEventListener('blur', function () {
+        wtf_phone_field.value = fancy_phone_iti.getNumber();
+      });
+    </script>
+    <!-- Phone number -->
+    <script>
+      var wtf_phone_field = document.getElementById('phone_number');
+      //  wtf_phone_field.style.position = 'absolute';
+      wtf_phone_field.style.top = '-9999px';
+      wtf_phone_field.style.left = '-9999px';
+      wtf_phone_field.buyerElement.insertAdjacentHTML('beforeend', '<div><input type="tel" id="_phone"></div>');
+      var fancy_phone_field = document.getElementById('_phone');
+      var fancy_phone_iti = window.intlTelInput(fancy_phone_field, {
+        separateDialCode: true,
+        utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/16.0.4/js/utils.js",
+      });
+      fancy_phone_iti.setNumber(wtf_phone_field.value);
+      fancy_phone_field.addEventListener('blur', function () {
+        wtf_phone_field.value = fancy_phone_iti.getNumber();
+      });
+    </script>
+
+    {% block current_user_scripts %}{% endblock %}
+
+    {% endif %}
+
+
+    <!-- ============================================== -->
+    <!-- End of content accessed by logged-in user -->
+    <!-- ============================================== -->
+
+
+</body>
+
+</html>

@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
+
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-4 mb-4">{{ title }} ({{ all_pans }})</h1>
+        </div>
+    </div>
+    <!-- End of page title -->
+
+    <!-- List of all pans -->
+    <div class="row pans">
+        <div class="col-md-12">
+            <!-- pan list -->
+            <div class="table-responsive">
+                <form id="checkbox-form" action="{{ url_for('available_pans') }}" method="post">
+                    <table id="data" class="table table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Select <input type="checkbox" id="select-all"> </th>
+                                <th>Subject To <select name="def" id="def">
+                                        <option value="none" default="checked">None</option>
+                                        <option value="Subject 1">Subject 1</option>
+                                        <option value="Subject 2">Subject 2</option>
+                                    </select> </th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Pan</th>
+                                <th>DP id</th>
+                                {% if current_user.type == "admin" %}
+                                <th>Timestamp</th>
+                                <th>Seller</th> <!-- New column for actions -->
+                                {% endif %}
+                                <th>Actions</th> <!-- New column for actions -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Get all pans from the database -->
+                            {% for pan in pans %}
+                            <tr>
+                                <td><input type="checkbox" name="ID[]" value="{{ pan.id }}"></td>
+                                <td><select name="subject" id="sub">
+                                        <option value="none" default="checked">None</option>
+                                        <option value="Subject 1">Subject 1</option>
+                                        <option value="Subject 2">Subject 2</option>
+                                    </select></td>
+                                <td>{{ pan.id }}</td>
+                                <td>{{ pan.name }}</td>
+                                <td>{{ pan.pan_number }}</td>
+                                <td>{{ pan.dp_id }}</td>
+                                {% if current_user.type == "admin" %}
+                                <td>{{ moment(pan.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
+                                <th> {{ pan.seller.first_name.title() }} {{ pan.seller.last_name.title() }} </th>
+                                {% endif %}
+                                <!-- New column for actions -->
+                                <td>
+                                    <a href="{{ url_for('edit_pan', id=pan.id) }}" class="btn btn-primary">Edit</a>
+                                    <a href="{{ url_for('delete_pan', id=pan.id) }}" class="btn btn-danger">Delete</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            <!-- End of getting all pans from the database -->
+                        </tbody>
+                    </table>
+                    <button type="submit" id="submit-btn" class="btn btn-primary">Process Selected</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- End of list of all pans -->
+    <hr>
+    <br>
+    <div class="row">
+        <br>
+        <h1>Add Pan</h1>
+        <div class="col-md-6 success">
+            <p style="color: black;">
+                Want to add your pan? <br><br>
+                <a class="btn" style="background-color: #2d1b37; color: white;" href=" {{ url_for('add_pan') }} ">
+                    Add Pan
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block current_user_scripts %}
+<script>
+    $(document).ready(function () {
+        var table = $('#data').DataTable();
+
+        //     // Handle select all checkbox change event
+        $('#select-all').on('change', function () {
+            var rows = table.rows({ page: 'current' }).nodes();
+            $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
+        });
+    });
+
+
+    // For Subject To dropdown
+    $(document).ready(function () {
+        // Handle change event of the "Subject To" dropdown
+        $('#def').change(function () {
+            // Get the selected value
+            var selectedSubject = $(this).val();
+
+            // Update all corresponding cells in the table
+            $('tbody tr').each(function () {
+                // Find the select element in the current row
+                var subjectDropdown = $(this).find('select[name="subject"]');
+
+                // Update the selected value
+                subjectDropdown.val(selectedSubject);
+
+                // If you want to trigger the change event on the select element
+                // subjectDropdown.trigger('change');
+            });
+        });
+    });
+
+    $(document).ready(function() {
+    $('#checkbox-form').on('submit', function(e) {
+        e.preventDefault(); // Prevent the default form submission
+        var formData = $(this).serialize(); // Serialize form data
+
+        $.post('/available-pans', formData, function(response) {
+            console.log(response);
+            // Handle the response here, e.g., show a message to the user
+        });
+    });
+});
+</script>
+
+{% endblock %}

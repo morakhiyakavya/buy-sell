@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block current_user_content %}
+  <!-- Login form -->
+  <div class="row align-items-center mb-1 gy-1">
+    <div class="col-lg-6">
+      <h2 class="text-center mb-4">{{ title }}</h2>
+      <hr>
+      <h4>{{ product_name.name }}</h4>
+      <!-- form-->
+      <div class="my-form">
+        <form method="POST" action="">  <!-- Specify the correct method and action -->
+          {{ form.hidden_tag() }}
+          {{ wtf.form_field(form.subject) }}
+          {{ wtf.form_field(form.formtype) }}
+          {{ wtf.form_field(form.price) }}
+          {{ wtf.form_field(form.quantity) }}
+          {{ wtf.form_field(form.submit, button_map={"submit":"warning"}) }}
+          <hr>
+          <!-- Add your anchor tag here -->
+          <ul class="list-unstyled CTAs">
+          <li>
+          <a href="{{ url_for('available_pans') }}" class="nav-link article">Proceed Ahead.</a>
+
+          </li>
+          </ul>
+        </form>
+      </div>        
+      <!-- End of form -->
+    </div>
+    <div class="col-lg-6">
+      <!-- Empty col -->
+    </div>
+  </div>
+  <!-- End of login form -->
+{% endblock %}

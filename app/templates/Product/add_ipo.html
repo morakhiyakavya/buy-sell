@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add IPO</title>
+</head>
+<body>
+    <h1>Add IPO</h1>
+    <form method="post" action="{{ url_for('add_ipo') }}">
+        <label for="ipo_name">IPO Name:</label>
+        <input type="text" name="ipo_name" required><br>
+        <input type="submit" value="Add IPO">
+    </form>
+    <p><a href="{{ url_for('dashboard') }}">Back to Dashboard</a></p>
+</body>
+</html>
