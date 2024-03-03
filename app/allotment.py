@@ -745,9 +745,6 @@ website_configs = {
 # # # Data Printing
 
 
-
-
-
 def scrape_data_from_websites(driver_path, company, ipo, usernames, headless=False):
     """
     Scrape data from multiple websites based on the given company and IPO.
@@ -837,3 +834,4 @@ class IPODetailsScraper(BaseScraper):
         self.close()
         return ipo_details_green, ipo_details_lightyellow, ipo_details_aqua
     
+
