@@ -20,6 +20,16 @@ def process_excel_data(filepath, pan_Column, start_Row, end_Row=None):
 
     """
     df = pd.read_excel(filepath)
+    column_data = column_det(pan_Column, df)
+    
+    if end_Row:
+        username = column_data[start_Row:end_Row].tolist()
+    else:
+        username = column_data[start_Row:].tolist()
+    
+    return username
+
+def column_det(pan_Column, df):
     if isinstance(pan_Column, str):
         # Convert Excel column letter to zero-based index
         pan_Column = ord(pan_Column.upper()) - ord('A')
@@ -30,18 +40,11 @@ def process_excel_data(filepath, pan_Column, start_Row, end_Row=None):
         column_data = df.iloc[:, pan_Column]
     else:
         raise ValueError("Invalid column identifier")
-    
-    if end_Row:
-        username = column_data[start_Row:end_Row].tolist()
-    else:
-        username = column_data[start_Row:].tolist()
-    
-    return username
-            
+    return column_data
 
-def write_in_excel(file_path, results):
+def write_in_excel(file_path, results, pan_Column):
     """
-    Writes data to an Excel file, updating existing rows based on a unique identifier ('Pan No')
+    Writes data to an Excel file, updating existing rows based on a unique identifier (column_name)
     and appending new rows if the identifier does not exist. Dynamically adds new columns if
     they do not exist in the DataFrame.
 
@@ -56,15 +59,23 @@ def write_in_excel(file_path, results):
     """
     df = pd.read_excel(file_path)
 
+    #For getting column name
+    
+    if isinstance(pan_Column, str):
+        # Convert Excel column letter to zero-based index
+        pan_Column = ord(pan_Column.upper()) - ord('A')
+    
+    column_name = df.columns[pan_Column]
+
     for identifier, updates in results.items():
-        if identifier in df['Pan No'].values:
+        if identifier in df[column_name].values:
             # Update existing row(s)
             for column, value in updates.items():
                 # Check if column exists, if not, add it
                 if column not in df.columns:
                     df[column] = pd.NA  # Initialize new column with missing values
                 df[column] = df[column].astype('object')
-                df.loc[df['Pan No'] == identifier, column] = value
+                df.loc[df[column_name] == identifier, column] = value
         else:
             # Append a new row if the identifier does not exist
             # Ensure all columns in updates exist or are added to the DataFrame
@@ -72,12 +83,11 @@ def write_in_excel(file_path, results):
                 if column not in df.columns:
                     df[column] = pd.NA  # Initialize new column with missing values
             new_row = updates
-            new_row['Pan No'] = identifier  # Ensure the unique identifier is included in the new row
+            new_row[column_name] = identifier  # Ensure the unique identifier is included in the new row
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
     # Save the updated DataFrame back to the Excel file
     df.to_excel(file_path, index=False)
     return df
-
 
 def print_details(company, ipo, results):
     print("*-----------------------------------------------------*")

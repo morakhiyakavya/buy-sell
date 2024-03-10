@@ -8,14 +8,25 @@
     <div class="col-lg-6">
         <h2 class="text-center mb-4">{{ title }}</h2>
         <!-- form-->
-        <div class="my-form">
+        
+        <div class="my-form" id="my-form">
             <p>{{ wtf.quick_form(form, button_map={"submit":"warning"}) }}</p>
         </div>
+
         <!-- End of form -->
     </div>
     <div class="col-lg-6">
         <!-- Empty col -->
+        <div id="loadingMessage" style="display: none;">Processing your request. Please wait...</div>
     </div>
 </div>
 <!-- End of login form -->
+<script>
+    document.getElementById('my-form').addEventListener('submit', function() {
+        document.getElementById('submit_btn').disabled = true;
+        document.getElementById('submit_btn').innerText = 'Processing...';
+        console.log('Processing your request. Please wait...');
+    });
+    </script>
 {% endblock %}
+

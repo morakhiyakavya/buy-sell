@@ -10,6 +10,7 @@ from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 from config import Config
 from flask_ngrok import run_with_ngrok
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 run_with_ngrok(app)
@@ -22,6 +23,7 @@ login = LoginManager(app)
 login.login_view = "login"
 mail = Mail(app)
 boostrap = Bootstrap(app)
+socketio = SocketIO(app)
 
 if not app.debug:
     if app.config["MAIL_SERVER"]:

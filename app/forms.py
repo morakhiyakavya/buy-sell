@@ -17,6 +17,7 @@ from wtforms.validators import (
     Email,
     Regexp,
     ValidationError,
+    Optional,
 )
 import phonenumbers
 from app.models import User
@@ -321,36 +322,42 @@ class AllotmentForm(FlaskForm):
     ipo = StringField(
         "Ipo Name",
         validators=[DataRequired(), Length(1, 64)],
-        render_kw={"autofocus": True, "placeholder": "Allotment Name"},
+        render_kw={"autofocus": True, "placeholder": "Allotment Name", "id": "ipo_field"}
     )
     listing_On = SelectField(
+        "Listing On",
         choices=[("linkin", "linkin"), ("kfintech", "kfintech"), ("bigshare", "bigshare"), ("skyline", "skyline"), ("purva", "purva")],
         validators=[DataRequired()],
-        default="linkin" 
+        default="linkin",
+        render_kw={"id": "listing_on_field"}
     )
     pan_Column = StringField(
         "Pan Column",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Pan Column(eg: A or 1)"},
+        render_kw={"placeholder": "Pan Column(eg: A or 1)", "id": "pan_column_field"}
     )
     start_Row = IntegerField(
         "Pan Start Row",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Pan Start Row(eg: 2)"},
+        render_kw={"placeholder": "Pan Start Row(eg: 2)", "id": "start_row_field"}
     )
     end_Row = IntegerField(
         "Pan End Row",
-        # validators=[DataRequired()],
-        render_kw={"placeholder": "Pan End Row(eg: 100, you can leave it blank)"},
+        validators=[Optional()],
+        render_kw={"placeholder": "Pan End Row(eg: 100, you can leave it blank)", "id": "end_row_field"}
     )
     excel_file = FileField(
         'Upload Excel File',
         validators=[
             FileRequired(),
             FileAllowed(['xls', 'xlsx'], 'Excel files only!')
-        ]
+        ],
+        render_kw={"id": "excel_file_field"}
     )
-    submit = SubmitField("Add Allotment")
+    submit = SubmitField(
+        "Add Allotment",
+        render_kw={"id": "submit_btn"}
+    )
 
 # ========================================
 # END OF ALLOTMENT RELATED FORMS

@@ -12,6 +12,7 @@ from app.captcha import predict_captcha
 from app.excel import process_excel_data, write_in_excel, print_details
 import json
 import os
+from flask_socketio import emit
 
 # Configuration
 
@@ -199,7 +200,7 @@ class Scrape_Website(BaseScraper):
                         print("Captcha error, retrying...")
                         refresh_button = self.config['refresh_button']
                         if refresh_button:
-                            refresh = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, refresh_button)))
+                            refresh = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, refresh_button)))
                             refresh.click()
                         continue  # Retry captcha solving
                     elif error_type == "no_error":
@@ -543,7 +544,6 @@ class Scrape_Website(BaseScraper):
                     if username not in results:  # Check if this username has already been processed
                         # if self.select_dropdown_option(ipo):
                         writing_pan = self.input_username_and_submit(username)
-                        print(f"Working on {username}")
                         username_index = usernames.index(username) + 1
                         print(f"Left pan numbers {len(usernames) - username_index}")
                         if writing_pan == True:
@@ -555,7 +555,7 @@ class Scrape_Website(BaseScraper):
                             # Assuming you want to go back or refresh between usernames
                             self.prepare_for_next_username()
                         else:
-                            results[username] = {'error': 'unknown error'}
+                            results[username] = {'error': writing_pan}
                     break  # Exit the loop if everything goes well for this username
                 except (NoSuchWindowException, WebDriverException) as e:
                     print(f"Encountered an error: {e}. \nRetrying...")
@@ -577,7 +577,7 @@ class Scrape_Website(BaseScraper):
                         results[username] = {'error': "Maximum retries reached"}
                         break
         return results
-        
+
     def prepare_for_next_username(self):
             
             """
@@ -621,7 +621,7 @@ website_configs = {
         'back_button': 'lnk_new',
         'error_message': 'jconfirm-content',
         'close_dialog': 'btn.btn-blue',
-        'refresh_button': 'refresh',
+        'refresh_button': 'refresh', # CLASS_NAME
         # Add other necessary identifiers
     },
 

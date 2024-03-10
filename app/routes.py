@@ -1560,7 +1560,7 @@ def checking_allotment():
             with open(f"{ipo}.json", "w") as file:
                json.dump(results, file) # Save the results to a JSON file
             # Saving the results
-            write_in_excel(filepath, results)
+            write_in_excel(filepath, results, pan_Column)
             file_ready = True
             return download_updated_file(filepath)
         return render_template(
