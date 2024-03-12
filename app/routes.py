@@ -1557,7 +1557,7 @@ def checking_allotment():
             usernames = process_excel_data(filepath,pan_Column,start_Row,end_Row)
             # # Scraping the website
             results = scrape_data_from_websites(driver_path, listing_On, ipo, usernames, headless=False)
-            with open(f"{ipo}.json", "w") as file:
+            with open(f"json/{ipo}.json", "w") as file:
                json.dump(results, file) # Save the results to a JSON file
             # Saving the results
             write_in_excel(filepath, results, pan_Column)

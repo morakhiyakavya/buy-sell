@@ -834,4 +834,4 @@ class IPODetailsScraper(BaseScraper):
         self.close()
         return ipo_details_green, ipo_details_lightyellow, ipo_details_aqua
     
-
+    
