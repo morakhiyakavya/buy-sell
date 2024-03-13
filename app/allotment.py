@@ -139,7 +139,7 @@ class Scrape_Website(BaseScraper):
         """
         try:
             dropdown_id = self.config['dropdown']
-            dropdown_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, dropdown_id)))
+            dropdown_element = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, dropdown_id)))
             dropdown = Select(dropdown_element)
             available_options = [opt.text for opt in dropdown.options]
             user_input = ipo.title()
@@ -187,7 +187,7 @@ class Scrape_Website(BaseScraper):
                 max_retries = 5  # Example limit, adjust as needed
                 while retry_count < max_retries:
                     username_field_id = self.config['username_field']
-                    username_field = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, username_field_id)))
+                    username_field = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, username_field_id)))
                     username_field.clear()
                     username_field.send_keys(username.strip().upper())
                     # Assuming captcha solving is required here; implement as needed.
@@ -200,7 +200,7 @@ class Scrape_Website(BaseScraper):
                         print("Captcha error, retrying...")
                         refresh_button = self.config['refresh_button']
                         if refresh_button:
-                            refresh = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, refresh_button)))
+                            refresh = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, refresh_button)))
                             refresh.click()
                         continue  # Retry captcha solving
                     elif error_type == "no_error":
@@ -237,7 +237,7 @@ class Scrape_Website(BaseScraper):
         if captcha_type == 'bigshare' or captcha_type == 'kfintech':
             captcha_input = predict_captcha(self.driver,captcha_type)# Replace with actual captcha solution logic
             captcha_id = self.config['captcha_field']
-            captcha_field = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, captcha_id)))
+            captcha_field = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, captcha_id)))
             captcha_field.clear()
             captcha_field.send_keys(captcha_input)
         submit_id = self.config['submit_button']
@@ -266,18 +266,18 @@ class Scrape_Website(BaseScraper):
         if self.config['website_name'] == 'kfintech':
             try:
                 error_message = self.config['error_message']
-                message_element = WebDriverWait(self.driver, 10).until(
+                message_element = WebDriverWait(self.driver, 5).until(
                     EC.presence_of_element_located((By.CLASS_NAME, error_message)))
                 message_text = message_element.text
                 close_dialog = self.config['close_dialog']
                 if close_dialog:
-                    close_button = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, close_dialog)))
+                    close_button = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, close_dialog)))
                     close_button.click()
                 if self.config['website_name'] == 'kfintech':
                     known_captcha_errors = ["CAPTCHA is invalid or Expired", "Captcha is invalid."]
                     # Check if the message matches known captcha errors
                     matching_option, confidence = process.extractOne(message_text, known_captcha_errors)
-                    if confidence >= 100:  # Adjust threshold as needed    
+                    if confidence >= 50:  # Adjust threshold as needed    
                         return "captcha_error"
                 return message_text
             except TimeoutException:
@@ -289,7 +289,7 @@ class Scrape_Website(BaseScraper):
         elif self.config['website_name'] == 'bigshare':
             try:
                 error_message = self.config['error_message']
-                message_element = WebDriverWait(self.driver, 10).until(
+                message_element = WebDriverWait(self.driver, 5).until(
                     EC.presence_of_element_located((By.CLASS_NAME, error_message)))
                 message_text = 'No Record Found'
                 close_dialog = self.config['close_dialog']
@@ -321,7 +321,7 @@ class Scrape_Website(BaseScraper):
         elif self.config['website_name'] == 'linkin':    
             try:
                 try:
-                    # Wait up to 10 seconds for the alert to be present
+                    # Wait up to 5 seconds for the alert to be present
                     WebDriverWait(self.driver, 5).until(EC.alert_is_present())
 
                     # Switch to the alert
@@ -369,15 +369,15 @@ class Scrape_Website(BaseScraper):
         
         if self.config['website_name'] == 'kfintech':
             try:
-                securities_allotted = int(WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text)
+                securities_allotted = int(WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text)
                 result_data = {
-                    'application_number': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_l1']"))).text,
-                    'category': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label1']"))).text,
-                    'name': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text,
-                    'client_id': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_dpclid']"))).text,
-                    'pan': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_pan']"))).text,
-                    'applied': int(WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label5']"))).text),
+                    'name': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text,
+                    'category': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label1']"))).text,
                     'securities_allotted': securities_allotted,
+                    'applied': int(WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label5']"))).text),
+                    'pan': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_pan']"))).text,
+                    'client_id': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_dpclid']"))).text,
+                    'application_number': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_l1']"))).text,
                     'error' : None
                 }
                 if securities_allotted > 0:
@@ -403,11 +403,11 @@ class Scrape_Website(BaseScraper):
                 except ValueError:
                     pass
                 result_data = {
-                    'application_no': label_elements[0].text,
-                    'dp_id': label_elements[1].text,
                     'name': label_elements[2].text,
-                    'applied': int(label_elements[3].text),
                     'alloted': alloted,
+                    'applied': int(label_elements[3].text),
+                    'dp_id': label_elements[1].text,
+                    'application_no': label_elements[0].text,
                     'error' : None
                 }
                 if type(alloted) == int:
@@ -422,36 +422,45 @@ class Scrape_Website(BaseScraper):
         
         elif self.config['website_name'] == 'linkin':
             try:
-                output_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, 'tbl_DetSec')))
+                output_element = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, 'tbl_DetSec')))
                 
                 if output_element : 
                     tables = self.driver.find_elements(By.CSS_SELECTOR, '#tbl_DetSec table')
 
                     for i,table in enumerate(tables,1):
                         # Use CSS selectors to extract data from the table
-                        applicant_name = table.find_element(By.XPATH, "//td[text()='Sole / 1st Applicant']/following-sibling::td").text
+                        applicant_name = table.find_element(By.XPATH, ".//td[text()='Sole / 1st Applicant']/following-sibling::td").text
                         if applicant_name == '':
                             applicant_name = 'Client/Id not found'
-                        securities_applied = int(table.find_element(By.XPATH, "//td[text()='Securities applied']/following-sibling::td").text)
-                        cutoff_price = int(table.find_element(By.XPATH, "//td[text()='Cut off Price']/following-sibling::td").text)
-                        securities_allotted = int(table.find_element(By.XPATH, "//td[text()='Securities Allotted']/following-sibling::td").text)
-                        amount_adjusted = int(table.find_element(By.XPATH, "//td[text()='Amount Adjusted']/following-sibling::td").text)
+                        securities_applied = int(table.find_element(By.XPATH, ".//td[text()='Securities applied']/following-sibling::td").text)
+                        cutoff_price = int(table.find_element(By.XPATH, ".//td[text()='Cut off Price']/following-sibling::td").text)
+                        securities_allotted = int(table.find_element(By.XPATH, ".//td[text()='Securities Allotted']/following-sibling::td").text)
+                        amount_adjusted = int(table.find_element(By.XPATH, ".//td[text()='Amount Adjusted']/following-sibling::td").text)
                         heading_text = table.find_element(By.CSS_SELECTOR, 'tr.heading_table th span').text
-                        formtype = heading_text.split(' - ')[1]
+                        formtype = heading_text.split(' - ')[1] 
                         if securities_allotted > 0:
                             self.allotment += 1
                             self.total_shares += securities_allotted
                             print(f" Alloted : {self.allotment}")
                             print(f" Total shares : {self.total_shares}")
+                        
                         result_data = {
                             'applicant_name' : applicant_name,
+                            'Type': formtype,
+                            'shares_allotted': securities_allotted,
                             'shares_applied': securities_applied,
                             'application_amount': cutoff_price,
-                            'shares_allotted': securities_allotted,
                             'amount_adjusted': amount_adjusted,
-                            'Type': formtype,
                             'error' : None
                         }
+                        if i > 1:
+                            result_data.update({f'Applicant_name_{i}': applicant_name})
+                            result_data.update({f'Form_type_{i}': formtype})
+                            result_data.update({f'Shares_allotted_{i}': securities_allotted})
+                            result_data.update({f'Shares_applied_{i}': securities_applied})
+                            result_data.update({f'Application_amount_{i}': cutoff_price})
+                            result_data.update({f'Amount_adjusted_{i}': amount_adjusted})
+
                 return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
@@ -459,7 +468,7 @@ class Scrape_Website(BaseScraper):
 
         elif self.config['website_name'] == 'skyline':
             try:
-                div_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, "fullwidth.resultsec")))
+                div_element = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.CLASS_NAME, "fullwidth.resultsec")))
                 self.driver.execute_script("arguments[0].scrollIntoView();", div_element)
                 print("Scrolled to the element -> ", div_element)
                 applicant_name =  div_element.find_elements(By.TAG_NAME,"p")
@@ -468,10 +477,10 @@ class Scrape_Website(BaseScraper):
                     shares_allotted = int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(3)")[0].text)
                     result_data = {
                     'applicant_name' : div_element.find_elements(By.TAG_NAME,"p")[1].text.split(" : ")[1],
-                    'pan_number' : div_element.find_elements(By.TAG_NAME,"p")[4].text.split(" : ")[1],
-                    'shares_applied': float(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(1)")[0].text),
-                    'application_amount': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(2)")[0].text),
                     'shares_allotted': shares_allotted,
+                    'shares_applied': float(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(1)")[0].text),
+                    'pan_number' : div_element.find_elements(By.TAG_NAME,"p")[4].text.split(" : ")[1],
+                    'application_amount': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(2)")[0].text),
                     'amount_adjusted': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(4)")[0].text),
                     'amount_refunded': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(5)")[0].text),
                     'status': div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(9)")[0].text,
@@ -506,13 +515,13 @@ class Scrape_Website(BaseScraper):
         elif self.config['website_name'] == 'purva':
             try:
                 result_data = {
-                    'application_number': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_l1']"))).text,
-                    'category': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label1']"))).text,
-                    'name': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text,
-                    'client_id': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_dpclid']"))).text,
-                    'pan': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_pan']"))).text,
-                    'applied': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label5']"))).text,
-                    'securities_allotted': WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text,
+                    'application_number': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_l1']"))).text,
+                    'category': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label1']"))).text,
+                    'name': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text,
+                    'client_id': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_dpclid']"))).text,
+                    'pan': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_pan']"))).text,
+                    'applied': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label5']"))).text,
+                    'securities_allotted': WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text,
                     'error' : None
                 }
                 return result_data
@@ -595,7 +604,7 @@ class Scrape_Website(BaseScraper):
             try:
                 back_id = self.config['back_button']
                 if back_id:
-                    back_button = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.ID, back_id)))
+                    back_button = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, back_id)))
                     back_button.click()
                     # print("Going back to the initial form...")
                 else:
@@ -698,53 +707,6 @@ website_configs = {
     # Define configurations for other websites similarly
 }
 
-
-# # # Path to your Excel file
-
-# # Example usage: To be taken from the user
-# file_path = 'jana.xlsx'
-# df = pd.read_excel(file_path)
-# column_index = 'B'
-# start_row = 15
-# end_row = 25
-# # end_row = None
-
-# usernames = process_excel_data(df, column_index, start_row, end_row)
-
-
-
-# --website_and_ipo_name-- #
-
-# company = "skyline"
-# ipo = "Alpex" # skyline
-
-# company = "linkin"
-# ipo = "capital" # linkin
-
-# company = "kfintech"
-# ipo = "jana" # kfintech
-
-# company = "bigshare"
-# ipo = "nova" # bigshare
-
-# company = "purva"
-# ipo = None
-
-# ---pan_name--- #
-# usernames = ["ABVFA3322P","HQTPS3086L","AIJPS0335D","AABHD3347","ANDPS8030N","ADOPS3545D"]  # List of usernames
-
-# scraper = Scrape_Website(driver_path,company, headless)
-
-# results = scraper.run(ipo, usernames)
-
-# with open(f"{ipo}.json", "w") as file:
-#     json.dump(results, file) # Save the results to a JSON file
-
-# # print(results)
-
-# # # Data Printing
-
-
 def scrape_data_from_websites(driver_path, company, ipo, usernames, headless=False):
     """
     Scrape data from multiple websites based on the given company and IPO.
@@ -763,12 +725,6 @@ def scrape_data_from_websites(driver_path, company, ipo, usernames, headless=Fal
     results = scraper.run(ipo, usernames)
     print_details(company, ipo, results)
     return results
-
-
-# Writing to Excel
-
-# Example usage
-# write_in_excel(file_path, df,results)
 
 class IPODetailsScraper(BaseScraper):
 
@@ -833,5 +789,5 @@ class IPODetailsScraper(BaseScraper):
         # print("Aqua IPOs:", ipo_details_aqua)  # Adjust usage based on actual presence
         self.close()
         return ipo_details_green, ipo_details_lightyellow, ipo_details_aqua
-    
+
     

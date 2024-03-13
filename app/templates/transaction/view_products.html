@@ -63,61 +63,6 @@
         <!-- End of each product card -->
         {% endfor %}
     </div>
-
-
-<!-- List of all products in card format -->
-<div class="row products">
-    <div class="col-md-12 col-lg-12 col-sl-12">
-        <div class="card-deck">
-            <!-- Get all products from the database -->
-            {% for product in products %}
-            <div class="card">
-                <!-- <div class="card-img"><div class="img"></div></div> -->
-                <div class="card-title">{{ product.name.upper() }}</div>
-                <div class="card-subtitle"> Open Date : {{product.open_date}} </div>
-                <div class="card-subtitle">End Date : {{product.close_date}} </div>
-                <div class="card-subtitle">Listing Date : {{product.listing_date}} </div>
-                <div class="card-subtitle"> Price : {{product.price}} </div>
-                <div class="card-subtitle"> Issue Size : {{product.issue_size}} </div>
-                <div class="card-subtitle"> Lot Size : {{product.lot_size}} </div>
-                <div class="card-subtitle"> Listing At : {{product.listing_at}} </div>
-                <div class="card-subtitle"> Status : {{product.status}} </div>
-
-                <hr class="card-divider">
-                <div class="card-footer">
-
-                    {% if current_user.type == 'seller' %}
-                    <div class="card-price"><span>Sell: </span></div>
-                    <a class="card-btn" href="{{ url_for('add_details',product_id = product.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                            <path
-                                d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z">
-                            </path>
-                            <path
-                                d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z">
-                            </path>
-                            <path
-                                d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z">
-                            </path>
-                            <path
-                                d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z">
-                            </path>
-                        </svg>
-                    </a>
-                    {% elif current_user.type == 'buyer' %}
-                    <div class="card-price"><span>Sell: </span></div>
-                    <a class="card-btn" href="{{ url_for('edit_product',product_id = product.id) }}"></a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-            <!-- End of getting all products from the database -->
-        </div>
-    </div>
-
-</div>
-
-<!-- End of list of all products in card format -->
 </div>
 {% endblock %}
 

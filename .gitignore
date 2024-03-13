@@ -1,11 +1,11 @@
 migrations/
 upload_folder/
 logs/
-myflaskapp/app/__pycache__/
-myflaskapp/__pycache__/
-myflaskapp/json/
+app/__pycache__/
+__pycache__/
+json/
 exicon.json
 GPT.json
 platinum.json
-myflaskapp/app/captcha.png
+app/captcha.png
 ```
