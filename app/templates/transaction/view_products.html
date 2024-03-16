@@ -1,196 +1,311 @@
 {% extends 'base.html' %}
 
 {% block current_user_content %}
-<div class="container-fluid content">
 
-    <!-- Flash message -->
-    {% include '_flash_message.html' %}
-    <!-- End of flash message -->
+<!DOCTYPE html>
+<html lang="en">
 
-    <!-- Page title -->
-    <div class="row">
-        <div class="col-md-12">
-            <h1 class="mt-4 mb-4">{{ title }} ({{ all_products }})</h1>
-        </div>
-    </div>
-    <!-- End of page title -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- List of all products in card format -->
-    <div class="row">
+
+    <title>All Ipos</title>
+
+
+    <!-- plausible -->
+    <script defer event-user="unregistered" data-domain="screener.in"
+        src="https://plausible.screener.in/js/script.pageview-props.tagged-events.js"></script>
+    <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
+
+
+    <link rel="stylesheet" href="../../static/css/product.css" media="all">
+    <link rel="stylesheet" href="../../static/css/product1.css" media="all">
+    <link rel="stylesheet" href="../../static/css/product2.css" media="all">
+
+
+    <style>
+        .outer-card {
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            /* Padding inside the outer card for space around the inner card */
+        }
+
+        .inner-card {
+            margin: 15px;
+            margin-top: 30px;
+            /* Space between title and inner card */
+            border-radius: 8px;
+            /* margin-bottom: 20px; Space between inner card and bottom of outer card */
+            padding: 20px;
+            /* Padding inside the inner card */
+            /* background-color: #f8f9fa; Optional: different background color for the inner card */
+        }
+
+        .card-title {
+            word-wrap: break-word;
+            /* Ensures the title breaks to prevent overflow */
+        }
+
+        @media (max-width: 768px) {
+            .outer-card {
+                padding: 10px;
+                /* Smaller padding on smaller devices */
+            }
+
+            .inner-card {
+                margin: 10px 0;
+                /* Adjust margin */
+            }
+
+            .card-title {
+                font-size: 16px;
+                /* Smaller font size */
+            }
+
+            .grid-container {
+                font-size: 16px;
+            }
+        }
+
+        .key2 {
+            align-items: center;
+            box-sizing: border-box;
+            display: flex;
+            height: 47.4px;
+            justify-content: space-between;
+            margin: 0;
+            padding: 12px;
+            width: 293.763px;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
+            font-size: 15px;
+            font-weight: 400;
+            letter-spacing: -0.135px;
+            line-height: 23.4px;
+            text-align: left;
+            color: rgb(96, 111, 123);
+            background-color: rgb(255, 255, 255);
+            border-radius: 6px;
+            /* Other properties related to borders, background, and list styles can be omitted
+     if they do not apply or default values are intended to be used. */
+        }
+
+
+        .grid-container {
+            margin-top: 24px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 24px 16px;
+
+            /* font-size: 1.5rem; */
+            letter-spacing: var(--letter-spacing-15);
+        }
+    </style>
+
+
+    <!-- PWA manifest -->
+
+    <!-- favicons -->
+    <!-- <link rel="apple-touch-icon" sizes="180x180"
+        href="https://cdn-static.screener.in/favicon/apple-touch-icon.b6e5f24bf7d3.png">
+    <link rel="icon" type="image/png" sizes="32x32"
+        href="https://cdn-static.screener.in/favicon/favicon-32x32.00205914303a.png">
+    <link rel="icon" type="image/png" sizes="16x16"
+        href="https://cdn-static.screener.in/favicon/favicon-16x16.2b35594b2f33.png">
+    <link rel="mask-icon" href="https://cdn-static.screener.in/favicon/safari-pinned-tab.adbe3ed3c5ad.svg"
+        color="#8ED443"> -->
+</head>
+
+<body class="light flex-column">
+
+    <main class="flex-grow container">
+
         {% for product in products %}
-        <!-- Each product card -->
-        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 mb-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h4 class="card-title" style="font-family: Palatino bold ">{{ product.name.upper() }}</h4>
-                    <div class="card-subtitle"> Open Date : {{product.open_date}} </div>
-                    <div class="card-subtitle">End Date : {{product.close_date}} </div>
-                    <div class="card-subtitle">Listing Date : {{product.listing_date}} </div>
-                    <div class="card-subtitle"> Price : {{product.price}} </div>
-                    <div class="card-subtitle"> Issue Size : {{product.issue_size}} </div>
-                    <div class="card-subtitle"> Lot Size : {{product.lot_size}} </div>
-                    <div class="card-subtitle"> Listing At : {{product.listing_at}} </div>
-                    <div class="card-subtitle"> Status : {{product.status}} </div>
-                    <!-- Add more product details here -->
+
+
+        <div class="card card-large" id="top">
+            <div class="flex flex-space-between flex-gap-8">
+                <div class="flex-row flex-wrap flex-align-center flex-grow">
+                    <h3 class="h3 shrink-text">{{product.name.upper()}}</h1>
+                        <div class="ink-600 show-from-tablet-landscape" style="opacity: 0.5;">
+                            <i class="icon-dot"></i>
+                        </div>
                 </div>
-                <div class="card-footer">
-                    <!-- Your buttons/links for each product -->
-                    {% if current_user.type == 'seller' %}
-                    <div class="card-price"><span>Sell: </span></div>
-                    <a class="card-btn" href="{{ url_for('add_details',product_id = product.id) }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                            <path
-                                d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z">
-                            </path>
-                            <path
-                                d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z">
-                            </path>
-                            <path
-                                d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z">
-                            </path>
-                            <path
-                                d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z">
-                            </path>
-                        </svg>
-                    </a>
-                    {% elif current_user.type == 'buyer' %}
-                    <div class="card-price"><span>Sell: </span></div>
-                    <a class="card-btn" href="{{ url_for('edit_product',product_id = product.id) }}"></a>
-                    {% endif %}
+
+
+
+                <!-- 
+                <form method="post" class="flex margin-0" style="align-items: center">
+                    <input type="hidden" name="csrfmiddlewaretoken"
+                        value="xk7Vr1AByKm2FwO6d6znWvSJoM0MshRzFzcFGVl3ZUMZlg0FxH26M75nbi8Z649K">
+                    <input type="hidden" name="next" value="/company/506852/">
+
+
+                    <button class="margin-right-8 plausible-event-name=Excel+Company plausible-event-user=unregistered"
+                        formaction="/user/company/export/722/" aria-label="Export to Excel">
+                        <i class="icon-download"></i>
+                        <span class="hide-on-mobile">Export to Excel</span>
+                    </button>
+
+
+                    <div class="dropdown-filter" id="add-to-sublists">
+
+                        <button formaction="/api/company/2597/add/" class="button-primary no-margin">
+                            <i class="icon-plus"></i> Follow
+                        </button>
+
+                        <div id="company-in-sublists" class="hidden"></div>
+                    </div>
+                </form>
+                 -->
+            </div>
+
+
+            <div class="company-info">
+                <div class="company-ratios">
+                    <ul id="top-ratios">
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+
+                                Issue Size
+
+                            </span>
+
+                            <span class="nowrap value">
+
+
+
+                                <span class="number"> {{product.issue_size}}</span>
+
+                                Cr.
+
+                            </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+                                Price
+                            </span>
+
+                            <span class="nowrap value">
+                                <span class="number">{{product.price}}</span>
+                            </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+                                Listing On
+                            </span>
+
+
+                            <span class="nowrap value">
+                                <span class="number"> {{product.listing_at}} </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+
+                                Open Date
+
+                            </span>
+
+
+                            <span class="nowrap value">
+
+                                <span class="number"> {{product.open_date.strftime('%b %d, %Y')}} </span>
+
+                            </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+
+                                Close Date
+
+                            </span>
+
+
+                            <span class="nowrap value">
+
+
+
+                                <span class="number">{{product.close_date.strftime('%b %d, %Y')}}</span>
+
+                            </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+
+                                Listing Date
+
+                            </span>
+
+
+                            <span class="nowrap value">
+
+                                <span class="number"> {{product.listing_date.strftime('%b %d, %Y')}} </span>
+
+                            </span>
+
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+                                Lot Size
+                            </span>
+                            <span class="nowrap value">
+                                <span class="number">{{product.lot_size}}</span>
+                            </span>
+                        </li>
+
+                        <li class="flex flex-space-between" data-source="default">
+                            <span class="name">
+                                Status
+                            </span>
+                            <span class="nowrap value">
+                                <span class="number">{{product.status}}</span>
+                            </span>
+                        </li>
+
+
+                    </ul>
+                    <!-- 
+                    <div style="margin-top: 32px;">
+
+                        <div class="flex-row flex-space-between flex-baseline flex-gap-16">
+                            <div class="dropdown-typeahead flex-grow" style="max-width: 480px;">
+                                <input id="quick-ratio-search" type="text" placeholder="eg. Promoter holding"
+                                    style="width: 100%;">
+                            </div>
+
+
+                            <a href="/user/quick_ratios/?next=/company/506852/" class="smaller">
+                                <i class="icon-pencil"></i>
+                                <span class="upper font-weight-500 letter-spacing">Edit ratios</span>
+                            </a>
+                        </div>
+                    </div>
+                     -->
                 </div>
             </div>
         </div>
-        <!-- End of each product card -->
         {% endfor %}
-    </div>
-</div>
-{% endblock %}
+        </div>
+        </div>
 
-{% block current_user_scripts %}
-<script>
-    $(document).ready(function () {
-        // No need for DataTables initialization if displaying cards
-    });
-</script>
-<style>
-    /* before adding the img to the div with the 
-"card-img" class, remove css styles 
-.card-img .img::before and .card-img .img::after,
-then set the desired styles for .card-img. */
-    /* Container holding cards */
-    .products .card-deck {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        gap: 20px;
-        /* Adjust based on your preference */
-    }
 
-    .card {
-        --font-color: #323232;
-        --font-color-sub: #666;
-        --bg-color: #fff;
-        --main-color: #323232;
-        --main-focus: #2d8cf0;
-        width: 230px;
-        height: 300px;
-        
-        background: var(--bg-color);
-        border: 2px solid var(--main-color);
-        box-shadow: 4px 4px var(--main-color);
-        border-radius: 5px;
-        display: flex;
-        flex-direction: column;
-        flex: 0 1 230px;
-        /* justify-content: flex-start; */
-        padding: 20px;
-        gap: 10px;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
+    </main>
 
-    /* Responsive adjustments */
-    @media (max-width: 768px) {
-        .card {
-            flex: 0 1 45%;
-            /* Make cards take roughly half the width on smaller screens */
-        }
-    }
+</body>
 
-    @media (max-width: 480px) {
-        .card {
-            flex: 0 1 100%;
-            /* Stack cards on very small screens */
-        }
-    }
+</html>
 
-    .card-title {
-        font-size: 20px;
-        font-weight: 500;
-        text-align: center;
-        color: var(--font-color);
-    }
-
-    .card-subtitle {
-        font-size: 14px;
-        font-weight: 400;
-        color: var(--font-color-sub);
-    }
-
-    .card-divider {
-        width: 100%;
-        border: 1px solid var(--main-color);
-        border-radius: 50px;
-    }
-
-    .card-footer {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .card-price {
-        font-size: 20px;
-        font-weight: 500;
-        color: var(--font-color);
-    }
-
-    .card-price span {
-        font-size: 20px;
-        font-weight: 500;
-        color: var(--font-color-sub);
-    }
-
-    .card-btn {
-        height: 35px;
-        background: var(--bg-color);
-        border: 2px solid var(--main-color);
-        border-radius: 5px;
-        padding: 0 15px;
-        transition: all 0.3s;
-    }
-
-    .card-btn svg {
-        width: 100%;
-        height: 100%;
-        fill: var(--main-color);
-        transition: all 0.3s;
-    }
-
-    .card-img:hover {
-        transform: translateY(-3px);
-    }
-
-    .card-btn:hover {
-        border: 2px solid var(--main-focus);
-    }
-
-    .card-btn:hover svg {
-        fill: var(--main-focus);
-    }
-
-    .card-btn:active {
-        transform: translateY(3px);
-    }
-</style>
 {% endblock %}

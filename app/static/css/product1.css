@@ -1,0 +1,973 @@
+/* Base Styles
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+/* NOTE
+html is set to 62.5% so that all the REM measurements throughout Skeleton
+are based on 10px sizing. So basically 1.5rem = 15px :) */
+
+html {
+    font-size: 62.5%;
+    font-family: "Inter", sans-serif;
+}
+
+i {
+    font-family: "fontello", sans-serif;
+}
+
+@supports (font-variation-settings: normal) {
+    html {
+        font-family: "Inter var", "Inter", sans-serif;
+        text-rendering: optimizeLegibility;
+    }
+}
+
+/* Colors for themes */
+body {
+    --base-hsl: 0, 0%, 100%;
+    /* constant colors */
+    --black: hsl(240, 16%, 16%);
+    --white: hsl(0, 0%, 100%);
+    --white-700: hsl(212, 79%, 85%);
+
+    /* colors */
+    --base: var(--white);
+    --page-base: hsl(218, 34%, 96%);
+    --page-base-gradient: linear-gradient(
+        177deg,
+        hsla(218, 36%, 93%, 0.64) 29%,
+        hsla(0, 0%, 100%, 0.64) 150%
+    );
+
+    --ink-900: var(--black);
+    --ink-700: hsl(207, 12%, 43%);
+    --ink-600: hsla(207, 12%, 43%, 0.8);
+
+    --link: hsl(243, 93%, 67%);
+    --link-hover: hsl(243, 96%, 67%);
+    --link-icons: hsl(243, 97%, 68%);
+    --link-mute: hsla(243, 97%, 68%, 0.5);
+    --link-visited: hsl(243, 85%, 37%);
+
+    --button-border: hsla(0, 0%, 59%, 0.5);
+    --button-background: var(--base);
+    --button-primary: var(--link);
+    --button-primary-hover: var(--link-hover);
+
+    --border-color: hsla(216, 41%, 87%, 0.8);
+    --partition: hsl(223, 33%, 96%);
+    --stripes-dark: hsl(245, 40%, 97%);
+    --stripes: hsl(245, 40%, 98%);
+    --stripes-light: hsl(245, 40%, 99%);
+    --lines: hsl(215, 42%, 90%);
+
+    --input-border: var(--button-border);
+
+    --bg-light-blue: hsla(236, 96%, 70%, 0.08);
+    --bg-light-blue-border: 1px solid hsla(234, 77%, 60%, 0.04);
+
+    --red: hsl(10, 94%, 44%);
+
+    --error-bg: hsl(33, 68%, 95%);
+    --error-border: hsla(29, 100%, 45%, 0.4);
+    --success-bg: hsl(207, 68%, 98%);
+    --success-border: hsla(210, 100%, 45%, 0.4);
+
+    --pros: hsl(163, 70%, 70%);
+    --cons: hsl(360, 73%, 83%);
+
+    --up: hsl(89, 89%, 38%);
+    --down: hsl(0, 89%, 63%);
+
+    --inserts-bg: hsl(115, 91%, 96%);
+    --inserts-text: hsl(89, 90%, 27%);
+    --deletes-bg: hsl(0, 100%, 97%);
+    --deletes-text: hsl(0, 89%, 63%);
+
+    --chart-price: var(--link);
+    --chart-volume: hsl(220, 95%, 87%);
+}
+
+body.dark {
+    --base-hsl: 224, 19%, 16%;
+    --base: hsl(224, 19%, 16%);
+    --page-base: hsl(227, 22%, 10%);
+    --page-base-gradient: linear-gradient(
+        177deg,
+        hsl(227, 22%, 10%) 29%,
+        hsl(0, 0%, 0%) 150%
+    );
+
+    --ink-900: hsl(0, 0%, 100%);
+    --ink-700: hsl(224, 25%, 77%);
+    --ink-600: hsl(224, 14%, 55%);
+
+    --link: hsl(233, 100%, 71%);
+    --link-hover: hsl(233, 100%, 76%);
+    --link-icons: hsl(233, 100%, 71%);
+    --link-mute: hsla(233, 100%, 71%, 0.4);
+    --link-visited: hsl(233, 30%, 60%);
+
+    --button-border: hsl(224, 21%, 12%);
+    --button-background: hsl(224, 21%, 12%);
+    --button-primary: hsl(236, 88%, 61%);
+    --button-primary-hover: hsl(236, 88, 70%);
+
+    --border-color: hsla(224, 22%, 53%, 0.32);
+    --partition: hsla(224, 22%, 53%, 0.64);
+    --stripes-dark: hsl(224, 40%, 5%);
+    --stripes: hsl(224, 22%, 10%);
+    --stripes-light: hsl(225, 21%, 10%);
+    --lines: hsla(224, 22%, 53%, 0.32);
+
+    --input-border: var(--button-border);
+
+    --error-bg: hsl(33, 85%, 15%);
+    --error-border: hsl(33, 85%, 15%);
+    --success-bg: hsl(224, 85%, 15%);
+    --success-border: hsla(224, 85%, 15%);
+}
+
+body.dark .logo {
+    filter: invert(0.5) brightness(2);
+}
+
+@media (prefers-color-scheme: dark) {
+    body.auto {
+        --base-hsl: 224, 19%, 16%;
+        --base: hsl(224, 19%, 16%);
+        --page-base: hsl(227, 22%, 10%);
+        --page-base-gradient: linear-gradient(
+            177deg,
+            hsl(227, 22%, 10%) 29%,
+            hsl(0, 0%, 0%) 150%
+        );
+
+        --ink-900: hsl(0, 0%, 100%);
+        --ink-700: hsl(224, 25%, 77%);
+        --ink-600: hsl(224, 14%, 55%);
+
+        --link: hsl(233, 100%, 71%);
+        --link-hover: hsl(233, 100%, 76%);
+        --link-icons: hsl(233, 100%, 71%);
+        --link-mute: hsla(233, 100%, 71%, 0.4);
+        --link-visited: hsl(233, 30%, 60%);
+
+        --button-border: hsl(224, 21%, 12%);
+        --button-background: hsl(224, 21%, 12%);
+        --button-primary: hsl(236, 88%, 61%);
+        --button-primary-hover: hsl(236, 88, 70%);
+
+        --border-color: hsla(224, 22%, 53%, 0.32);
+        --partition: hsla(224, 22%, 53%, 0.64);
+        --stripes-dark: hsl(224, 40%, 5%);
+        --stripes: hsl(224, 22%, 10%);
+        --stripes-light: hsl(225, 21%, 10%);
+        --lines: hsla(224, 22%, 53%, 0.32);
+
+        --input-border: var(--button-border);
+
+        --error-bg: hsl(33, 85%, 15%);
+        --error-border: hsl(33, 85%, 15%);
+        --success-bg: hsl(224, 85%, 15%);
+        --success-border: hsla(224, 85%, 15%);
+    }
+
+    body.auto .logo {
+        filter: invert(0.5) brightness(2);
+    }
+}
+
+/* Derived */
+body {
+    /* derived */
+    --top-nav-bg: var(--base);
+    --top-nav-text: var(--ink-700);
+    --sub-nav-bg: var(--stripes);
+    --sub-nav-text: var(--ink-600);
+
+    /* sizes */
+    --golden-small-width: 38.19661%;
+    --golden-large-width: 61.80339%;
+}
+
+/* margins */
+html {
+    --margin-tiny: 6px;
+    --margin-small: 12px;
+    --margin-medium: 20px;
+    --margin-large: 30px;
+    --margin-x-large: 60px;
+}
+
+@media (min-width: 768px) {
+    html {
+        --margin-tiny: 8px;
+        --margin-small: 16px;
+        --margin-medium: 32px;
+        --margin-large: 48px;
+        --margin-x-large: 96px;
+    }
+}
+
+/* body */
+
+body {
+    font-size: 1.6rem;
+    letter-spacing: -0.011em;
+    /* currently ems cause chrome bug misinterpreting rems on body element */
+    line-height: 1.56;
+    font-weight: 400;
+    color: #222;
+    color: var(--ink-900);
+    background-color: #f1f1f1;
+    background-color: var(--page-base);
+    background-image: var(--page-base-gradient);
+    min-height: 100vh;
+    scroll-behavior: smooth;
+}
+
+/* Typography
+Used: https://type-scale.com/ for sizes
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+html {
+    --letter-spacing-13: -0.003em;
+    --letter-spacing-14: -0.006em;
+    --letter-spacing-15: -0.009em;
+    --letter-spacing-16: -0.011em;
+    --letter-spacing-17: -0.013em;
+    --letter-spacing-18: -0.014em;
+    --letter-spacing-19: -0.015em;
+    --letter-spacing-button: 0.1em;
+}
+
+h1,
+h2,
+h3,
+.heading-spacing {
+    margin: 0.67em 0;
+    text-wrap: balance;
+}
+
+@media (min-width: 992px) {
+    h1,
+    h2,
+    h3,
+    .heading-spacing {
+        /* we can remove top margin on headings
+        as nav adds the margin */
+        margin-top: 0;
+    }
+}
+
+h1,
+h2,
+h3,
+.h1,
+.h2,
+.h3 {
+    font-weight: 500;
+}
+
+h1,
+.h1 {
+    font-size: 2.8rem;
+    line-height: 1.214;
+    letter-spacing: -0.019em;
+}
+
+h2,
+.h2,
+article h1 {
+    font-size: 2.2rem;
+    line-height: 1.1818;
+    letter-spacing: -0.018em;
+}
+
+h3,
+.h3 {
+    font-size: 1.9rem;
+    line-height: 1.2105;
+    letter-spacing: -0.016em;
+}
+
+/* Tablet onwards */
+@media (min-width: 768px) {
+    h1,
+    .h1 {
+        font-size: 4rem;
+        line-height: 1.225;
+        letter-spacing: -0.022em;
+    }
+
+    h2,
+    .h2 {
+        font-size: 2.8rem;
+        line-height: 1.214;
+        letter-spacing: -0.019em;
+        
+    }
+
+    h3,
+    .h3 {
+        font-size: 1.9rem;
+        line-height: 1.2105;
+        letter-spacing: -0.016em;
+    }
+}
+
+p {
+    margin: 0.5em 0 1em;
+}
+
+.title {
+    text-transform: uppercase;
+    font-feature-settings: "cpsp" on;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    word-wrap: break-word
+}
+
+.shrink-text {
+    min-width: 40px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    flex-shrink: 2;
+    word-wrap: break-word;
+}
+
+/* Containers */
+html {
+    --container-width: 100%;
+    --container-padding: 20px;
+}
+
+.container {
+    box-sizing: border-box;
+
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
+    width: var(--container-width);
+
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+}
+
+@media (min-width: 768px) {
+    html {
+        --container-padding: 24px;
+    }
+}
+
+@media (min-width: 992px) {
+    html {
+        --container-width: calc(100% - 48px);
+    }
+}
+
+@media (min-width: 1200px) {
+    html {
+        --container-width: calc(100% - 96px);
+    }
+}
+
+@media (min-width: 1400px) {
+    html {
+        --container-width: 90%;
+    }
+}
+
+/* Cards */
+.card {
+    background: white;
+    background: var(--base);
+    box-shadow: 0 16px 20px -24px hsla(219, 37%, 18%, 0.24);
+
+    margin-bottom: 24px;
+    margin-bottom: var(--margin-medium);
+
+    /* cards are like container, but with an outside island */
+    --card-margin: calc(-1 * var(--container-padding));
+    --card-padding: var(--container-padding);
+    margin-left: var(--card-margin);
+    margin-right: var(--card-margin);
+    padding: 20px;
+    padding: var(--card-padding);
+}
+
+.no-card-margin {
+    --card-margin: 0;
+}
+
+.card.card-small {
+    --card-radius: 8px;
+    border-radius: var(--card-radius);
+}
+
+.card h1,
+h2,
+h3 {
+    margin-top: 0;
+    margin-bottom: 0.35em;
+}
+
+@media (min-width: 768px) {
+    .card.card-medium {
+        --card-radius: 12px;
+        border-radius: var(--card-radius);
+    }
+
+    .card.card-medium,
+    .card.card-large {
+        box-shadow: 0 20px 20px -24px hsla(219, 37%, 18%, 0.24);
+    }
+}
+
+@media (min-width: 992px) {
+    .card.card-large {
+        --card-radius: 16px;
+        border-radius: var(--card-radius);
+        box-shadow: 0 23px 20px -24px hsla(219, 37%, 18%, 0.24);
+    }
+}
+
+.fill-card-width {
+    margin-left: calc(-1 * var(--card-padding));
+    margin-right: calc(-1 * var(--card-padding));
+}
+
+.fill-card-width > table tr td:first-child,
+.fill-card-width > table tr th:first-child,
+.fill-card-width #result_list tr td:first-child,
+.fill-card-width #result_list tr th:first-child {
+    padding-left: var(--card-padding);
+}
+
+.fill-card-width > table tr td:last-child,
+.fill-card-width > table tr th:last-child,
+.fill-card-width #result_list tr td:last-child,
+.fill-card-width #result_list tr th:last-child {
+    padding-right: var(--card-padding);
+}
+
+/* Flex */
+.flex {
+    display: -ms-flexbox;
+    display: flex;
+}
+
+.flex-column {
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+.flex-align-center {
+    align-items: center;
+}
+
+.flex-align-baseline {
+    align-items: baseline;
+}
+
+.flex-align-start {
+    align-items: flex-start;
+}
+
+.flex-end {
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.flex-space-between {
+    justify-content: space-between;
+}
+
+.flex-space-around {
+    justify-content: space-around;
+}
+
+.flex-baseline {
+    align-items: baseline;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.flex-shrink {
+    flex-shrink: 1;
+}
+
+.flex-filler {
+    flex-grow: 2;
+}
+
+/* magical flex-row */
+.flex-row {
+    display: -ms-flexbox;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+/* responsive flex for devices */
+.flex-column-mobile {
+    flex-direction: column;
+}
+
+.flex-column-tablet {
+    flex-direction: column;
+}
+
+.flex-column-desktop {
+    flex-direction: column;
+}
+
+@media (min-width: 576px) {
+    .flex-column-mobile {
+        flex-direction: unset;
+    }
+
+    .flex-column-mobile > .width-50-cent {
+        width: 50%;
+    }
+}
+
+@media (min-width: 768px) {
+    .flex-column-tablet {
+        flex-direction: unset;
+    }
+}
+
+/* gaps */
+.gap-4 {
+    gap: 4px;
+}
+
+/* Gutter hack */
+.flex-gap-8 {
+    margin: -4px;
+}
+
+.flex-gap-8 > * {
+    margin: 4px;
+}
+
+.flex-gap-12 {
+    margin: -6px;
+}
+
+.flex-gap-12 > * {
+    margin: 6px;
+}
+
+.flex-gap-16 {
+    margin: -8px;
+}
+
+.flex-gap-16 > * {
+    margin: 8px;
+}
+
+.flex-gap-24 {
+    margin: -12px;
+}
+
+.flex-gap-24 > * {
+    margin: 12px;
+}
+
+.flex-gap-32 {
+    margin: -16px;
+}
+
+.flex-gap-32 > * {
+    margin: 16px;
+}
+
+.flex-gap-48 {
+    margin: -24px;
+}
+
+.flex-gap-48 > * {
+    margin: 24px;
+}
+
+.flex-gap-small {
+    margin: calc(-1 * var(--margin-small));
+}
+
+.flex-gap-small > * {
+    margin: var(--margin-small);
+}
+
+.flex-gap-medium {
+    margin: calc(-1 * var(--margin-medium));
+}
+
+.flex-gap-medium > * {
+    margin: var(--margin-medium);
+}
+
+/* Links */
+a,
+.a {
+    /*
+    This color is aria complied but on darker side.
+    It looks okay for lines and text but not for fills such as button
+    Thus we are using hsl(220, 96%, 56%) for button: brighter
+  */
+    color: var(--link);
+    text-decoration: none;
+}
+
+a:hover,
+.a:hover {
+    color: var(--link-hover);
+}
+
+.mark-visited a:visited,
+.mark-visited .button:visited {
+    color: var(--link-visited);
+}
+
+/* Buttons */
+[disabled] {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.button {
+    display: inline-block;
+    text-align: center;
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+    border: 1px solid var(--button-border);
+    border-radius: 6px;
+
+    padding: 6px 8px;
+    font-size: 1.2rem;
+    letter-spacing: 0em;
+
+    line-height: 1.25;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-feature-settings: "cpsp" on;
+    text-decoration: none;
+    white-space: nowrap;
+    background-color: var(--button-background);
+    color: var(--ink-700);
+}
+
+.button.button-small,
+.button-small {
+    font-size: 1.2rem;
+    padding: 5px 10px;
+}
+
+@media (min-width: 768px) {
+    .button,
+    button,
+    input[type="submit"],
+    input[type="reset"],
+    input[type="button"] {
+        padding: 12px 16px;
+        font-size: 14px;
+        letter-spacing: 0.125em;
+    }
+
+    .button.button-small,
+    .button-small {
+        font-size: 1.3rem;
+        padding: 8px 12px;
+    }
+}
+
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover {
+    color: var(--link-hover);
+}
+
+.button:active,
+button:active,
+input[type="submit"]:active,
+input[type="reset"]:active,
+input[type="button"]:active {
+    color: var(--ink-900);
+    outline: 0;
+}
+
+/* for call to action */
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="button"].button-primary,
+input[type="submit"].razorpay-payment-button {
+    color: #fff;
+    background-color: var(--button-primary);
+    border-color: var(--button-primary);
+}
+
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:active,
+button.button-primary:active,
+input[type="submit"].button-primary:active,
+input[type="button"].button-primary:active,
+input[type="submit"].razorpay-payment-button:active,
+input[type="submit"].razorpay-payment-button:hover {
+    color: #fff;
+    background-color: var(--button-primary-hover);
+}
+
+/* secondary button for important button inside section */
+.button.button-secondary,
+button.button-secondary,
+input[type="submit"].button-secondary,
+input[type="button"].button-secondary {
+    color: var(--link);
+    border-color: var(--link);
+    background-color: var(--button-background);
+}
+
+.button.button-secondary:hover,
+button.button-secondary:hover,
+input[type="submit"].button-secondary:hover,
+input[type="button"].button-secondary:hover {
+    color: var(--link-hover);
+    border-color: var(--link-hover);
+}
+
+/* For buttons to look like link */
+.a,
+.button-plain {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+    font: inherit;
+    letter-spacing: unset;
+    text-align: left;
+    text-transform: unset;
+    text-decoration: inherit;
+}
+
+/* For pseudo buttons to look like text */
+.button-plain {
+    color: inherit;
+}
+
+/* Forms
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+/* extend line-height in normalize to use common line-height */
+input,
+optgroup,
+select,
+textarea {
+    line-height: 1.56;
+}
+
+input[type="search"] {
+    /* Remove iOS rounding */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+.pseudo-textarea,
+select {
+    border: 1.5px solid var(--input-border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    background-color: var(--button-background);
+    transition: border 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    box-sizing: border-box;
+    color: var(--ink-900);
+}
+
+input.small {
+    font-size: 1.4rem;
+    padding: 5px 10px;
+}
+
+textarea,
+.pseudo-textarea {
+    height: auto;
+    min-height: 65px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+    border: 1.5px solid var(--link);
+    outline: 0;
+}
+
+label,
+legend {
+    display: block;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+fieldset {
+    padding: 0;
+    border-width: 0;
+}
+
+label.label-body {
+    font-weight: normal;
+}
+
+label.label-body > span {
+    margin-left: 0.5rem;
+}
+
+/* Lists
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+ul {
+    list-style: disc;
+    padding-left: 16px;
+}
+
+ol {
+    list-style: decimal;
+}
+
+ol,
+ul {
+    margin-top: 0;
+}
+
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+    margin: 1.5rem 0 1.5rem 3rem;
+    font-size: 90%;
+    letter-spacing: var(--letter-spacing-14);
+}
+
+li {
+    margin-bottom: 1rem;
+}
+
+/* Code
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+code {
+    padding: 0.2rem 0.5rem;
+    margin: 0 0.2rem;
+    font-size: 90%;
+    white-space: nowrap;
+    background: #f1f1f1;
+    border: 1px solid #e1e1e1;
+    border-radius: 4px;
+}
+
+pre > code {
+    display: block;
+    padding: 1rem 1.5rem;
+    white-space: pre;
+    overflow: scroll;
+}
+
+/* Tables
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+th,
+td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid var(--lines);
+}
+
+th:first-child,
+td:first-child {
+    padding-left: 0;
+}
+
+th:last-child,
+td:last-child {
+    padding-right: 0;
+}
+
+/* Utilities
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+.u-full-width {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.u-max-full-width {
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Misc
+â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“â€“ */
+hr {
+    margin-top: 3rem;
+    margin-bottom: 3.5rem;
+    border-width: 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.flex hr,
+.flex-row hr {
+    flex-grow: 1;
+}
+
+/* Print CSS */
+@media print {
+    body {
+        background: white;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+}

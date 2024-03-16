@@ -56,8 +56,8 @@ sample Elearning App
     --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
     --bs-body-font-family: var(--bs-font-sans-serif);
     --bs-body-font-size: 1rem;
-    --bs-body-font-weight: 400;
-    --bs-body-line-height: 1.5;
+    --bs-body-font-weight: 490;
+    --bs-body-line--height: 2.9;
     --bs-body-color: #212529;
     --bs-body-bg: #fff;
   }
@@ -79,7 +79,7 @@ sample Elearning App
     font-family: var(--bs-body-font-family);
     font-size: var(--bs-body-font-size);
     font-weight: var(--bs-body-font-weight);
-    line-height: var(--bs-body-line-height);
+    line-height: var(--bs-body-line--height);
     color: var(--bs-body-color);
     text-align: var(--bs-body-text-align);
     background-color: var(--bs-body-bg);
@@ -384,6 +384,7 @@ sample Elearning App
   [type="reset"],
   [type="submit"] {
     -webkit-appearance: button;
+    appearance: button;
   }
   
   button:not(:disabled),
@@ -445,6 +446,7 @@ sample Elearning App
   [type="search"] {
     outline-offset: -2px;
     -webkit-appearance: textfield;
+    appearance: textfield;
   }
   
   /* rtl:raw:
@@ -2415,6 +2417,7 @@ sample Elearning App
     -moz-appearance: none;
     appearance: none;
     -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
     color-adjust: exact;
   }
   

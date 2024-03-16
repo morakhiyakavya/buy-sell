@@ -156,12 +156,12 @@ class IPO(db.Model):
     __tablename__ = 'ipos'
     id = db.Column(db.Integer, primary_key=True, name='pk_ipo_id')
     name = db.Column(db.String(255), nullable=False, unique=True, name='uq_ipo_name')
-    open_date = db.Column(db.String(255), nullable=True)
-    close_date = db.Column(db.String(255), nullable=True)
-    listing_date = db.Column(db.String(255), nullable=True)
     price = db.Column(db.String(255), nullable=True)
     issue_size = db.Column(db.String(255), nullable=True)
     lot_size = db.Column(db.String(255), nullable=True)
+    open_date = db.Column(db.DateTime, nullable=True)
+    close_date = db.Column(db.DateTime, nullable=True)
+    listing_date = db.Column(db.DateTime, nullable=True)
     listing_at = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(255), nullable=False)
 

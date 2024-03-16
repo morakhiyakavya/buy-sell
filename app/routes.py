@@ -1,7 +1,18 @@
+from datetime import datetime
 import json
 import os
-from flask import (render_template, redirect, url_for, flash, request,
-                    session, jsonify, send_file, abort)
+import re
+from flask import (
+    render_template,
+    redirect,
+    url_for,
+    flash,
+    request,
+    session,
+    jsonify,
+    send_file,
+    abort,
+)
 from flask_login import current_user, login_user, logout_user, login_required
 from app.forms import (
     BuyerRegistrationForm,
@@ -19,7 +30,6 @@ from app.forms import (
     PanForm,
     DetailForm,
     AllotmentForm,
-
 )
 from app.models import (
     User,
@@ -37,19 +47,20 @@ from app.email import send_user_private_email, send_login_details
 from app.email import send_password_reset_email, request_account_deletion
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
+
 # Check and Write Allotment in Excel.
 from app.allotment import scrape_data_from_websites, driver_path, IPODetailsScraper
 from app.excel import process_excel_data, write_in_excel
 
 from app import app, db
-  
+
 
 # =========================================
 # USER AUTHENTICATION
 # =========================================
 
 
-def flash_message(): # An base level error message function
+def flash_message():  # An base level error message function
     if current_user.is_authenticated:
         flash(f"As a {current_user.type} you are not authorized to view the page.")
         return redirect(url_for("dashboard"))
@@ -64,9 +75,7 @@ def home():
 
 
 @app.route("/dashboard")
-@login_required
 def dashboard():
-    if current_user.is_authenticated:
         if current_user.type == "buyer":
             return redirect(url_for("buyer_profile"))
         if current_user.type == "seller":
@@ -74,7 +83,9 @@ def dashboard():
         if current_user.type == "admin":
             return redirect(url_for("admin_profile"))
 
-
+@app.route("/idk")
+def idk():
+    return render_template("idk.html")
 # Login
 
 
@@ -215,7 +226,9 @@ def register_buyer():
                 )
                 return redirect(url_for("dashboard"))
             return render_template(
-                "auth/register_current_user.html", title="Register As A Buyer", form=form
+                "auth/register_current_user.html",
+                title="Register As A Buyer",
+                form=form,
             )
     else:
         return flash_message()
@@ -271,6 +284,7 @@ def register_seller():
 
 # Admin registration
 
+
 @app.route("/register/admin", methods=["GET", "POST"])
 @login_required
 def register_admin():
@@ -317,6 +331,7 @@ def register_admin():
     return render_template(
         "auth/register_current_user.html", title="Register An Admin", form=form
     )
+
 
 # =========================================
 # END OF USER AUTHENTICATION
@@ -453,21 +468,22 @@ def delete_admin(username):
     flash(f"{admin.username} has been deleted as an admin")
     return redirect(url_for("all_admins"))
 
+
 @app.route("/del")
 def delete_det():
     admin = Seller(
-                first_name='Shrenik',
-                last_name='Morakhiya',
-                username='shrenik',
-                email='shrenik888@gmail.com',
-                phone_number='7016184560',
-                current_residence='Ahmedabad,Gujarat',
-                confirm_password='kavyaarya123.',
-                buyer_id = 2
-            )
+        first_name="Shrenik",
+        last_name="Morakhiya",
+        username="shrenik",
+        email="shrenik888@gmail.com",
+        phone_number="7016184560",
+        current_residence="Ahmedabad,Gujarat",
+        confirm_password="kavyaarya123.",
+        buyer_id=2,
+    )
 
     # Show actual admin password in registration email
-    session["password"] = 'kavyaarya123.'
+    session["password"] = "kavyaarya123."
     user_password = session["password"]
 
     # Update the database
@@ -496,6 +512,7 @@ def delete_det():
     # db.session.commit()
     # # flash("Product added successfully")
     # return "Done"
+
 
 # Send email to individual admin
 
@@ -691,6 +708,7 @@ def deactivate_buyer(username):
     flash(f"{buyer.username} has been deactivated as a buyer")
     return redirect(url_for("all_buyers"))
 
+
 # Reactivate buyer
 
 
@@ -841,7 +859,6 @@ def seller_profile():
         return flash_message()
 
 
-
 @app.route("/seller/deactivate-account")
 @login_required
 def seller_deactivate_account():
@@ -891,7 +908,7 @@ def compose_direct_email_to_seller(email):
         db.session.add(email)
         db.session.commit()
         flash(f"Sample private email to {seller_username} saved")
-        return redirect(url_for("emails_to_individual_seller"))
+        return redirect(url_for("emails_to_individual_sellers"))
     return render_template(
         "admin/email_seller.html",
         title="Compose Private Email",
@@ -1082,6 +1099,7 @@ def add_product():
     # Add a return statement for cases when the current user type is not 'buyer'
     return flash_message()
 
+
 @app.route("/del-ipo-det")
 def add_ipo_det():
     product = IPO.query.all()
@@ -1090,38 +1108,103 @@ def add_ipo_det():
         db.session.commit()
     return "Done"
 
-@app.route("/get-product")
-def get_product():
-    scraper = IPODetailsScraper(driver_path, 'chittorgarh', headless=True)
 
-    ipo_details_green,ipo_details_lightyellow,ipo_details_aqua = scraper.scrape_ipo_details()
-    # ipo_details_aqua = {'Name': 'Juniper Hotels Limited IPO', 'Open Date': '2021-09-30', 'Close Date': '2021-10-05', 'Listing Date': '2021-10-14', 'Price': '₹ 0', 'Issue Size': '₹ 0', 'Lot Size': '0', 'Listing At': 'BSE SME', 'Status': 'listed'}
+# Getting current ipo from chittorgarh
+@app.route("/get-product") 
+def get_product():
+    scraper = IPODetailsScraper(driver_path, "chittorgarh", headless=True)
+
+    ipo_details_green, ipo_details_lightyellow, ipo_details_aqua = (
+        scraper.scrape_ipo_details()
+    )
     process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua)
     return "DOne"
 
+# ipo status and name assigninig
 def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua):
     # Process green IPOs - Add new
     for ipo in ipo_details_green:
-        if not IPO.query.filter_by(name=ipo['Name']).first():
-            new_ipo = IPO(name=ipo['Name'], open_date=ipo['Open Date'], close_date=ipo['Close Date'],
-                          listing_date=ipo['Listing Date'], price=ipo['Price'], issue_size=ipo['Issue Size'],
-                          lot_size=ipo['Lot Size'], listing_at=ipo['Listing At'], status='Open')
+        if not IPO.query.filter_by(name=ipo["Name"]).first():
+            open_date_sort = datetime.strptime(ipo["Open Date"], "%b %d, %Y")
+            close_date_sort = datetime.strptime(ipo["Close Date"], "%b %d, %Y")
+            listing_date_sort = datetime.strptime(ipo["Listing Date"], "%b %d, %Y")
+            name = clean_name(ipo["Name"])
+        #     if name.upper().endswith(" IPO"):
+        # # Remove the last 4 characters (" IPO") from the name
+        #         name = name[:-4]
+        #     elif name.upper().endswith("IPO"):
+        #         # Remove the last 3 characters ("IPO") from the name
+        #       name = name[:-3]
+        #     elif name.upper().endswith(" LIMITED"):
+        #         # Remove the last 8 characters (" LIMITED") from the name
+        #         name = name[:-8]
+        #     elif name.upper().endswith(" LTD"):
+        #         # Remove the last 4 characters (" LTD") from the name
+        #         name = name[:-4]
+        #     elif name.upper().endswith(" LTD."):
+        #         # Remove the last 5 characters (" LTD.") from the name
+        #         name = name[:-5]
+        #     elif name.upper().endswith(" LIMITED."):
+        #         # Remove the last 9 characters (" LIMITED.") from the name
+        #         name = name[:-9]
+        #     elif name.upper().endswith(" LIMITED "):
+        #         # Remove the last 9 characters (" LIMITED ") from the name
+        #         name = name[:-9]
+        #     elif name.upper().endswith(" PUBLIC LIMITED"):
+        #         # Remove the last 14 characters (" PUBLIC LIMITED") from the name
+        #         name = name[:-14]
+        #     elif name.upper().endswith(" PUBLIC LTD"):
+        #         # Remove the last 10 characters (" PUBLIC LTD") from the name
+        #         name = name[:-10]
+        #     elif name.upper().endswith(" PUBLIC LTD."):
+        #         # Remove the last 11 characters (" PUBLIC LTD.") from the name
+        #         name = name[:-11]
+        #     elif name.upper().endswith(" PUBLIC LIMITED."):
+        #         # Remove the last 15 characters (" PUBLIC LIMITED.") from the name
+        #         name = name[:-15]
+        #     elif name.upper().endswith(" PUBLIC LIMITED "):
+        #         # Remove the last 15 characters (" PUBLIC LIMITED ") from the name
+        #         name = name[:-15]
+                
+            
+            new_ipo = IPO(
+                name=name,
+                price=ipo["Price"],
+                issue_size=ipo["Issue Size"],
+                lot_size=ipo["Lot Size"],
+                open_date= open_date_sort,
+                close_date= close_date_sort,
+                listing_date= listing_date_sort,
+                listing_at=ipo["Listing At"],
+                status="Open",
+            )
             db.session.add(new_ipo)
 
     # Update status for lightyellow and aqua IPOs
-    for status, ipos in [('closed', ipo_details_lightyellow), ('listed', ipo_details_aqua)]:
+    for status, ipos in [
+        ("closed", ipo_details_lightyellow),
+        ("listed", ipo_details_aqua),
+    ]:
         for ipo in ipos:
-            existing_ipo = IPO.query.filter_by(name=ipo['Name']).first()
+            existing_ipo = IPO.query.filter_by(name=ipo["Name"]).first()
             if existing_ipo:
                 existing_ipo.status = status
 
     # Delete IPOs that are no longer aqua
-    listed_ipos_names = [ipo['Name'] for ipo in ipo_details_aqua]
-    for ipo in IPO.query.filter_by(status='listed').all():
+    listed_ipos_names = [ipo["Name"] for ipo in ipo_details_aqua]
+    for ipo in IPO.query.filter_by(status="listed").all():
         if ipo.name not in listed_ipos_names:
             db.session.delete(ipo)
 
     db.session.commit()
+
+def clean_name(name):
+    # Combine all patterns, prioritizing longer/more specific patterns to ensure they're matched first
+    pattern = r'( PUBLIC LIMITED IPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?|LIMITED\.? ?| LTD\.? ?| IPO)$'
+    # Use re.IGNORECASE to make the pattern case-insensitive
+    cleaned_name = re.sub(pattern, '', name, flags=re.IGNORECASE)
+    return cleaned_name
+
 
 # Update Product
 @app.route("/edit-product/<product_id>", methods=["GET", "POST"])
@@ -1164,12 +1247,14 @@ def all_product():
     else:
         return flash_message()
 
+
 # View Product
+
 
 # Read All Product
 @app.route("/view-product")
 @login_required
-def view_product(): # Testing Feature
+def view_product():  # Testing Feature
     buyer_id = None  # Default value, for cases other than "buyer" or "seller"
 
     if current_user.type == "seller":
@@ -1180,6 +1265,8 @@ def view_product(): # Testing Feature
     if buyer_id is not None:
         products = IPO.query.all()
         view_products = len(products)
+        products.sort(key=lambda x: x.listing_date)
+        print("Products -> \n",products)
         return render_template(
             "transaction/view_products.html",
             title="All Products",
@@ -1189,6 +1276,7 @@ def view_product(): # Testing Feature
     elif current_user.type == "admin":
         products = IPO.query.all()
         view_products = len(products)
+        products.sort(key=lambda x: x.listing_date)
         return render_template(
             "transaction/view_products.html",
             title="All Products",
@@ -1214,7 +1302,7 @@ def delete_product(id):
 
 
 # --------------
-# End Of Curd On Products 
+# End Of Curd On Products
 # --------------
 
 
@@ -1256,7 +1344,6 @@ def add_pan():
 
     # Add a return statement for cases when the current user type is not 'buyer'
     return flash_message()
-
 
 
 # Update pan
@@ -1343,7 +1430,6 @@ def delete_pan(id):
 # --------------------------------------
 
 
-
 # --------------------------------------
 # Add Details
 # --------------------------------------
@@ -1358,13 +1444,13 @@ def delete_pan(id):
 @login_required
 def add_details():
     if current_user.type == "seller":
-        print("Current ->",current_user)
-        product_id = request.args.get('product_id', default=None, type=int)
+        print("Current ->", current_user)
+        product_id = request.args.get("product_id", default=None, type=int)
         product_name = Product.query.filter_by(id=product_id).first_or_404()
         if product_id is None:
             flash("No Product Selected")
             return redirect(url_for("all_product"))
-        form = DetailForm() 
+        form = DetailForm()
         if form.validate_on_submit():
             details = Details(
                 product_id=product_id,
@@ -1380,21 +1466,25 @@ def add_details():
             print(details.id)
             transaction = Transaction(
                 details_id=details.id,
-                product_id = product_id,
-                buyer_id = current_user.buyer_id,
-                seller_id = current_user.id,
+                product_id=product_id,
+                buyer_id=current_user.buyer_id,
+                seller_id=current_user.id,
             )
             db.session.add(transaction)
             db.session.commit()
             flash("Details added successfully")
-            return redirect(url_for("add_details",product_id=product_id))
+            return redirect(url_for("add_details", product_id=product_id))
 
         return render_template(
-            "Details/add_details.html", title="Add Details", form=form,product_name=product_name
+            "Details/add_details.html",
+            title="Add Details",
+            form=form,
+            product_name=product_name,
         )
 
     if current_user.type != "seller":
         return flash_message()
+
 
 """
 # Update Subject
@@ -1476,6 +1566,7 @@ def delete_subject(id):
 # Curd On Transaction
 # ----------
 
+
 # Read Transaction
 @app.route("/all-transactions")
 @login_required
@@ -1489,21 +1580,20 @@ def all_transaction():
             transactions=transactions,
             all_transactions=all_transactions,
         )
-    
+
 
 # ----------
 # End Of Curd On Transaction
 # ----------
 
 
-
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
     if request.method == "POST":
-        selected_ids = request.form.getlist('ID[]')
-        print("Select ->",selected_ids)
-        return jsonify({'status': 'success', 'selected_ids': selected_ids})
+        selected_ids = request.form.getlist("ID[]")
+        print("Select ->", selected_ids)
+        return jsonify({"status": "success", "selected_ids": selected_ids})
     else:
         if current_user.type == "seller":
             pans = Pan.query.filter_by(seller_id=current_user.id).all()
@@ -1515,8 +1605,9 @@ def available_pans():
                 all_pans=all_pans,
             )
         else:
-            return flash_message()    
-    
+            return flash_message()
+
+
 # --------------------------------------
 # End of Related To Transaction
 # --------------------------------------
@@ -1526,6 +1617,7 @@ def available_pans():
 # Related To Checking allotment
 # --------------------------------------
 
+
 @app.route("/checking-allotment", methods=["GET", "POST"])
 # @login_required
 def checking_allotment():
@@ -1533,7 +1625,7 @@ def checking_allotment():
         form = AllotmentForm()
         file_ready = False
         if form.validate_on_submit():
-            folder_path = 'C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder'
+            folder_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder"
             for filename in os.listdir(folder_path):
                 file_path = os.path.join(folder_path, filename)
                 if os.path.isfile(file_path):
@@ -1552,13 +1644,15 @@ def checking_allotment():
                 pan_Column = int(pan_Column) - 1
             start_Row = form.start_Row.data
             end_Row = form.end_Row.data
-            
+
             # Reading the file
-            usernames = process_excel_data(filepath,pan_Column,start_Row,end_Row)
+            usernames = process_excel_data(filepath, pan_Column, start_Row, end_Row)
             # # Scraping the website
-            results = scrape_data_from_websites(driver_path, listing_On, ipo, usernames, headless=False)
+            results = scrape_data_from_websites(
+                driver_path, listing_On, ipo, usernames, headless=False
+            )
             with open(f"json/{ipo}.json", "w") as file:
-               json.dump(results, file) # Save the results to a JSON file
+                json.dump(results, file)  # Save the results to a JSON file
             # Saving the results
             write_in_excel(filepath, results, pan_Column)
             file_ready = True
@@ -1571,6 +1665,7 @@ def checking_allotment():
         )
     else:
         return flash_message()
+
 
 def download_updated_file(filepath):
 
@@ -1586,10 +1681,10 @@ def download_updated_file(filepath):
     else:
         return "Invalid download token or file does not exist", 404
 
+
 # --------------------------------------
 # End of Checking allotment
 # --------------------------------------
-
 
 
 # --------------------------------------
