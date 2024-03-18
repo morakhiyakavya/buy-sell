@@ -1,0 +1,168 @@
+
+    :root {
+        --default-primary: #90f188;
+        --default-secondary: #0f1d07;
+        --container-gutter: clamp(2.5rem, 2.6455026455vw, 3.325rem);
+        --theme-primary: var(--default-primary);
+        --theme-secondary: var(--default-secondary);
+    }
+
+    /* First */
+    .Header_menu__Yr6mh {
+        position: relative;
+        z-index: 0;
+        position: fixed;
+        bottom: 1.875rem;
+        z-index: 101;
+        border-radius: 100vh;
+        left: 50%;
+        transform: translateX(-50%);
+        display: grid
+    }
+
+    .Header_menu__Yr6mh:before {
+        content: "";
+        pointer-events: none;
+        position: absolute;
+        border-radius: inherit;
+        background: hsla(0, 0%, 100%, .7);
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        transition: background .15s ease-in-out;
+        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(8px);
+        z-index: -1;
+        animation: Header_replace-bg-after-submenu-close__Ub52C .6s ease-in-out
+    }
+
+
+    .Header_menu__Yr6mh {
+            top: 1.25rem;
+            bottom: auto;
+        }
+
+    /* Second */
+    .Header_menu__list__h_Anx {
+        grid-area: 1/-1;
+        list-style: none;
+        margin: 0;
+        display: grid;
+        grid-auto-flow: column;
+        grid-template-rows: 1fr;
+        padding: .4375rem;
+        transition: box-shadow .15s;
+        position: relative;
+        border-radius: inherit
+    }
+
+    /* Third */
+    .Header_menu__item__cb_Hw:first-of-type .Header_menu__link__UGkEv:before {
+        left: -.4375rem
+    }
+
+    .Header_menu__item__cb_Hw:last-of-type .Header_menu__link__UGkEv:before {
+        right: -.4375rem
+    }
+
+    /* Fourth */
+    .Header_menu__link__UGkEv {
+        background: none;
+        border: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        display: block;
+        padding: .5rem .75rem;
+        font-size: .9375rem;
+        font-weight: 500;
+        text-decoration: none;
+        color: var(--theme-secondary);
+        position: relative;
+        transition: color .3s ease;
+        line-height: 1;
+        cursor: pointer;
+        z-index: 2
+    }
+
+    @media(max-width: 767px) {
+        .Header_menu__link__UGkEv {
+            padding: .5rem .59375rem
+        }
+    }
+
+    .Header_menu__link__UGkEv:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
+        top: -.4375rem;
+        bottom: -.4375rem
+    }
+
+    .Header_menu__item__cb_Hw:first-of-type .Header_menu__link__UGkEv:before {
+        left: -.4375rem
+    }
+
+    .Header_menu__item__cb_Hw:last-of-type .Header_menu__link__UGkEv:before {
+        right: -.4375rem
+    }
+
+    /* Fifth */
+    .Header_menu__link--active__QKyk9 {
+        color: var(--theme-primary)
+    }
+
+    /* Sixth */
+
+    .Header_menu__list--twin__w_0Lp {
+        pointer-events: none;
+        order: -1
+    }
+
+    /* Seventh */
+    .Header_menu__link--twin__3W8NS {
+        pointer-events: none;
+        opacity: 0;
+        grid-row: 1
+    }
+
+    /* Eighth */
+    .Header_menu__active-pill__YdBUl,
+    .Header_menu__hover-pill__NFAxL {
+        grid-row: 1;
+        align-self: stretch;
+        justify-self: stretch;
+        background-color: var(--theme-secondary);
+        border-radius: 100vh;
+        transition: background-color .15s ease, opacity .15s ease;
+        z-index: 1;
+        min-width: 3em
+    }
+
+    .Header_menu__hover-pill__NFAxL {
+        background-color: var(--theme-secondary);
+        opacity: .05
+    }
+
+    /* Ninth */
+    .Header_header__inner__nfTZS {
+    height: 5.3125rem;
+    width: 100%;
+    padding-left: var(--container-gutter);
+    padding-right: var(--container-gutter);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-gap: 3.75rem;
+    gap: 3.75rem;
+    align-items: center;
+    margin-bottom: 5rem
+}
+
+/* --theme-secondary
+--theme-primary
+--container-gutter */
