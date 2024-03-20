@@ -9,8 +9,8 @@ def process_excel_data(filepath, pan_Column, start_Row, end_Row=None):
 
     Args:
         pan_Column (str or int): The index or label of the column to extract.
-        start_Row (int): The starting row index.
-        end_Row (int, optional): The ending row index. If not provided, all rows starting from start_Row will be considered.
+        start_Row (int): The starting row number in the Excel sheet (1-based index).
+        end_Row (int, optional): The ending row number in the Excel sheet. If not provided, all rows starting from start_Row will be considered.
 
     Returns:
         list: A list of values from the specified column.
@@ -22,11 +22,18 @@ def process_excel_data(filepath, pan_Column, start_Row, end_Row=None):
     df = pd.read_excel(filepath)
     column_data = column_det(pan_Column, df)
     
+    # Adjust start_Row and end_Row to zero-based index
+    if start_Row > 1:
+        start_Row -= 2
+    else:
+        start_Row -= 1
     if end_Row:
+        end_Row -= 2  # Adjust end_Row to zero-based index
         username = column_data[start_Row:end_Row].tolist()
     else:
         username = column_data[start_Row:].tolist()
     
+    print(f"Column data : {column_data[start_Row]} and end row : {column_data[end_Row]}")
     return username
 
 def column_det(pan_Column, df):

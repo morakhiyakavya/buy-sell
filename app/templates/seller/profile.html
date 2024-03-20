@@ -157,14 +157,36 @@
         </div>
          -->
     <div class="row">
-        <h1>Add Pan</h1>
-        <div class="col-md-6 success">
-            <p style="color: black;">
-                Want to add your pan? <br><br>
+        <h1>Pan</h1>
+        <div class="col-md-6 success" style="word-wrap: break-word;">
+            <div class="row">
+                <div class="col-md-6">
+                    <p style="color: black;">
+                        Want to add your pan? <br><br>
+                        <a class="btn" style="background-color: #2d1b37; color: white; " href=" {{ url_for('add_pan') }} ">
+                            Add Pan
+                        </a>
+                    </p>
+                </div>
+                
+                <div class="col-md-6">
+                    <p style="color: black;">
+                        Check allotment. <br><br>
+                        <a class="btn" style
+                            ="background-color: #2d1b37; color: white;" href=" {{ url_for('checking_allotment') }} ">
+                            Check Allotment
+                        </a>
+                    </p>
+            </div>
+            <!-- <p style="color: black;">
+                Want to add your pan? or Check Allotment. <br><br>
                 <a class="btn" style="background-color: #2d1b37; color: white;" href=" {{ url_for('add_pan') }} ">
                     Add Pan
                 </a>
-            </p>
+                <a class="btn" style="background-color: #2d1b37; color: white; float: right;"  href=" {{ url_for('checking_allotment') }} ">
+                    Check Allotment
+                </a>
+            </p> -->
         </div>
     </div>
     {% endblock %}
