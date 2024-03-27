@@ -34,10 +34,10 @@ class LoginForm(FlaskForm):
     username = StringField(
         "Username",
         validators=[DataRequired(), Length(1, 64)],
-        render_kw={"autofocus": True, "placeholder": "muthonigitau"},
+        render_kw={"autofocus": True, "placeholder": "arya"},
     )
     password = PasswordField(
-        "Password:",
+        "Password",
         validators=[
             DataRequired(),
             Length(min=8, max=20),
@@ -47,7 +47,7 @@ class LoginForm(FlaskForm):
             #     "contain at least one letter and one number.",
             # ),
         ],
-        render_kw={"placeholder": "Example:  kavyaarya123@."},
+        render_kw={"placeholder": "Example:  kavyaarya123."},
     )
     remember_me = BooleanField("Keep me logged in", default=True)
     submit = SubmitField("Log In")
@@ -140,7 +140,7 @@ class UserForm(FlaskForm):
         render_kw={"placeholder": "9876543210"},
     )
     password = PasswordField(
-        "Password:",
+        "Password",
         validators=[
             DataRequired(),
             Length(min=8, max=20),

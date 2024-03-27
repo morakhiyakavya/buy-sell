@@ -17,7 +17,7 @@
 
     <!-- List of all pans -->
     <div class="row pans">
-        <div class="col-md-12">
+        <div class="col-sm-12 col-md-12 ">
             <!-- pan list -->
             <div class="table-responsive">
                 <table id="data" class="table table-hover table-bordered">
@@ -29,7 +29,7 @@
                                     <option value="Subject 1">Subject 1</option>
                                     <option value="Subject 2">Subject 2</option>
                                 </select> </th>
-                            <th>ID</th>
+                            <th>Id</th>
                             <th>Name</th>
                             <th>Pan</th>
                             <th>DP id</th>
@@ -50,7 +50,7 @@
                                     <option value="Subject 1">Subject 1</option>
                                     <option value="Subject 2">Subject 2</option>
                                 </select></td>
-                            <td>{{ pan.id }}</td>
+                                <td> {{pan.id}} </td>
                             <td>{{ pan.name }}</td>
                             <td>{{ pan.pan_number }}</td>
                             <td>{{ pan.dp_id }}</td>
@@ -99,12 +99,8 @@
             var rows = table.rows({ page: 'current' }).nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
         });
-    });
 
-
-// For Subject To dropdown
-    $(document).ready(function () {
-    // Handle change event of the "Subject To" dropdown
+        // Handle change event of the "Subject To" dropdown
     $('#def').change(function () {
         // Get the selected value
         var selectedSubject = $(this).val();
@@ -121,7 +117,30 @@
             // subjectDropdown.trigger('change');
         });
     });
-});
+
+    });
+
+
+// // For Subject To dropdown
+//     $(document).ready(function () {
+//     // Handle change event of the "Subject To" dropdown
+//     $('#def').change(function () {
+//         // Get the selected value
+//         var selectedSubject = $(this).val();
+
+//         // Update all corresponding cells in the table
+//         $('tbody tr').each(function () {
+//             // Find the select element in the current row
+//             var subjectDropdown = $(this).find('select[name="subject"]');
+
+//             // Update the selected value
+//             subjectDropdown.val(selectedSubject);
+
+//             // If you want to trigger the change event on the select element
+//             // subjectDropdown.trigger('change');
+//         });
+//     });
+// });
 </script>
 
 {% endblock %}

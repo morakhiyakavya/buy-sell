@@ -108,7 +108,7 @@ class Scrape_Website(BaseScraper):
         message (str): A message to store any error or informational messages.
     """
 
-    def __init__(self, driver_path, website, headless=False, initial_wait=5):
+    def __init__(self, driver_path, website, room,socketio, headless=False):
         """
         Initialize the Scrape_Website class.
 
@@ -123,15 +123,13 @@ class Scrape_Website(BaseScraper):
         self.message = ""
         self.allotment = 0
         self.total_shares = 0
-        self.wait_time = initial_wait
+        self.mistakes = 0
+        self.room = room
+        self.socketio = socketio
 
-    def adjust_wait_time(self, action_duration):
-        if action_duration < self.wait_time * 0.75:  # If action is faster than 75% of wait_time
-            self.wait_time = max(self.wait_time - 1, 1)  # Decrease wait_time but keep it at least 1 second
-            print(f"Adjusted wait time: {self.wait_time}")
-        elif action_duration > self.wait_time:
-            self.wait_time += 1
-            print(f"Adjusted wait time: {self.wait_time}")
+    def log(self, data, room):
+        # Emit a SocketIO event to the client
+        self.socketio.emit('log', data, room=room)
             
     def select_dropdown_option(self, ipo):
         
@@ -158,6 +156,7 @@ class Scrape_Website(BaseScraper):
             if confidence >= 20:
                 dropdown.select_by_visible_text(matching_option)
                 print(f"Selected option: {matching_option}")
+                self.log({"type": "selected_option", "ipo": matching_option}, self.room)
             else:
                 self.message = "No matching options found for the specified IPO."
                 return False
@@ -197,27 +196,31 @@ class Scrape_Website(BaseScraper):
                 max_retries = 2  # Example limit, adjust as needed
                 while retry_count < max_retries:
                     username_field_id = self.config['username_field']
-                    username_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, username_field_id)))
+                    if self.config['website_name'] == 'purva':
+                        username_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.NAME, username_field_id)))
+                    else:
+                        username_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, username_field_id)))
                     username_field.clear()
                     username_field.send_keys(username.replace(" ", "").strip().upper())
                     # Assuming captcha solving is required here; implement as needed.
                 
-                    solve_captcha_start_time = time.time()
+                    # solve_captcha_start_time = time.time()
                 
                     self.solve_captcha_and_submit()
                 
-                    solve_captcha_end_time = time.time()
-                    print(f"Duration for solving captcha and submitting: {solve_captcha_end_time - solve_captcha_start_time} seconds")
+                    # solve_captcha_end_time = time.time()
+                    # print(f"Duration for solving captcha and submitting: {solve_captcha_end_time - solve_captcha_start_time} seconds")
 
                     # Check for errors after submission
-                    handle_dialog_box_start_time = time.time()
+                    # handle_dialog_box_start_time = time.time()
 
                     error_type = self.handle_dialog_box()
                     
-                    handle_dialog_end_time = time.time()
-                    print(f"Duration for handling dialog box: {handle_dialog_end_time - handle_dialog_box_start_time} seconds")
+                    # handle_dialog_end_time = time.time()
+                    # print(f"Duration for handling dialog box: {handle_dialog_end_time - handle_dialog_box_start_time} seconds")
 
                     if error_type == "captcha_error":
+                        time.sleep(2)  # Add a delay before retrying captcha solving
                         retry_count += 1
                         print("Captcha error, retrying...")
                         refresh_button = self.config['refresh_button']
@@ -229,6 +232,7 @@ class Scrape_Website(BaseScraper):
                         return True  # Success, proceed to data scraping
                     else:
                         print(f"{error_type} error, stopping retries.")
+                        # time.sleep(2) # Add a delay before moving to the next username
                         return error_type  # For unknown errors, you might choose to stop or log and continue
                     
                 print("Max captcha retries reached, moving to next username.")
@@ -265,6 +269,8 @@ class Scrape_Website(BaseScraper):
         submit_id = self.config['submit_button']
         if self.config['website_name'] == 'skyline':
             submit_button = self.driver.find_element(By.CLASS_NAME, submit_id)
+        elif self.config['website_name'] == 'purva':
+            submit_button = self.driver.find_element(By.NAME, submit_id)
         else:
             submit_button = self.driver.find_element(By.ID, submit_id)
         submit_button.click()
@@ -385,6 +391,22 @@ class Scrape_Website(BaseScraper):
         elif self.config['website_name'] == 'skyline':
             return "no_error"
 
+        elif self.config['website_name'] == 'purva':
+            error_message = self.config['error_message']
+            try:
+                message_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.CSS_SELECTOR, error_message)))
+                message_text = message_element.text
+                print(f"Error message purva: {message_text}")
+                close_dialog = self.config['close_dialog']                
+                close_button = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.CSS_SELECTOR, close_dialog)))
+                print(f"Close button purva: {close_button}")
+                close_button.click()
+                return message_text
+            except TimeoutException:
+                return "no_error"
+            except Exception as e:
+                print(f"Error handling dialog box: {str(e)}")
+                raise
         else:
             return "no_error"
 
@@ -440,7 +462,9 @@ class Scrape_Website(BaseScraper):
                     self.allotment += 1
                     self.total_shares += securities_allotted
                     print(f" Alloted : {self.allotment}")
+                    self.log({"type": "alloted", "allotment": self.allotment}, self.room)
                     print(f" Total shares : {self.total_shares}")
+                    self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
                 return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
@@ -471,7 +495,9 @@ class Scrape_Website(BaseScraper):
                     self.allotment += 1
                     self.total_shares += alloted
                     print(f" Alloted : {self.allotment}")
+                    self.log({"type": "alloted", "allotment": self.allotment}, self.room)
                     print(f" Total shares : {self.total_shares}")
+                    self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
                 return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
@@ -479,13 +505,13 @@ class Scrape_Website(BaseScraper):
 
         elif self.config['website_name'] == 'linkin':
             try:
-                start_time = time.time()
+                # start_time = time.time()
                 output_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, 'tbl_DetSec')))
                 
                 if output_element :
-                    fetch_time = time.time()
+                    # fetch_time = time.time()
                     html_source = self.driver.page_source
-                    soup_time = time.time()
+                    # soup_time = time.time()
                     soup = BeautifulSoup(html_source, 'html.parser')
 
                     # Extract the table within the div with id="tbl_DetSec"
@@ -510,8 +536,9 @@ class Scrape_Website(BaseScraper):
                             self.allotment += 1
                             self.total_shares += securities_allotted
                             print(f" Alloted : {self.allotment}")
+                            self.log({"type": "alloted", "allotment": self.allotment}, self.room)
                             print(f" Total shares : {self.total_shares}")
-                        
+                            self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
                         
                         result_data[f'applicant_name_{i}'] = applicant_name
                         result_data[f'Type_{i}'] = formtype
@@ -520,21 +547,20 @@ class Scrape_Website(BaseScraper):
                         result_data[f'application_amount_{i}'] = cutoff_price
                         result_data[f'amount_adjusted_{i}'] = amount_adjusted
                         result_data['error'] = error
-                    parse_time = time.time()
+                    # parse_time = time.time()
                     # Calculate the durations
-                    duration_fetch = fetch_time - start_time
-                    duration_parse = parse_time - soup_time
-                    total_duration = parse_time - start_time
+                    # duration_fetch = fetch_time - start_time
+                    # duration_parse = parse_time - soup_time
+                    # total_duration = parse_time - start_time
                     
-                    print(f"Time to fetch page: {duration_fetch} seconds")
-                    print(f"Time to parse HTML and extract data: {duration_parse} seconds")
-                    print(f"Total time: {total_duration} seconds")
+                    # print(f"Time to fetch page: {duration_fetch} seconds")
+                    # print(f"Time to parse HTML and extract data: {duration_parse} seconds")
+                    # print(f"Total time: {total_duration} seconds")
 
                 return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
                 return None
-        
         
         elif self.config['website_name'] == 'skyline':
             try:
@@ -560,7 +586,9 @@ class Scrape_Website(BaseScraper):
                         self.allotment += 1
                         self.total_shares += shares_allotted
                         print(f" Alloted : {self.allotment}")
+                        self.log({"type": "alloted", "allotment": self.allotment}, self.room)
                         print(f" Total shares : {self.total_shares}")
+                        self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
 
                 if len(applicant_name) == 0:
                     result_data = {
@@ -599,7 +627,7 @@ class Scrape_Website(BaseScraper):
                 print(f"Error scraping data: {e}")
                 return None
 
-    def run(self, ipo, usernames):
+    def run(self, ipo, usernames): # self.room will be user id
         
         """
         Executes the scraping process for a list of usernames.
@@ -616,13 +644,14 @@ class Scrape_Website(BaseScraper):
         
         max_retries = 3
         print(f"Total pan numbers {len(usernames)}")
+        self.log({"type": "total_pan_numbers", "count": len(usernames)}, self.room)
         
-        dropdown_start_time = time.time()
+        # dropdown_start_time = time.time()
+        if self.config['website_name'] != 'purva':
+            self.select_dropdown_option(ipo)
         
-        self.select_dropdown_option(ipo)
-        
-        dropdown_end_time = time.time()
-        print(f"Duration for dropdown: {dropdown_end_time - dropdown_start_time} seconds")
+        # dropdown_end_time = time.time()
+        # print(f"Duration for dropdown: {dropdown_end_time - dropdown_start_time} seconds")
         
         for username in usernames:
             one_username_start_time = time.time()
@@ -632,38 +661,46 @@ class Scrape_Website(BaseScraper):
                     if username not in self.result_dict:  # Check if this username has already been processed
                         # if self.select_dropdown_option(ipo):
 
-                        input_start_time = time.time()
+                        # input_start_time = time.time()
+                        if self.config['website_name'] == 'purva':
+                            self.select_dropdown_option(ipo)
         
                         writing_pan = self.input_username_and_submit(username)
         
-                        input_end_time = time.time()
-                        print(f"Duration for input and submit: {input_end_time - input_start_time} seconds")
+                        # input_end_time = time.time()
+                        # print(f"Duration for input and submit: {input_end_time - input_start_time} seconds")
                         
+                        self.log({"type": "processing_username", "username": username}, self.room)
                         username_index = usernames.index(username) + 1
+                        self.log({"type": "processing_on", "checked": username_index}, self.room)
                         print(f"Left pan numbers {len(usernames) - username_index}")
+                        self.log({"type": "left_pan_numbers", "count": len(usernames) - username_index}, self.room)
                         if writing_pan == True:
                             
-                            scrape_start_time = time.time()
+                            # scrape_start_time = time.time()
                             
                             data = self.scrape_data()
 
-                            scrape_end_time = time.time()
-                            print(f"Duration for scraping data: {scrape_end_time - scrape_start_time} seconds")
+                            # scrape_end_time = time.time()
+                            # print(f"Duration for scraping data: {scrape_end_time - scrape_start_time} seconds")
                             
                             if data:
                                 self.result_dict[username] = data
                             else:
                                 self.result_dict[username] = {'error': "Failed to scrape data or data not found"}
                             # Assuming you want to go back or refresh between usernames
-                            prepare_start_time = time.time()
+                            # prepare_start_time = time.time()
                             
                             self.prepare_for_next_username()
 
-                            prepare_end_time = time.time()
-                            print(f"Duration for preparing for next username: {prepare_end_time - prepare_start_time} seconds")
+                            # prepare_end_time = time.time()
+                            # print(f"Duration for preparing for next username: {prepare_end_time - prepare_start_time} seconds")
 
                         else:
                             self.result_dict[username] = {'error': writing_pan}
+                            self.mistakes += 1
+                            self.log({"type": "mistakes", "count": self.mistakes}, self.room)
+                            
                     break  # Exit the loop if everything goes well for this username
                 except (NoSuchWindowException, WebDriverException) as e:
                     print(f"Encountered an error: {e}. \nRetrying...")
@@ -673,6 +710,8 @@ class Scrape_Website(BaseScraper):
                     if retries >= max_retries:
                         print(f"Maximum retries reached for {username}. Moving to next username.")
                         self.result_dict[username] = {'error': "Maximum retries reached"}
+                        self.mistakes += 1
+                        self.log({"type": "mistakes", "count": self.mistakes}, self.room)
                         break
                 except Exception as e:
                     print(f"Encountered an error with {username}: {str(e)}. \nRetrying...")
@@ -683,11 +722,13 @@ class Scrape_Website(BaseScraper):
                     if retries >= max_retries:
                         print(f"Maximum retries reached for {username}. Moving to next username.")
                         self.result_dict[username] = {'error': "Maximum retries reached"}
+                        self.mistakes += 1
+                        self.log({"type": "mistakes", "count": self.mistakes}, self.room)
                         break
             one_username_end_time = time.time()
             one_username_duration = one_username_end_time - one_username_start_time
             print(f"Duration for {username}: {one_username_duration} seconds")
-            print("*"*10)
+            print("*"*20)
         run_end_time = time.time()
         run_duration = run_end_time - run_start_time
         print(f"Total run function duration: {run_duration} seconds")
@@ -794,10 +835,10 @@ website_configs = {
         'pan': False,
         'username_field': 'panNumber',#NAME
         'captcha_field': False,
-        'submit_button': '//input[@value=" Search "]' ,#XPATH or 'submit' -NAME
+        'submit_button': 'submit', #'//input[@value=" Search "]'  XPATH or 'submit' NAME
         'back_button': False,
-        'error_message': 'alert-warning',#CLASS_NAME
-        'close_dialog': 'close',#CLASS_NAME
+        'error_message': 'div.alert b',#CSS SELECTOR
+        'close_dialog': 'div.alert button.btn-close',#CSS SELECTOR  
         'refresh_button': False,
         # Add other necessary identifiers
     },
@@ -813,7 +854,7 @@ website_configs = {
     # Define configurations for other websites similarly
 }
 
-def scrape_data_from_websites(driver_path, company, ipo, usernames, headless=False):
+def scrape_data_from_websites(driver_path, company, ipo, usernames, room, socketio, headless=False):
     """
     Scrape data from multiple websites based on the given company and IPO.
 
@@ -827,7 +868,7 @@ def scrape_data_from_websites(driver_path, company, ipo, usernames, headless=Fal
     Returns:
         dict: A dictionary containing the results of the scraping process for each username.
     """
-    scraper = Scrape_Website(driver_path, company, headless)
+    scraper = Scrape_Website(driver_path, company, room, socketio, headless)
     results = scraper.run(ipo, usernames)
     print_details(company, ipo, results)
     return results

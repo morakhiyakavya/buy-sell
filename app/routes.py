@@ -14,6 +14,8 @@ from flask import (
     abort,
 )
 from flask_login import current_user, login_user, logout_user, login_required
+from flask_socketio import emit, join_room
+import socketio
 from app.forms import (
     BuyerRegistrationForm,
     SellerRegistrationForm,
@@ -52,7 +54,7 @@ from werkzeug.utils import secure_filename
 from app.allotment import scrape_data_from_websites, driver_path, IPODetailsScraper
 from app.excel import process_excel_data, write_in_excel
 
-from app import app, db
+from app import app, db, socketio
 
 
 # =========================================
@@ -71,7 +73,13 @@ def flash_message():  # An base level error message function
 
 @app.route("/")
 def home():
-    return render_template("home.html", title="Home")
+    return render_template("home.html")
+
+
+@app.route("/allotment_file")
+def allotment_file():
+    file_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder\\ENSER_COM_-_PANCARD_-_Copy.xlsx"
+    return send_file(file_path, as_attachment=True)
 
 
 @app.route("/dashboard")
@@ -1118,55 +1126,50 @@ def get_product():
         scraper.scrape_ipo_details()
     )
     process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua)
-    return "DOne"
+    return redirect(url_for("view_product"))
 
 # ipo status and name assigninig
 def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua):
     # Process green IPOs - Add new
-    for ipo in ipo_details_green:
-        if not IPO.query.filter_by(name=ipo["Name"]).first():
+    # for ipo in ipo_details_green:
+    #     if not IPO.query.filter_by(name=ipo["Name"]).first():
+    #         open_date_sort = datetime.strptime(ipo["Open Date"], "%b %d, %Y")
+    #         close_date_sort = datetime.strptime(ipo["Close Date"], "%b %d, %Y")
+    #         listing_date_sort = datetime.strptime(ipo["Listing Date"], "%b %d, %Y")
+    #         name = clean_name(ipo["Name"])
+    #         status = "Open"
+    #         new_ipo = IPO(
+    #             name=name,
+    #             price=ipo["Price"],
+    #             issue_size=ipo["Issue Size"],
+    #             lot_size=ipo["Lot Size"],
+    #             open_date= open_date_sort,
+    #             close_date= close_date_sort,
+    #             listing_date= listing_date_sort,
+    #             listing_at=ipo["Listing At"],
+    #             status=status,
+    #         )
+    #         db.session.add(new_ipo)
+    #         db.session.commit()
+
+    # Process light yellow IPOs - Update existing
+    update_ipo_status(ipo_details_green, "open")
+    update_ipo_status(ipo_details_lightyellow, "closed")
+    update_ipo_status(ipo_details_aqua, "listed")
+
+def update_ipo_status(ipo_details, status):
+    for ipo in ipo_details:
+        name = clean_name(ipo["Name"])
+        ipo_db = IPO.query.filter_by(name=name).first()
+        if ipo_db:
+            if status != "open": 
+                ipo_db.status = status
+                db.session.commit()
+        else :
             open_date_sort = datetime.strptime(ipo["Open Date"], "%b %d, %Y")
             close_date_sort = datetime.strptime(ipo["Close Date"], "%b %d, %Y")
             listing_date_sort = datetime.strptime(ipo["Listing Date"], "%b %d, %Y")
-            name = clean_name(ipo["Name"])
-        #     if name.upper().endswith(" IPO"):
-        # # Remove the last 4 characters (" IPO") from the name
-        #         name = name[:-4]
-        #     elif name.upper().endswith("IPO"):
-        #         # Remove the last 3 characters ("IPO") from the name
-        #       name = name[:-3]
-        #     elif name.upper().endswith(" LIMITED"):
-        #         # Remove the last 8 characters (" LIMITED") from the name
-        #         name = name[:-8]
-        #     elif name.upper().endswith(" LTD"):
-        #         # Remove the last 4 characters (" LTD") from the name
-        #         name = name[:-4]
-        #     elif name.upper().endswith(" LTD."):
-        #         # Remove the last 5 characters (" LTD.") from the name
-        #         name = name[:-5]
-        #     elif name.upper().endswith(" LIMITED."):
-        #         # Remove the last 9 characters (" LIMITED.") from the name
-        #         name = name[:-9]
-        #     elif name.upper().endswith(" LIMITED "):
-        #         # Remove the last 9 characters (" LIMITED ") from the name
-        #         name = name[:-9]
-        #     elif name.upper().endswith(" PUBLIC LIMITED"):
-        #         # Remove the last 14 characters (" PUBLIC LIMITED") from the name
-        #         name = name[:-14]
-        #     elif name.upper().endswith(" PUBLIC LTD"):
-        #         # Remove the last 10 characters (" PUBLIC LTD") from the name
-        #         name = name[:-10]
-        #     elif name.upper().endswith(" PUBLIC LTD."):
-        #         # Remove the last 11 characters (" PUBLIC LTD.") from the name
-        #         name = name[:-11]
-        #     elif name.upper().endswith(" PUBLIC LIMITED."):
-        #         # Remove the last 15 characters (" PUBLIC LIMITED.") from the name
-        #         name = name[:-15]
-        #     elif name.upper().endswith(" PUBLIC LIMITED "):
-        #         # Remove the last 15 characters (" PUBLIC LIMITED ") from the name
-        #         name = name[:-15]
-                
-            
+            # name = clean_name(ipo["Name"])
             new_ipo = IPO(
                 name=name,
                 price=ipo["Price"],
@@ -1176,27 +1179,10 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
                 close_date= close_date_sort,
                 listing_date= listing_date_sort,
                 listing_at=ipo["Listing At"],
-                status="Open",
+                status=status,
             )
             db.session.add(new_ipo)
-
-    # Update status for lightyellow and aqua IPOs
-    for status, ipos in [
-        ("closed", ipo_details_lightyellow),
-        ("listed", ipo_details_aqua),
-    ]:
-        for ipo in ipos:
-            existing_ipo = IPO.query.filter_by(name=ipo["Name"]).first()
-            if existing_ipo:
-                existing_ipo.status = status
-
-    # Delete IPOs that are no longer aqua
-    listed_ipos_names = [ipo["Name"] for ipo in ipo_details_aqua]
-    for ipo in IPO.query.filter_by(status="listed").all():
-        if ipo.name not in listed_ipos_names:
-            db.session.delete(ipo)
-
-    db.session.commit()
+            db.session.commit()
 
 def clean_name(name):
     # Combine all patterns, prioritizing longer/more specific patterns to ensure they're matched first
@@ -1265,7 +1251,9 @@ def view_product():  # Testing Feature
     if buyer_id is not None:
         products = IPO.query.all()
         view_products = len(products)
-        products.sort(key=lambda x: x.listing_date)
+        status_priority = {"open": 1, "close": 2, "listed": 3}
+        
+        products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         print("Products -> \n",products)
         return render_template(
             "transaction/view_products.html",
@@ -1276,7 +1264,9 @@ def view_product():  # Testing Feature
     elif current_user.type == "admin":
         products = IPO.query.all()
         view_products = len(products)
-        products.sort(key=lambda x: x.listing_date)
+        # products.sort(key=lambda x: (x.status, x.listing_date))
+        status_priority = {"open": 1, "close": 2, "listed": 3}
+        products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         return render_template(
             "transaction/view_products.html",
             title="All Products",
@@ -1369,6 +1359,19 @@ def edit_pan():
         return render_template("Pan/add_pan.html", title="Add Pan", form=form)
     return redirect(url_for("all-pan"))
 
+@app.route("/multi-pan")
+def multi_pan():
+    for i in range(10):
+        for j in range(10):
+            pan = Pan(
+                name=f"kavya{i}{j}",
+                pan_number= f"omops41{i}{j}o".upper(),
+                dp_id= f"2584815512{j}{i}",
+                seller_id=3,
+        )
+            db.session.add(pan)
+            db.session.commit()
+    return redirect(url_for("all_pan"))
 
 # Read Pan
 @app.route("/all-pan")
@@ -1619,12 +1622,15 @@ def available_pans():
 
 
 @app.route("/checking-allotment", methods=["GET", "POST"])
-# @login_required
+@login_required
 def checking_allotment():
     if current_user.is_authenticated:
         form = AllotmentForm()
         file_ready = False
+        room = current_user.id
+        print("Room id ->", room)
         if form.validate_on_submit():
+            # Checking whether the folder is empty or not
             folder_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder"
             for filename in os.listdir(folder_path):
                 file_path = os.path.join(folder_path, filename)
@@ -1648,8 +1654,9 @@ def checking_allotment():
             # Reading the file
             usernames = process_excel_data(filepath, pan_Column, start_Row, end_Row)
             # # Scraping the website
+            print("Socket ->", socketio)
             results = scrape_data_from_websites(
-                driver_path, listing_On, ipo, usernames, headless=False
+                driver_path, listing_On, ipo, usernames, room, socketio, headless=False
             )
             with open(f"json/{ipo}.json", "w") as file:
                 json.dump(results, file)  # Save the results to a JSON file
@@ -1662,10 +1669,16 @@ def checking_allotment():
             title="Checking Allotment",
             form=form,
             file_ready=file_ready,
+            room = room
         )
     else:
         return flash_message()
 
+@socketio.on('join')
+def on_join(data):
+    room = current_user.id
+    join_room(room)
+    # emit('log', {'data': 'Connected to live log stream.'}, room=room)
 
 def download_updated_file(filepath):
 

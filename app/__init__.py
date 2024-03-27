@@ -23,7 +23,7 @@ login = LoginManager(app)
 login.login_view = "login"
 mail = Mail(app)
 boostrap = Bootstrap(app)
-socketio = SocketIO(app)
+socketio = SocketIO(app, cors_allowed_origins='*') #remove cross origin in production / Deployment
 
 if not app.debug:
     if app.config["MAIL_SERVER"]:

@@ -1,11 +1,13 @@
 migrations/
 upload_folder/
 logs/
-app/__pycache__/
+app\__pycache__
 __pycache__/
 json/
 exicon.json
 GPT.json
 platinum.json
 app/captcha.png
+app/static/css/card_design.css
+app/static/css/design1.css
 ```

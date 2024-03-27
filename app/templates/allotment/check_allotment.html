@@ -8,25 +8,178 @@
     <div class="col-lg-6">
         <h2 class="text-center mb-4">{{ title }}</h2>
         <!-- form-->
-        
+
         <div class="my-form" id="my-form">
             <p>{{ wtf.quick_form(form, button_map={"submit":"warning"}) }}</p>
         </div>
 
         <!-- End of form -->
     </div>
+    
+
+<link rel="stylesheet" href="../../static/css/card.css">
+
+<div class="col-lg-6">
+<div class="grid-card">
+    <div class="card-grid">
+        <span class="icon-card">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"
+                stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M4.5 9.5V5.5C4.5 4.94772 4.94772 4.5 5.5 4.5H9.5C10.0523 4.5 10.5 4.94772 10.5 5.5V9.5C10.5 10.0523 10.0523 10.5 9.5 10.5H5.5C4.94772 10.5 4.5 10.0523 4.5 9.5Z" />
+                <path
+                    d="M13.5 18.5V14.5C13.5 13.9477 13.9477 13.5 14.5 13.5H18.5C19.0523 13.5 19.5 13.9477 19.5 14.5V18.5C19.5 19.0523 19.0523 19.5 18.5 19.5H14.5C13.9477 19.5 13.5 19.0523 13.5 18.5Z" />
+                <path d="M4.5 19.5L7.5 13.5L10.5 19.5H4.5Z" />
+                <path
+                    d="M16.5 4.5C18.1569 4.5 19.5 5.84315 19.5 7.5C19.5 9.15685 18.1569 10.5 16.5 10.5C14.8431 10.5 13.5 9.15685 13.5 7.5C13.5 5.84315 14.8431 4.5 16.5 4.5Z" />
+            </svg>
+        </span>
+        <div id="log-container">
+            <!-- <h4 id="ipo">Company</h4> -->
+            <span id="ipo" class="h4" >Company</span>
+            <p>Total Pan numbers :
+                <span id="totalPanNumbers" style="font-weight: bold;">0</span>
+            </p>
+            <p>Processing  
+                <span id="processingUsername" style="font-weight: bold;">  &nbsp;&nbsp;... </span>
+            </p>
+            <p>Checked : 
+                <span id="checked" style="font-weight: bold;">0</span>
+            </p>
+            <p>Alloted : 
+                <span id="alloted" style="font-weight: bold;">0</span>
+            </p>
+            <p>Total Shares : 
+                <span id="totalShares" style="font-weight: bold;">0</span>
+            </p>
+            <p>Error : 
+                <span id="mistake" style="font-weight: bold;">0</span>
+            </p>
+            <p>Left PAN numbers: 
+                <span id="leftPanNumbers" style="font-weight: bold;">0</span>
+            </p>
+        </div>
+        <div class="shine"></div>
+        <div class="background">
+            <div class="tiles">
+                <div class="tile tile-1"></div>
+                <div class="tile tile-2"></div>
+                <div class="tile tile-3"></div>
+                <div class="tile tile-4"></div>
+
+                <div class="tile tile-5"></div>
+                <div class="tile tile-6"></div>
+                <div class="tile tile-7"></div>
+                <div class="tile tile-8"></div>
+
+                <div class="tile tile-9"></div>
+                <div class="tile tile-10"></div>
+            </div>
+
+            <div class="line line-1"></div>
+            <div class="line line-2"></div>
+            <div class="line line-3"></div>
+        </div>
+    </div>
+</div>
+
+
     <div class="col-lg-6">
         <!-- Empty col -->
         <div id="loadingMessage" style="display: none;">Processing your request. Please wait...</div>
     </div>
 </div>
+</div>
+
+
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"
+    integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO"
+    crossorigin="anonymous"></script>
+<script type="text/javascript">
+    var socket = io.connect('http://' + document.domain + ':' + location.port); // Connect to the server in localhost
+    // var socket = io.connect('https://d7f3-103-50-153-46.ngrok-free.app') // Connect to the ngronk server
+    var logContainer = document.getElementById('log-container');
+
+
+    socket.on('connect', function () {
+        // Log to the console when the connection to the server is established
+        console.log('Connected to the server.');
+        // Ensure the room is dynamically assigned, for example, using a data attribute or inline script tag
+        var room = '{{ room }}'; // This should be dynamically assigned
+        socket.emit('join', { 'room': room });
+        console.log('Attempted to join room:', room);
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Assuming Socket.IO connection has been established as `socket`
+        // and the DOM is fully loaded
+        socket.emit('client_ready', { room: '{{ room }}' });
+        console.log('Client is ready to receive messages from the server.');
+    });
+    socket.on('log', function (data) {
+        // Gets the company name
+        if (data.type === 'selected_option') {
+            // Update the UI element showing the currently processing username
+            console.log(`Company : ${data.ipo}`);
+            document.getElementById('ipo').innerText = `${data.ipo}`;
+        }
+        // Gets the total allotments
+        else if (data.type === 'alloted') {
+            // Update the UI element showing the currently processing username
+            console.log(`Alloted : ${data.allotment}`)
+            document.getElementById('alloted').innerText = `${data.allotment}`;
+        }
+        // Gets the total shares collected from the allotment
+        else if (data.type === 'total_shares') {
+            // Update the UI element showing the currently processing username
+            console.log(`Total Shares : ${data.total_share}`)
+            document.getElementById('totalShares').innerText = `${data.total_share}`;
+        }
+        // Gets the total pan numbers are there to check
+        else if (data.type === 'total_pan_numbers') {
+            // Update the UI element showing the currently processing username
+            console.log(`Total Pan numbers : ${data.count}`)
+            document.getElementById('totalPanNumbers').innerText = `${data.count}`;
+        }
+        // Gets the processing username
+        else if (data.type === 'processing_username') {
+            // Update the UI element showing the currently processing username
+            console.log(`Processing  ${data.username}  ...`);
+            document.getElementById('processingUsername').innerText = `${data.username}  ...`;
+        }
+        // Gets the left pan numbers to check
+        else if (data.type === 'left_pan_numbers') {
+            // Update the UI element showing the count of left PAN numbers
+            console.log(`Left Pan numbers: ${data.count}`);
+            document.getElementById('leftPanNumbers').innerText = `${data.count}`;
+        }
+        // Gets the numbers of username checked
+        else if (data.type === 'processing_on') {
+            // Update the UI element showing the count of checked usernames
+            console.log(`Checked : ${data.checked}`);
+            document.getElementById('checked').innerText = `${data.checked}`;
+        }
+        // Gets the number of mistakes happened
+        else if (data.type === 'mistakes') {
+            // Update the UI element showing the count of mistakes
+            console.log(`Error : ${data.count}`);
+            document.getElementById('mistake').innerText = `${data.count}`;
+        }
+
+    });
+
+    // Example of how you might handle a disconnection
+    socket.on('disconnect', function () {
+        console.log('Disconnected from the server.');
+    });
+</script>
 <!-- End of login form -->
 <script>
-    document.getElementById('my-form').addEventListener('submit', function() {
+    document.getElementById('my-form').addEventListener('submit', function () {
         document.getElementById('submit_btn').disabled = true;
         document.getElementById('submit_btn').innerText = 'Processing...';
         console.log('Processing your request. Please wait...');
     });
-    </script>
+</script>
 {% endblock %}
-

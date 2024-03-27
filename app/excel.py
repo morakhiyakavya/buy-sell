@@ -33,7 +33,7 @@ def process_excel_data(filepath, pan_Column, start_Row, end_Row=None):
     else:
         username = column_data[start_Row:].tolist()
     
-    print(f"Column data : {column_data[start_Row]} and end row : {column_data[end_Row]}")
+    # print(f"Column data : {column_data[start_Row]} and end row : {column_data[end_Row]}")
     return username
 
 def column_det(pan_Column, df):
