@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="description" content="eLearning App">
+  <meta name="description" content="Ipo App">
   <meta name="keywords" content="Newsletter, eLearning, Python, Flask, JavaScript, Django, Twilio">
   <meta name="author" content="Gitau Harrison">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -88,7 +88,11 @@
   <!-- End of authenticated user user -->
   <!-- ============================================== -->
 
+  {% block ipo_css %}
 
+  
+  {% endblock %}
+ 
 </head>
 
 <body>
@@ -258,212 +262,6 @@
     {% if current_user.is_active %}
     <div class="wrapper">
       <!-- Sidebar  -->
-      <nav id="sidebar">
-        <div class="sidebar-header">
-          <h3>Dashboard</h3>
-          </a>
-        </div>
-
-        <ul class="list-unstyled components">
-
-          <!-- Class content can be seen by all except the buyer -->
-          {% if current_user.type != 'buyer' %}
-          {% if current_user.type == 'seller' %}
-          <li>
-            <a href="#pySubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Python</a>
-            <ul class="collapse list-unstyled" id="pySubmenu">
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1:
-                  Install/Configure Git</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2:
-                  Virtualenvwrapper</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 3: Start Flask
-                  Server</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 4: Connect to
-                  GitHub</a></li>
-            </ul>
-          </li>
-          <li class="active">
-            <a href="#jsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">JavaScript</a>
-            <ul class="collapse list-unstyled" id="jsSubmenu">
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1: Lorem
-                  Ipsum</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2: Lorem
-                  Ipsum</a></li>
-            </ul>
-          </li>
-          {% endif %}
-
-          <!-- Accessible by admins and admins only -->
-          <!-- There are no conditions set to view any of the lessons' chapters -->
-          {% if current_user.type != "seller" %}
-          <li>
-            <a href="#pySubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Flask Lessons</a>
-            <ul class="collapse list-unstyled" id="pySubmenu">
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1:
-                  Install/Configure Git</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2:
-                  Virtualenvwrapper</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 3: Start Flask
-                  Server</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 4: Connect to
-                  GitHub </a></li>
-            </ul>
-          </li>
-          <li class="active">
-            <a href="#jsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">React Lessons</a>
-            <ul class="collapse list-unstyled" id="jsSubmenu">
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 1: Lorem
-                  Ipsum</a></li>
-              <li><a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Chapter 2: Lorem
-                  Ipsum</a></li>
-            </ul>
-          </li>
-          {% endif %}
-          {% endif %}
-
-          <!-- Each user has their own profile page -->
-          {% if current_user.type == 'seller' %}
-          <li>
-            <a href=" {{ url_for('seller_profile') }} " alt="397 Not available at this momement">Profile</a>
-          </li>
-          {% endif %}
-          {% if current_user.type == 'admin' %}
-          <li>
-            <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Profile</a>
-          </li>
-          {% endif %}
-          {% if current_user.type == 'buyer' %}
-          <!-- Only buyer can register child/seller -->
-          <li class="active">
-            <a href=" {{ url_for('register_seller') }} " alt="397 Not available at this momement">Register Seller</a>
-          </li>
-          <li>
-            <a href=" # " alt="397 Not available at this momement">Seller Analysis</a>
-          </li>
-          <li>
-            <a href=" {{ url_for('buyer_profile') }} " alt="397 Not available at this momement">Profile</a>
-          </li>
-          {% endif %}
-          {% if current_user.type == 'admin' %}
-          <li>
-            <a href=" {{ url_for('admin_profile') }} " alt="397 Not available at this momement">Profile</a>
-          </li>
-          {% endif %}
-
-          <!-- seller and buyer cannot see the list of app users -->
-          {% if current_user.type != 'seller' and current_user.type != 'buyer' %}
-          <li class="active">
-            <a href="#usersSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Users</a>
-            <ul class="collapse list-unstyled" id="usersSubmenu">
-              <li>
-                <a href=" {{ url_for('all_sellers') }} " alt="397 Not available at this momement">All seller</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('all_buyers') }} " alt="397 Not available at this momement">All buyer</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">All admins</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('all_admins') }} " alt="397 Not available at this momement">All Admins</a>
-              </li>
-            </ul>
-          </li>
-          <li class="active">
-            <a href="#allEmailsSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">In-app
-              Emails</a>
-            <ul class="collapse list-unstyled" id="allEmailsSubmenu">
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual Subscriber
-                  Emails</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual buyer
-                  Emails</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual seller
-                  Emails</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual admin
-                  Emails</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Individual Admin
-                  Emails</a>
-              </li>
-              <hr>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All buyer</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All seller</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All admins</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="397 Not available at this momement">Emails To All Admins</a>
-              </li>
-            </ul>
-          </li>
-          <li class="active">
-            <a href="#sellerAnalysisSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">seller
-              Analysis</a>
-            <ul class="collapse list-unstyled" id="sellerAnalysisSubmenu">
-              <li>
-                <a href=" # " alt="397 Not available at this momement">seller Attendance</a>
-              </li>
-              <li>
-                <a href=" # " alt="397 Not available at this momement">Projects Submissions</a>
-              </li>
-              <li>
-                <a href=" # " alt="397 Not available at this momement">Assess Projects</a>
-              </li>
-            </ul>
-          </li>
-          {% endif %}
-
-          <!-- Only admins can access the links below -->
-          {% if current_user.type == 'admin' %}
-          <li class="active">
-            <a href="#registrationSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"
-              alt="406 Not available at this momoent">Registration</a>
-            <ul class="collapse list-unstyled" id="registrationSubmenu">
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="409 Not available at this momoent">Register Admin</a>
-              </li>
-              <li>
-                <a href=" {{ url_for('register_admin') }} " alt="412 Not available at this momoent">Register Admin</a>
-              </li>
-            </ul>
-          </li>
-          <li>
-            <a href=" # " alt="417 Not available at this momoent">App Analytics</a>
-          </li>
-          <li class="active">
-            <a href="#newsletterSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"
-              alt="420 Not available at this momoent">Newsletter</a>
-            <ul class="collapse list-unstyled" id="newsletterSubmenu">
-              <li>
-                <a href=" {{ url_for('dashboard') }} " alt="423 Not available at this momoent">Subscribers</a>
-              </li>
-            </ul>
-          </li>
-          {% endif %}
-        </ul>
-
-        <ul class="list-unstyled CTAs">
-          <li>
-            {% if not current_user.two_factor_enabled() %}
-            <a class="nav-link article" href=" # " alt="433 Not available at this momoent">Enable 2FA</a>
-            {% else %}
-            <a class="nav-link download" href=" # " alt="435 Not available at this momoent">Disable 2FA</a>
-            {% endif %}
-          </li>
-        </ul>
-      </nav>
 
       <!-- Page Content  -->
       <div id="content">
@@ -471,25 +269,47 @@
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
           <div class="container-fluid">
 
-            <button type="button" id="sidebarCollapse" class="btn btn-light">
+            <!-- <button type="button" id="sidebarCollapse" class="btn btn-light">
               <i class="fas fa-align-left"></i>
               <span>Toggle Sidebar</span>
-            </button>
-            <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
-              data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+            </button> -->
+            <button class="btn btn-dark d-inline-block d-lg-none ms-auto" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
               aria-label="Toggle navigation">
               <i class="fas fa-align-justify"></i>
             </button>
+            <!-- <button class="btn btn-dark d-inline-block d-lg-none ms-auto" type="button" data-toggle="collapse"
+              data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="Toggle navigation">
+              <i class="fas fa-align-justify"></i>
+            </button> -->
 
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-              <ul class="nav navbar-nav ml-auto">
-                <li class="nav-item link_disabled"><a class="nav-link" href=" # "
-                    alt="457 Not available at this momoent">{{ current_user.username }}</a></li>
-                <li class="nav-item active">
-                  <a class="nav-link" href="{{ url_for('logout') }}" alt="459 Not available at this momoent">Logout</a>
-                </li>
+              <ul class="nav navbar-nav ms-auto">
+                  <li class="nav-item">
+                      <a class="nav-link {{ 'link_disabled' if request.endpoint == 'view_product' else '' }}" href="{{ url_for('view_product') }}" alt="459 Not available at this moment">IPO's</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_pan' else '' }}" href="{{ url_for('all_pan') }}" alt="459 Not available at this moment">My Pan</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {{ 'link_disabled' if request.endpoint == 'add_pan' else '' }}" href="{{ url_for('add_pan') }}" alt="459 Not available at this moment">Add Pan</a>
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {{ 'link_disabled' if request.endpoint == 'checking_allotment' else '' }}" href="{{ url_for('checking_allotment') }}" alt="459 Not available at this moment">Allotment</a>
+                  </li>
+                  <!-- User's username displayed; using the link_disabled class for consistency -->
+                  <li class="nav-item ">
+                    <a class="nav-link {{ 'link_disabled' if request.endpoint == 'dashboard' else '' }}" href="{{ url_for('dashboard') }}" alt="459 Not available at this moment">{{ current_user.username }}</a>
+                      <!-- <span class="nav-link">{{ current_user.username }}</span> -->
+                  </li>
+                  <li class="nav-item">
+                      <a class="nav-link {{ 'link_disabled' if request.endpoint == 'logout' else '' }}" href="{{ url_for('logout') }}" alt="459 Not available at this moment">Logout</a>
+                  </li>
               </ul>
-            </div>
+          </div>
+          
+          
           </div>
         </nav>
 
@@ -520,7 +340,7 @@
     <!-- jQuery CDN - Full version -->
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
     <!-- Edited -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script> 
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
 
     <!-- Popper.JS -->
@@ -535,9 +355,9 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
       integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
       crossorigin="anonymous"></script> -->
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- Edited -->
     <!-- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"
       integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm"
@@ -548,18 +368,21 @@
     <!-- Edited -->
     <!-- <script
       src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.concat.min.js"></script>
 
     <!-- DataTableJs links -->
     <!-- Edited -->
     <!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js">
     </script> -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
-    
-    <!-- Edited -->    
+    <script type="text/javascript" charset="utf8"
+      src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.js"></script>
+
+    <!-- Edited -->
     <!-- <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js">
     </script> -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" charset="utf8"
+      src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 
     <!-- intl-tel-input -->
     <!-- Edited -->
@@ -584,7 +407,7 @@
           $('a[aria-expanded=true]').attr('aria-expanded', 'false');
         });
       });
-    
+
     </script>
 
     <!-- Make image fullscreen when clicked -->

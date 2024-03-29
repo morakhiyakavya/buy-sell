@@ -1,124 +1,29 @@
 {% extends 'base.html' %}
 
+{% block ipo_css %}
+
+<link rel="stylesheet" href="../../static/css/product.css" media="all">
+<link rel="stylesheet" href="../../static/css/product1.css" media="all">
+<link rel="stylesheet" href="../../static/css/product2.css" media="all">
+{% endblock %}
+
 {% block current_user_content %}
 
-<!DOCTYPE html>
-<html lang="en">
+<div class="container-fluid content">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
 
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-4 mb-4">{{ title }} ({{ view_products }})</h1>
+        </div>
+    </div>
+    <br>
+    <!-- End of page title -->
 
-    <title>All Ipos</title>
-
-
-    <!-- plausible -->
-    <script defer event-user="unregistered" data-domain="screener.in"
-        src="https://plausible.screener.in/js/script.pageview-props.tagged-events.js"></script>
-    <script>window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments) }</script>
-
-
-    <link rel="stylesheet" href="../../static/css/product.css" media="all">
-    <link rel="stylesheet" href="../../static/css/product1.css" media="all">
-    <link rel="stylesheet" href="../../static/css/product2.css" media="all">
-
-
-    <style>
-        .outer-card {
-            border-radius: 20px;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            /* Padding inside the outer card for space around the inner card */
-        }
-
-        .inner-card {
-            margin: 15px;
-            margin-top: 30px;
-            /* Space between title and inner card */
-            border-radius: 8px;
-            /* margin-bottom: 20px; Space between inner card and bottom of outer card */
-            padding: 20px;
-            /* Padding inside the inner card */
-            /* background-color: #f8f9fa; Optional: different background color for the inner card */
-        }
-
-        .card-title {
-            word-wrap: break-word;
-            /* Ensures the title breaks to prevent overflow */
-        }
-
-        @media (max-width: 768px) {
-            .outer-card {
-                padding: 10px;
-                /* Smaller padding on smaller devices */
-            }
-
-            .inner-card {
-                margin: 10px 0;
-                /* Adjust margin */
-            }
-
-            .card-title {
-                font-size: 16px;
-                /* Smaller font size */
-            }
-
-            .grid-container {
-                font-size: 16px;
-            }
-        }
-
-        .key2 {
-            align-items: center;
-            box-sizing: border-box;
-            display: flex;
-            height: 47.4px;
-            justify-content: space-between;
-            margin: 0;
-            padding: 12px;
-            width: 293.763px;
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif;
-            font-size: 15px;
-            font-weight: 400;
-            letter-spacing: -0.135px;
-            line-height: 23.4px;
-            text-align: left;
-            color: rgb(96, 111, 123);
-            background-color: rgb(255, 255, 255);
-            border-radius: 6px;
-            /* Other properties related to borders, background, and list styles can be omitted
-     if they do not apply or default values are intended to be used. */
-        }
-
-
-        .grid-container {
-            margin-top: 24px;
-            border: 1.5px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 24px 16px;
-
-            /* font-size: 1.5rem; */
-            letter-spacing: var(--letter-spacing-15);
-        }
-    </style>
-
-
-    <!-- PWA manifest -->
-
-    <!-- favicons -->
-    <!-- <link rel="apple-touch-icon" sizes="180x180"
-        href="https://cdn-static.screener.in/favicon/apple-touch-icon.b6e5f24bf7d3.png">
-    <link rel="icon" type="image/png" sizes="32x32"
-        href="https://cdn-static.screener.in/favicon/favicon-32x32.00205914303a.png">
-    <link rel="icon" type="image/png" sizes="16x16"
-        href="https://cdn-static.screener.in/favicon/favicon-16x16.2b35594b2f33.png">
-    <link rel="mask-icon" href="https://cdn-static.screener.in/favicon/safari-pinned-tab.adbe3ed3c5ad.svg"
-        color="#8ED443"> -->
-</head>
-
-<body class="light flex-column">
 
     <main class="flex-grow container">
 
@@ -192,6 +97,7 @@
 
                             <span class="nowrap value">
                                 <span class="number">{{product.price}}</span>
+                                Rs.
                             </span>
 
                         </li>
@@ -298,39 +204,11 @@
             </div>
         </div>
         {% endfor %}
-        </div>
-        </div>
-
 
     </main>
+</div>
+<!-- </body> -->
 
-
-    <!-- <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-          // Ensure the element exists before trying to click it
-          const sidebarCollapseButton = document.getElementById('sidebarCollapse');
-          if (sidebarCollapseButton) {
-            sidebarCollapseButton.click();
-          }
-        });
-      </script> -->
-
-      <!-- <script>
-
-
-        console.log("=================================");
-        document.addEventListener('DOMContentLoaded', (event) => {
-          // Ensure the element exists before trying to click it
-          const sidebarCollapseButton = document.getElementById('sidebarCollapse');
-          if (sidebarCollapseButton) {
-            sidebarCollapseButton.click();
-          }
-        });
-      </script> -->
-      
-
-</body>
-
-</html>
+<!-- </html> -->
 
 {% endblock %}

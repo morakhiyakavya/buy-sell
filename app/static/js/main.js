@@ -25,19 +25,19 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("scroll", navBehavior);
     window.addEventListener("load", navBehavior);
 
-    function navBehavior() {
-        if (window.pageYOffset > 5) {
-            document.querySelector(".navbar").classList.add("active");
-        } else {
-            document.querySelector(".navbar").classList.remove("active");
-        }
+    // function navBehavior() {
+    //     if (window.pageYOffset > 5) {
+    //         document.querySelector(".navbar").classList.add("active");
+    //     } else {
+    //         document.querySelector(".navbar").classList.remove("active");
+    //     }
 
-        if (window.pageYOffset > 1000) {
-            document.querySelector("#scrollTop").classList.add("active");
-        } else {
-            document.querySelector("#scrollTop").classList.remove("active");
-        }
-    }
+    //     if (window.pageYOffset > 1000) {
+    //         document.querySelector("#scrollTop").classList.add("active");
+    //     } else {
+    //         document.querySelector("#scrollTop").classList.remove("active");
+    //     }
+    // }
 
     /* =====================================
 		MOVE TO TOP OF THE PAGE

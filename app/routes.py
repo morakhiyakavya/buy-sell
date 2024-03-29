@@ -73,6 +73,8 @@ def flash_message():  # An base level error message function
 
 @app.route("/")
 def home():
+    if current_user.is_authenticated: 
+        return redirect(url_for("dashboard"))
     return render_template("home.html")
 
 
@@ -1241,35 +1243,19 @@ def all_product():
 @app.route("/view-product")
 @login_required
 def view_product():  # Testing Feature
-    buyer_id = None  # Default value, for cases other than "buyer" or "seller"
+    
+    if current_user.is_authenticated :
 
-    if current_user.type == "seller":
-        buyer_id = current_user.buyer_id
-    elif current_user.type == "buyer":
-        buyer_id = current_user.id
-
-    if buyer_id is not None:
         products = IPO.query.all()
         view_products = len(products)
+        print("View Products -> ",view_products)
         status_priority = {"open": 1, "close": 2, "listed": 3}
         
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         print("Products -> \n",products)
         return render_template(
             "transaction/view_products.html",
-            title="All Products",
-            products=products,
-            view_products=view_products,
-        )
-    elif current_user.type == "admin":
-        products = IPO.query.all()
-        view_products = len(products)
-        # products.sort(key=lambda x: (x.status, x.listing_date))
-        status_priority = {"open": 1, "close": 2, "listed": 3}
-        products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
-        return render_template(
-            "transaction/view_products.html",
-            title="All Products",
+            title="Running Ipo's ",
             products=products,
             view_products=view_products,
         )

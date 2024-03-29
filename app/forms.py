@@ -150,7 +150,7 @@ class UserForm(FlaskForm):
             #     "contain at least one letter and one number.",
             # ),
         ],
-        render_kw={"placeholder": "Example:  #kavyaarya123#."},
+        render_kw={"placeholder": "Example:  kavyaarya123."},
     )
     confirm_password = PasswordField(
         "Confirm Password",

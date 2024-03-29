@@ -418,29 +418,6 @@ class Scrape_Website(BaseScraper):
         If an error occurs during scraping, returns None.
         """
         
-        # if self.config['website_name'] == 'kfintech':
-        #     try:
-        #         securities_allotted = int(WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text)
-        #         result_data = {
-        #             'name': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text,
-        #             'category': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label1']"))).text,
-        #             'securities_allotted': securities_allotted,
-        #             'applied': int(WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_Label2']"))).text),
-        #             'pan': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_pan']"))).text,
-        #             'client_id': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_dpclid']"))).text,
-        #             'application_number': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_l1']"))).text,
-        #             'error' : None
-        #         }
-        #         if securities_allotted > 0:
-        #             self.allotment += 1
-        #             self.total_shares += securities_allotted
-        #             print(f" Alloted : {self.allotment}")
-        #             print(f" Total shares : {self.total_shares}")
-        #         return result_data
-        #     except Exception as e:
-        #         print(f"Error scraping data: {e}")
-        #         return None
-        
         if self.config['website_name'] == 'kfintech':
             html_content = self.driver.page_source  # If you're using Selenium to get to the page
             soup = BeautifulSoup(html_content, 'html.parser')
@@ -469,7 +446,6 @@ class Scrape_Website(BaseScraper):
             except Exception as e:
                 print(f"Error scraping data: {e}")
                 return None
-
 
         elif self.config['website_name'] == 'bigshare':
             try:
@@ -912,7 +888,7 @@ class IPODetailsScraper(BaseScraper):
                 "Open Date": row.find_element(By.XPATH, ".//td[2]").text,
                 "Close Date": row.find_element(By.XPATH, ".//td[3]").text,
                 "Listing Date": row.find_element(By.XPATH, ".//td[4]").text,
-                "Price": row.find_element(By.XPATH, ".//td[2]").text,
+                "Price": row.find_element(By.XPATH, ".//td[5]").text,
                 "Issue Size": row.find_element(By.XPATH, ".//td[6]").text,
                 "Lot Size": row.find_element(By.XPATH, ".//td[7]").text,
                 "Listing At": row.find_element(By.XPATH, ".//td[8]").text,
@@ -936,5 +912,3 @@ class IPODetailsScraper(BaseScraper):
         # print("Aqua IPOs:", ipo_details_aqua)  # Adjust usage based on actual presence
         self.close()
         return ipo_details_green, ipo_details_lightyellow, ipo_details_aqua
-
-    

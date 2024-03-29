@@ -73,9 +73,9 @@ a:focus {
     transition: all 0.3s;
 }
 
-#sidebar.active {
+/* #sidebar.active {
     margin-left: -250px;
-}
+} */
 
 #sidebar .sidebar-header {
     padding: 20px;
@@ -159,7 +159,7 @@ a.article:hover {
 ----------------------------------------------------- */
 
 #content {
-    width: calc(100% - 250px);
+    width: calc(100%);
     padding: 40px;
     min-height: 100vh;
     transition: all 0.3s;
@@ -168,9 +168,9 @@ a.article:hover {
     right: 0;
 }
 
-#content.active {
+/* #content.active {
     width: 100%;
-}
+} */
 
 /* ---------------------------------------------------
     MEDIAQUERIES
@@ -180,15 +180,15 @@ a.article:hover {
     #sidebar {
         margin-left: -250px;
     }
-    #sidebar.active {
+    /* #sidebar.active {
         margin-left: 0;
-    }
+    } */
     #content {
         width: 100%;
     }
-    #content.active {
+    /* #content.active {
         width: calc(100% - 250px);
-    }
+    } */
     #sidebarCollapse span {
         display: none;
     }
