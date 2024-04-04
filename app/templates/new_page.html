@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Image Card with Edit and Delete Buttons</title>
+    <style>
+        :root {
+            --powder-blue: #b7c7e1ff;
+            --columbia-blue: #c1cfe5ff;
+            --lavender-web: #d4ddedff;
+            --alice-blue: #e2e9f3ff;
+            --antiflash-white: #f1f4f9ff;
+            --mint-green: #bee9e8ff;
+            --moonstone: #62b6cbff;
+            --indigo-dye: #1b4965ff;
+            --columbia-blue: #cae9ffff;
+            --picton-blue: #5fa8d3ff;
+            --pink-lavender: #ffcbf2ff;
+            --mauve: #f3c4fbff;
+            --mauve-2: #ecbcfdff;
+            --mauve-3: #e5b3feff;
+            --mauve-4: #e2afffff;
+            --mauve-5: #deaaffff;
+            --mauve-6: #d8bbffff;
+            --periwinkle: #d0d1ffff;
+            --columbia-blue: #c8e7ffff;
+            --celeste: #c0fdffff;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--antiflash-white);
+
+        }
+
+        .card {
+            width: 100%;
+            max-width: 340px;
+            background-color: var(--mint-green);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-content {
+            padding: 15px;
+            color: #333;
+            background-color: var(--mint-green);
+
+        }
+
+        .card-title {
+            margin-top: 0;
+            color: #333;
+            color: var(--indigo-dye);
+        }
+
+        @media (max-width: 768px) {
+            .card {
+                margin: 20px;
+            }
+        }
+
+
+        .card-actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-around;
+
+        }
+
+        .card-actions button {
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .card-actions button img {
+            width: 24px;
+            /* Adjust based on your icon size */
+            height: 24px;
+            /* Adjust based on your icon size */
+        }
+
+        /* Additional styles to ensure responsiveness and aesthetics */
+        .card-content {
+            position: relative;
+            padding: 15px;
+            color: #333;
+        }
+
+        /* Optional: Add a hover effect for the buttons */
+        .card-actions button:hover {
+            opacity: 0.7;
+            background-color: var(--picton-blue);
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="card-image">
+            <img src="../static/images/home/man.svg" alt="Image description">
+        </div>
+        <div class="card-content">
+            <h2 class="card-title">Card Title</h2>
+            <p>This is a simple responsive image card using a specific color palette.</p>
+            <div class="card-actions">
+                <button class="edit-btn">
+                    <svg width="20px" height="20" viewBox="0 0 24 24" fill="currentColor" x="44.5" y="44.5" role="img"
+                        style="display:inline-block;vertical-align:middle" xmlns="http://www.w3.org/2000/svg">
+                        <g fill="currentColor">
+                            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                stroke-width="2">
+                                <path
+                                    d="m16.474 5.408l2.118 2.117m-.756-3.982L12.109 9.27a2.118 2.118 0 0 0-.58 1.082L11 13l2.648-.53c.41-.082.786-.283 1.082-.579l5.727-5.727a1.853 1.853 0 1 0-2.621-2.621Z" />
+                                <path d="M19 15v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h3" />
+                            </g>
+                        </g>
+                    </svg> <button class="delete-btn"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                            fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                            <path
+                                d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z" />
+                            <path
+                                d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z" />
+                        </svg></button>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

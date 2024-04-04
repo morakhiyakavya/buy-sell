@@ -34,12 +34,13 @@ from app.forms import (
     AllotmentForm,
 )
 from app.models import (
+    TransactionPan,
     User,
     Buyer,
     Seller,
     Admin,
     Email,
-    Product,
+    # Product,
     Transaction,
     Pan,
     Details,
@@ -197,49 +198,45 @@ def reset_password(token):
 @app.route("/register/buyer", methods=["GET", "POST"])
 def register_buyer():
     """Buyer registration logic"""
-    if current_user.is_authenticated:
-        if current_user.type == "buyer":
-            return redirect(url_for("dashboard"))
-        if current_user.type == "seller":
-            return redirect(url_for("dashboard"))
-        if current_user.type == "admin":
-            form = BuyerRegistrationForm()
-            if form.validate_on_submit():
-                buyer = Buyer(
-                    first_name=form.first_name.data,
-                    last_name=form.last_name.data,
-                    username=form.username.data,
-                    email=form.email.data,
-                    phone_number=form.phone_number.data,
-                    confirm_password=form.confirm_password.data,
-                    current_residence=form.current_residence.data,
-                )
-
-                # Show actual seller password in registration email
-                session["password"] = form.password.data
-                user_password = session["password"]
-
-                # Update database
-                buyer.set_password(form.password.data)
-                db.session.add(buyer)
-                db.session.commit()
-
-                # Send buyer and email with login credentials
-                send_login_details(buyer, user_password)
-
-                # Delete seller password session
-                del session["password"]
-
-                flash(
-                    f"Successfully registered Buyer {buyer.username}! "
-                    "Sent email for further guidance."
-                )
-                return redirect(url_for("dashboard"))
-            return render_template(
-                "auth/register_current_user.html",
-                title="Register As A Buyer",
-                form=form,
+    
+    if current_user.type == "admin":
+        form = BuyerRegistrationForm()
+        if form.validate_on_submit():
+            buyer = Buyer(
+                first_name=form.first_name.data,
+                last_name=form.last_name.data,
+                username=form.username.data,
+                email=form.email.data,
+                phone_number=form.phone_number.data,
+                confirm_password=form.confirm_password.data,
+                current_residence=form.current_residence.data,
             )
+
+            # Show actual seller password in registration email
+            session["password"] = form.password.data
+            user_password = session["password"]
+
+            # Update database
+            buyer.set_password(form.password.data)
+            db.session.add(buyer)
+            db.session.commit()
+
+            # Send buyer and email with login credentials
+            send_login_details(buyer, user_password)
+
+            # Delete seller password session
+            del session["password"]
+
+            flash(
+                f"Successfully registered Buyer {buyer.username}! "
+                "Sent email for further guidance."
+            )
+            return redirect(url_for("dashboard"))
+        return render_template(
+            "auth/register_current_user.html",
+            title="Register As A Buyer",
+            form=form,
+        )
     else:
         return flash_message()
 
@@ -481,11 +478,32 @@ def delete_admin(username):
 
 @app.route("/del")
 def delete_det():
-    admin = Seller(
+    admin = Admin(
+        first_name="kavya",
+        last_name="Morakhiya",
+        username="kavya",
+        email="morakhiyakavya@gmail.com",
+        phone_number="7016184560",
+        current_residence="Ahmedabad,Gujarat",
+        # confirm_password="kavyaarya123.",
+        department = "Super Admin",
+    )
+
+    buyer = Buyer(
         first_name="Shrenik",
         last_name="Morakhiya",
         username="shrenik",
         email="shrenik888@gmail.com",
+        phone_number="7016184560",
+        current_residence="Ahmedabad,Gujarat",
+        confirm_password="kavyaarya123.",
+    )
+
+    seller = Seller(
+        first_name="arya",
+        last_name="Morakhiya",
+        username="arya",
+        email="arya@gmail.com",
         phone_number="7016184560",
         current_residence="Ahmedabad,Gujarat",
         confirm_password="kavyaarya123.",
@@ -498,11 +516,17 @@ def delete_det():
 
     # Update the database
     admin.set_password(user_password)
+    buyer.set_password(user_password)
+    seller.set_password(user_password)
     db.session.add(admin)
+    db.session.add(buyer)
+    db.session.add(seller)
     db.session.commit()
 
     # Send admin an email with login credentials
     send_login_details(admin, user_password)
+    send_login_details(buyer, user_password)
+    send_login_details(seller, user_password)
 
     # Delete seller password session
     del session["password"]
@@ -1086,33 +1110,33 @@ def delete_seller_email(id):
 
 # Creating Product
 # Access to Buyer Only
-@app.route("/add-product", methods=["GET", "POST"])
-@login_required
-def add_product():
-    if current_user.type == "buyer":
-        form = ProductForm()
-        if form.validate_on_submit():
-            product = Product(
-                name=form.name.data,
-                description=form.description.data,
-                buyer=current_user,
-            )
-            db.session.add(product)
-            db.session.commit()
-            flash("Product added successfully")
-            return redirect(url_for("all_product"))
+# @app.route("/add-product", methods=["GET", "POST"])
+# @login_required
+# def add_product():
+#     if current_user.type == "buyer":
+#         form = ProductForm()
+#         if form.validate_on_submit():
+#             product = Product(
+#                 name=form.name.data,
+#                 description=form.description.data,
+#                 buyer=current_user,
+#             )
+#             db.session.add(product)
+#             db.session.commit()
+#             flash("Product added successfully")
+#             return redirect(url_for("all_product"))
 
-        return render_template(
-            "Product/add_product.html", title="Add Product", form=form
-        )
+#         return render_template(
+#             "Product/add_product.html", title="Add Product", form=form
+#         )
 
-    # Add a return statement for cases when the current user type is not 'buyer'
-    return flash_message()
+#     # Add a return statement for cases when the current user type is not 'buyer'
+#     return flash_message()
 
 
 @app.route("/del-ipo-det")
 def add_ipo_det():
-    product = IPO.query.all()
+    product = Pan.query.all()
     for i in product:
         db.session.delete(i)
         db.session.commit()
@@ -1204,36 +1228,36 @@ def edit_product(product_id):
 
 
 # Read All Product
-@app.route("/all-product")
-@login_required
-def all_product():
-    buyer_id = None  # Default value, for cases other than "buyer" or "seller"
+# @app.route("/all-product")
+# @login_required
+# def all_product():
+#     buyer_id = None  # Default value, for cases other than "buyer" or "seller"
 
-    if current_user.type == "seller":
-        buyer_id = current_user.buyer_id
-    elif current_user.type == "buyer":
-        buyer_id = current_user.id
+#     if current_user.type == "seller":
+#         buyer_id = current_user.buyer_id
+#     elif current_user.type == "buyer":
+#         buyer_id = current_user.id
 
-    if buyer_id is not None:
-        products = Product.query.filter_by(buyer_id=buyer_id).all()
-        all_products = len(products)
-        return render_template(
-            "transaction/available_products.html",
-            title="All Products",
-            products=products,
-            all_products=all_products,
-        )
-    elif current_user.type == "admin":
-        products = Product.query.all()
-        all_products = len(products)
-        return render_template(
-            "transaction/available_products.html",
-            title="All Products",
-            products=products,
-            all_products=all_products,
-        )
-    else:
-        return flash_message()
+#     if buyer_id is not None:
+#         products = Product.query.filter_by(buyer_id=buyer_id).all()
+#         all_products = len(products)
+#         return render_template(
+#             "transaction/available_products.html",
+#             title="All Products",
+#             products=products,
+#             all_products=all_products,
+#         )
+#     elif current_user.type == "admin":
+#         products = Product.query.all()
+#         all_products = len(products)
+#         return render_template(
+#             "transaction/available_products.html",
+#             title="All Products",
+#             products=products,
+#             all_products=all_products,
+#         )
+#     else:
+#         return flash_message()
 
 
 # View Product
@@ -1243,16 +1267,17 @@ def all_product():
 @app.route("/view-product")
 @login_required
 def view_product():  # Testing Feature
+    if session.get("temp_details") is not None:
+        session.pop('temp_details', None)
+        print("Session pop")
     
     if current_user.is_authenticated :
 
         products = IPO.query.all()
         view_products = len(products)
-        print("View Products -> ",view_products)
         status_priority = {"open": 1, "close": 2, "listed": 3}
         
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
-        print("Products -> \n",products)
         return render_template(
             "transaction/view_products.html",
             title="Running Ipo's ",
@@ -1264,17 +1289,17 @@ def view_product():  # Testing Feature
 
 
 # Delete Product
-@app.route("/delete-product/<id>")
-@login_required
-def delete_product(id):
-    if current_user.type == "buyer":
-        product = Product.query.filter_by(
-            buyer_id=current_user.id, id=id
-        ).first_or_404()
-        db.session.delete(product)
-        db.session.commit()
-        flash(f"The Ipo {product.name} has been deleted")
-        return redirect(url_for("all_product"))
+# @app.route("/delete-product/<id>")
+# @login_required
+# def delete_product(id):
+#     if current_user.type == "buyer":
+#         product = Product.query.filter_by(
+#             buyer_id=current_user.id, id=id
+#         ).first_or_404()
+#         db.session.delete(product)
+#         db.session.commit()
+#         flash(f"The Ipo {product.name} has been deleted")
+#         return redirect(url_for("all_product"))
 
 
 # --------------
@@ -1349,10 +1374,18 @@ def edit_pan():
 def multi_pan():
     for i in range(10):
         for j in range(10):
+            import random
+            import string
+            from faker import Faker
+            fake = Faker()
+            name = fake.name()
+            random_string = ''.join(random.choice(string.ascii_letters) for _ in range(4))
+            random_number = random.randint(1000, 9999)
+            one = ''.join(random.choice(string.ascii_letters) for _ in range(1))
             pan = Pan(
-                name=f"kavya{i}{j}",
-                pan_number= f"omops41{i}{j}o".upper(),
-                dp_id= f"2584815512{j}{i}",
+                name=f"{name}",
+                pan_number= f"{random_string}{random_number}{one}".upper(),
+                dp_id= random.randint(1000000000, 9999999999),
                 seller_id=3,
         )
             db.session.add(pan)
@@ -1429,16 +1462,17 @@ def delete_pan(id):
 
 
 # Create Details
-@app.route("/add-details", methods=["GET", "POST"])
+@app.route("/add-details/<int:product_id>", methods=["GET", "POST"])
 @login_required
-def add_details():
+def add_details(product_id):
     if current_user.type == "seller":
-        print("Current ->", current_user)
-        product_id = request.args.get("product_id", default=None, type=int)
-        product_name = Product.query.filter_by(id=product_id).first_or_404()
+        # print("Current ->", current_user)
+        product_name = IPO.query.filter_by(id=product_id).first_or_404()
+        if "temp_details" not in session:
+            session["temp_details"] = []
         if product_id is None:
             flash("No Product Selected")
-            return redirect(url_for("all_product"))
+            return redirect(url_for("view_product"))
         form = DetailForm()
         if form.validate_on_submit():
             details = Details(
@@ -1452,6 +1486,9 @@ def add_details():
             print(product_id)
             db.session.add(details)
             db.session.commit()
+            session["temp_details"].append(details.id)
+            session.modified = True
+            print("Session ->", session["temp_details"])
             print(details.id)
             transaction = Transaction(
                 details_id=details.id,
@@ -1469,10 +1506,27 @@ def add_details():
             title="Add Details",
             form=form,
             product_name=product_name,
+            extra_details= Details.query.filter(Details.id.in_(session["temp_details"])).all(),
         )
 
     if current_user.type != "seller":
         return flash_message()
+    
+# @app.route("/delete-subject")
+# @login_required
+# def delete_subject():
+#     if current_user.type == "seller":
+#         subject = Details.query.all()
+#         print("Subject ->",subject)
+#         for i in subject:
+#             db.session.delete(i)
+#             db.session.commit()
+#         # flash(f"The Subject {subject.name}({subject.subject_code}) has been deleted")
+#         return redirect(url_for("all_subject"))
+
+#     flash("You are not authorized to view this page.")
+#     return redirect(url_for("dashboard"))
+
 
 
 """
@@ -1560,8 +1614,13 @@ def delete_subject(id):
 @app.route("/all-transactions")
 @login_required
 def all_transaction():
+    if session.get("temp_details") is not None:
+        session.pop("temp_details", None)
+        print("Session pop")
     if current_user.type == "seller":
         transactions = Transaction.query.filter_by(seller_id=current_user.id).all()
+        for transaction in transactions:
+            transaction.items_processed = count_pan(transaction.id)
         all_transactions = len(transactions)
         return render_template(
             "transaction/all_transactions.html",
@@ -1570,21 +1629,22 @@ def all_transaction():
             all_transactions=all_transactions,
         )
 
+def count_pan(transaction_id):
+    count = TransactionPan.query.filter_by(transaction_id=transaction_id).count()
+    return count
 
 # ----------
 # End Of Curd On Transaction
 # ----------
 
-
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
-    if request.method == "POST":
-        selected_ids = request.form.getlist("ID[]")
-        print("Select ->", selected_ids)
-        return jsonify({"status": "success", "selected_ids": selected_ids})
-    else:
-        if current_user.type == "seller":
+    if current_user.type == "seller":
+        transaction_id = request.args.get("transaction_id", type=int)
+        transaction = Transaction.query.get_or_404(transaction_id)
+        count = count_pan(transaction_id)
+        if request.method == "GET":
             pans = Pan.query.filter_by(seller_id=current_user.id).all()
             all_pans = len(pans)
             return render_template(
@@ -1592,11 +1652,34 @@ def available_pans():
                 title="All Pans",
                 pans=pans,
                 all_pans=all_pans,
+                transaction=transaction  # Pass transaction to template to use its details
             )
-        else:
-            return flash_message()
-
-
+        elif request.method == "POST":
+            selected_ids = request.form.getlist("ID[]")
+            print("Selected Ids ->", selected_ids)
+            required_pans = transaction.details.quantity
+            print("Required Pans ->", required_pans)
+            
+            if len(selected_ids) > required_pans:
+                # Redirect back with an error message if the selected pans don't match required quantity exactly
+                flash(f"You must select exactly {required_pans} pans. You selected {len(selected_ids)}.")
+                return redirect(url_for("available_pans", transaction_id=transaction_id))
+            elif len(selected_ids) <= required_pans:
+                # Process exactly matched number of selected pans
+                for selected_id in selected_ids:
+                    print("transaction_id ->", transaction_id)
+                    transaction_pan = TransactionPan(
+                        transaction_id=transaction_id,
+                        pan_id=int(selected_id)
+                    )
+                    db.session.add(transaction_pan)
+                db.session.commit()
+                flash("The transaction has been updated successfully.")
+                return redirect(url_for("all_transaction"))
+    else:
+        # Handle non-seller users or redirect as needed
+        flash("You are not authorized to view this page.")
+        return redirect(url_for("index")) 
 # --------------------------------------
 # End of Related To Transaction
 # --------------------------------------

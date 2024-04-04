@@ -45,7 +45,7 @@
                             <td>{{ transaction.details.subject }}</td>
                             <td>{{ transaction.details.formtype }}</td>
                             <td>{{ transaction.details.price }}</td>
-                            <td><a href="{{ url_for('available_pans',transaction_id = transaction.id ) }}">{{ transaction.details.quantity }}</a></td>
+                            <td> {{ transaction.items_processed }}/<a href="{{ url_for('available_pans',transaction_id = transaction.id ) }}">{{ transaction.details.quantity }}</a></td>
                             <td>{{ moment(transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
                             {% if current_user.type == "admin" %}
                             <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }} </th>
@@ -72,6 +72,7 @@
 <script>
     $(document).ready(function () {
         var table = $('#data').DataTable();
+        fixedHeader: true
     });
 </script>
 

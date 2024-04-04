@@ -202,6 +202,13 @@
                      -->
                 </div>
             </div>
+            <br>
+            <div class="button-container" style="display: flex;justify-content: flex-end;">
+
+                <button type="button" style="border:2px solid ;padding: 1rem 2rem;width: fit-content;">
+                    <a href="{{ url_for('add_details', product_id=product.id) }}">sell</a>
+                </button>
+            </div>
         </div>
         {% endfor %}
 

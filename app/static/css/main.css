@@ -8,6 +8,7 @@ sample Elearning App
  * Copyright 2011-2021 Twitter, Inc.
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
+ @import url('https://cdn-uicons.flaticon.com/2.2.0/uicons-regular-rounded/css/uicons-regular-rounded.css');
  :root {
     --bs-blue: #0d6efd;
     --bs-indigo: #6610f2;
@@ -62,6 +63,7 @@ sample Elearning App
     --bs-body-bg: #fff;
   }
   
+
   *,
   *::before,
   *::after {
@@ -1941,6 +1943,7 @@ sample Elearning App
   .table-responsive {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    font-size: 0.875rem;
   }
   
   @media (max-width: 575.98px) {
@@ -12187,3 +12190,18 @@ sample Elearning App
     --swiper-theme-color: orange;
   }
   
+  #nostyle {
+    all: unset; 
+    display: revert;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: none !important;
+    font-size: medium !important; 
+    font-family: revert; 
+    color: inherit;
+}
+  #nostyle:hover {
+    cursor: pointer;
+    color: var(--bs-primary);
+  }

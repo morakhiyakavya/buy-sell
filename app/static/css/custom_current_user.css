@@ -160,7 +160,8 @@ a.article:hover {
 
 #content {
     width: calc(100%);
-    padding: 40px;
+    padding-top: 20px;
+    padding-bottom: 20px;
     min-height: 100vh;
     transition: all 0.3s;
     position: absolute;

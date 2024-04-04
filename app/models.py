@@ -82,7 +82,9 @@ class Seller(User):
     __tablename__ = "seller"
 
     id = db.Column(
-        db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
+        db.Integer, 
+        db.ForeignKey("user.id", ondelete="CASCADE", name="fk_seller_user_id"),  # Explicit FK name
+        primary_key=True
     )
     current_residence = db.Column(db.String(64), default="Ahmedabad, Gujarat")
     buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE"))
@@ -100,7 +102,9 @@ class Buyer(User):
     __tablename__ = "buyer"
 
     id = db.Column(
-        db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
+        db.Integer, 
+        db.ForeignKey("user.id", ondelete="CASCADE", name="fk_buyer_user_id"),  # Explicit FK name
+        primary_key=True
     )
     current_residence = db.Column(db.String(64), default="Ahmedabad, Gujarat")
     # registered_by_superadmin = db.relationship('BuyerRegistration', backref='registered_buyer', lazy='dynamic')
@@ -116,7 +120,9 @@ class Admin(User):
     __tablename__ = "admin"
 
     id = db.Column(
-        db.Integer, db.ForeignKey("user.id", ondelete="CASCADE"), primary_key=True
+        db.Integer, 
+        db.ForeignKey("user.id", ondelete="CASCADE", name="fk_admin_user_id"),  # Explicit FK name
+        primary_key=True
     )
     current_residence = db.Column(db.String(64), default="Ahmedabad, Gujarat")
     department = db.Column(db.String(64), default="Administration")
@@ -135,26 +141,26 @@ class Admin(User):
 # Application Users Purchase and Sell
 # =================
 
-#product detail
-class Product(db.Model):
-    __tablename__ = "products"
+# #product detail
+# class Product(db.Model):
+#     __tablename__ = "products"
 
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
-    description = db.Column(db.String(64), nullable=False)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(64), nullable=False)
+#     description = db.Column(db.String(64), nullable=False)
+#     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    # Relationships
-    buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE"), nullable=False)
-    buyer = db.relationship("Buyer", backref="products", foreign_keys=[buyer_id], passive_deletes=True)
-    price_combinations = db.relationship('Details', backref='product', lazy=True)
-    # Add a unique constraint on name and buyer_id
-    __table_args__ = (UniqueConstraint('name', 'buyer_id'),)
+#     # Relationships
+#     buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE"), nullable=False)
+#     buyer = db.relationship("Buyer", backref="products", foreign_keys=[buyer_id], passive_deletes=True)
+#     price_combinations = db.relationship('Details', backref='product', lazy=True)
+#     # Add a unique constraint on name and buyer_id
+#     __table_args__ = (UniqueConstraint('name', 'buyer_id'),)
 
 
 class IPO(db.Model):
     __tablename__ = 'ipos'
-    id = db.Column(db.Integer, primary_key=True, name='pk_ipo_id')
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False, unique=True, name='uq_ipo_name')
     price = db.Column(db.String(255), nullable=True)
     issue_size = db.Column(db.String(255), nullable=True)
@@ -171,31 +177,34 @@ class Details(db.Model):
     __tablename__ = "details"
 
     id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey("products.id"), nullable = False)
+    product_id = db.Column(db.Integer, db.ForeignKey("ipos.id", name="fk_details_product_id"), nullable=False)
     subject = db.Column(db.String(10), nullable=False)
     formtype = db.Column(db.String(8), nullable=False)
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    
-    # Relationships
-    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE"), nullable=False)
-    seller = db.relationship("Seller", backref="details", foreign_keys=[seller_id], passive_deletes=True)
 
+    # Relationships
+    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_details_seller_id"), nullable=False)
+    seller = db.relationship("Seller", backref="details", foreign_keys=[seller_id], passive_deletes=True)
+    ipo = db.relationship("IPO", backref="details")
 
 # Pan Detail
 class Pan(db.Model):
     __tablename__ = "pan"
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
-    pan_number = db.Column(db.String(64), nullable=False, unique = True)
-    dp_id = db.Column(db.String(64), nullable=False)
+    name = db.Column(db.String(64), nullable=True)
+    pan_number = db.Column(db.String(64), nullable=False)
+    dp_id = db.Column(db.String(64), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
-    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE"), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_pan_seller_id"), nullable=False)
     seller = db.relationship("Seller", backref="pan", foreign_keys=[seller_id], passive_deletes=True)
+
+    __table_args__ = (UniqueConstraint('pan_number', 'seller_id', name='_seller_pan_uc'),)
+
 
 
 #transaction detail
@@ -208,24 +217,24 @@ class Transaction(db.Model):
     settled = db.Column(db.Boolean, default=False)
 
     # Relationships
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
-    product = db.relationship('Product', backref='transactions')
+    product_id = db.Column(db.Integer, db.ForeignKey('ipos.id', name='fk_transaction_product_id'), nullable=False)
+    product = db.relationship('IPO', backref='transactions', foreign_keys=[product_id], passive_deletes=True)
 
-    details_id = db.Column(db.Integer, db.ForeignKey('details.id'), nullable=False)
-    details = db.relationship('Details', backref='transactions')
+    details_id = db.Column(db.Integer, db.ForeignKey('details.id', name='fk_transaction_details_id'), nullable=False)
+    details = db.relationship('Details', backref='transactions', foreign_keys=[details_id], passive_deletes=True)
 
-    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE"), nullable=False)
+    seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_transaction_seller_id"), nullable=False)
     seller = db.relationship("Seller", backref="transactions", foreign_keys=[seller_id], passive_deletes=True)
 
-    buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE"), nullable=False)
+    buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE", name="fk_transaction_buyer_id"), nullable=False)
     buyer = db.relationship("Buyer", backref="transactions", foreign_keys=[buyer_id], passive_deletes=True)
 
 
 class TransactionPan(db.Model):
     __tablename__ = "transaction_pan"
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id'), primary_key=True)
-    pan_id = db.Column(db.Integer, db.ForeignKey('pan.id'), primary_key=True)
-
+    transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id', name='fk_transaction_pan_transaction_id'), primary_key=True)
+    pan_id = db.Column(db.Integer, db.ForeignKey('pan.id', name='fk_transaction_pan_pan_id'), primary_key=True)
+    
     transaction = db.relationship('Transaction', backref=db.backref('transaction_pans', cascade='all, delete-orphan'))
     pan = db.relationship('Pan', backref=db.backref('pan_transactions', cascade='all, delete-orphan', overlaps = "pans, transactions"))
 

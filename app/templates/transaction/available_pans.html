@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.dataTables.min.css">
+<script src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
 
 {% block current_user_content %}
-<div class="container-fluid content">
+<div class="container-fluid content" style="padding: 0px; padding-left: 10px;">
 
     <!-- Flash message -->
     {% include '_flash_message.html' %}
@@ -20,38 +22,29 @@
         <div class="col-md-12">
             <!-- pan list -->
             <div class="table-responsive">
-                <form id="checkbox-form" action="{{ url_for('available_pans') }}" method="post">
-                    <table id="data" class="table table-hover table-bordered">
+                <form id="checkbox-form" action="{{ url_for('available_pans', transaction_id=transaction.id) }}" method="post">
+                    <table data-toggle="table" data-fixed-header="true" data-height="400" id="data" class="table table-hover table-bordered">
                         <thead>
                             <tr>
-                                <th>Select <input type="checkbox" id="select-all"> </th>
-                                <th>Subject To <select name="def" id="def">
-                                        <option value="none" default="checked">None</option>
-                                        <option value="Subject 1">Subject 1</option>
-                                        <option value="Subject 2">Subject 2</option>
+                                <th data-priority="1">Select  <input type="checkbox" id="select-all"> </th>
                                     </select> </th>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Pan</th>
-                                <th>DP id</th>
+                                <!-- <th data-priority="2">ID</th> -->
+                                <th data-priority="4">Name</th>
+                                <th data-priority="3">Pan</th>
+                                <th data-priority="5">DP id</th>
                                 {% if current_user.type == "admin" %}
-                                <th>Timestamp</th>
-                                <th>Seller</th> <!-- New column for actions -->
+                                <th data-priority="6">Timestamp</th>
+                                <th data-priority="7">Seller</th> <!-- New column for actions -->
                                 {% endif %}
-                                <th>Actions</th> <!-- New column for actions -->
+                                <th data-priority="8">Actions</th> <!-- New column for actions -->
                             </tr>
                         </thead>
                         <tbody>
                             <!-- Get all pans from the database -->
                             {% for pan in pans %}
                             <tr>
-                                <td><input type="checkbox" name="ID[]" value="{{ pan.id }}"></td>
-                                <td><select name="subject" id="sub">
-                                        <option value="none" default="checked">None</option>
-                                        <option value="Subject 1">Subject 1</option>
-                                        <option value="Subject 2">Subject 2</option>
-                                    </select></td>
-                                <td>{{ pan.id }}</td>
+                                <td>{{ loop.index }}  <input type="checkbox" name="ID[]" value="{{ pan.id }}"></td>
+                                <!-- <td>{{ loop.index }}</td> -->
                                 <td>{{ pan.name }}</td>
                                 <td>{{ pan.pan_number }}</td>
                                 <td>{{ pan.dp_id }}</td>
@@ -61,15 +54,20 @@
                                 {% endif %}
                                 <!-- New column for actions -->
                                 <td>
-                                    <a href="{{ url_for('edit_pan', id=pan.id) }}" class="btn btn-primary">Edit</a>
-                                    <a href="{{ url_for('delete_pan', id=pan.id) }}" class="btn btn-danger">Delete</a>
+                                    <a href="{{ url_for('edit_pan', id=pan.id) }}" id="nostyle">
+                                        <i class="fi fi-rr-pencil" style="font-size: 0.875rem;"></i>
+                                    </a>
+                                    &nbsp; &nbsp;
+                                    <a href="{{ url_for('delete_pan', id=pan.id) }}" id="nostyle">
+                                        <i class="fi fi-rr-trash" style="font-size: 0.875rem;"></i>
+                                    </a>
                                 </td>
                             </tr>
                             {% endfor %}
                             <!-- End of getting all pans from the database -->
                         </tbody>
                     </table>
-                    <button type="submit" id="submit-btn" class="btn btn-primary">Process Selected</button>
+                    <button type="submit" id="submit-btn" class="btn btn-primary">Give Pan</button>
                 </form>
             </div>
         </div>
@@ -93,50 +91,114 @@
 {% endblock %}
 
 {% block current_user_scripts %}
-<script>
+
+ <script>
     $(document).ready(function () {
         var table = $('#data').DataTable();
+        fixedHeader: true
+        columnDefs: [
+      { orderable: false, targets: 0 } // Assumes the checkbox is in the first column
+    ]
 
         //     // Handle select all checkbox change event
         $('#select-all').on('change', function () {
             var rows = table.rows({ page: 'current' }).nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
+
+        
         });
     });
 
+    $('#nostyle').removeAttr('style');
 
-    // For Subject To dropdown
-    $(document).ready(function () {
-        // Handle change event of the "Subject To" dropdown
-        $('#def').change(function () {
-            // Get the selected value
-            var selectedSubject = $(this).val();
 
-            // Update all corresponding cells in the table
-            $('tbody tr').each(function () {
-                // Find the select element in the current row
-                var subjectDropdown = $(this).find('select[name="subject"]');
+    // Stop propagation for the select-all checkbox click
+  $('#select-all').on('click', function(e){
+    e.stopPropagation();
+  });
 
-                // Update the selected value
-                subjectDropdown.val(selectedSubject);
+    // // For Subject To dropdown
+    // $(document).ready(function () {
+    //     // Handle change event of the "Subject To" dropdown
+    //     $('#def').change(function () {
+    //         // Get the selected value
+    //         var selectedSubject = $(this).val();
 
-                // If you want to trigger the change event on the select element
-                // subjectDropdown.trigger('change');
-            });
-        });
+    //         // Update all corresponding cells in the table
+    //         $('tbody tr').each(function () {
+    //             // Find the select element in the current row
+    //             var subjectDropdown = $(this).find('select[name="subject"]');
+
+    //             // Update the selected value
+    //             subjectDropdown.val(selectedSubject);
+
+    //             // If you want to trigger the change event on the select element
+    //             // subjectDropdown.trigger('change');
+    //         });
+    //     });
+    // });
+    
+//     $(document).ready(function() {
+//     $('#checkbox-form').on('submit', function(e) {
+//         e.preventDefault(); // Prevent the default form submission
+//         var formData = $(this).serialize(); // Serialize form data
+
+//         $.post('/available-pans', formData, function(response) {
+//             console.log(response);
+//             // Handle the response here, e.g., show a message to the user
+//         });
+//     });
+// });
+
+</script> 
+<!-- 
+<script>
+$(document).ready(function () {
+    // Initialize DataTables
+    var table = $('#data').DataTable();
+
+    // Select all functionality
+    $('#select-all').on('change', function () {
+        var rows = table.rows({ page: 'current' }).nodes();
+        $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
     });
 
-    $(document).ready(function() {
+    // Limit the number of checkboxes that can be checked
+    // var maxLimit = {{ transaction.details.quantity }};
+    // $('input[type="checkbox"][name="ID[]"]').on('change', function (evt) {
+    //    if ($('input[type="checkbox"][name="ID[]"]:checked').length > maxLimit) {
+    //        this.checked = false;
+    //        alert('You can only select ' + maxLimit + ' pans.');
+    //    }
+    // });
+
+    // AJAX form submission
     $('#checkbox-form').on('submit', function(e) {
-        e.preventDefault(); // Prevent the default form submission
-        var formData = $(this).serialize(); // Serialize form data
+        e.preventDefault(); // Prevent default form submission
+        var maxLimit = {{ transaction.details.quantity }};
+        if ($('input[type="checkbox"][name="ID[]"]:checked').length > maxLimit) {
+            alert('You must select exactly ' + maxLimit + ' pans.');
+            return;
+        }
 
-        $.post('/available-pans', formData, function(response) {
+        var formData = $(this).serialize(); // Serialize form data
+        $.post($(this).attr('action'), formData, function(response) {
+            // Handle the response here
             console.log(response);
-            // Handle the response here, e.g., show a message to the user
+            if(response.status === "success") {
+                // Success action, e.g., redirecting or showing a success message
+                alert('The transaction has been updated successfully.');
+                window.location.href = '/all-transactions'; // Redirect or update UI as needed
+            } else {
+                // Handle error
+                alert('An error occurred. Please try again.');
+            }
+        }).fail(function() {
+            alert('An error occurred. Please try again.');
         });
     });
 });
-</script>
+</script> -->
+
 
 {% endblock %}
