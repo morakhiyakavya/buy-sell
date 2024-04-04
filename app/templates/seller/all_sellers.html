@@ -47,9 +47,9 @@
                                 <tr>
 
                                     <td><img src="{{ seller.avatar(25) }}"></td>
-                                    <td>{{ seller.id }}</td>
+                                    <td>{{ loop.index }}</td>
                                     <td>{{ seller.first_name }} {{ seller.last_name }}</td>
-                                    <td>{{ seller.username }}</td>
+                                    <td> <a href="{{ url_for('all_transaction',seller_id = seller.id) }}">{{ seller.username }}</a></td>
                                     <td>{{ seller.email }}</td>
                                     <td><a href="https://wa.me/{{ seller.phone_number | replace('+', '') }}?text=Hello%20From%20somaSOMA" target="_blank">{{ seller.phone_number }}</a></td>
                                     <td><strong>{{ seller.buyer.first_name }} {{ seller.buyer.last_name }}</strong></td>

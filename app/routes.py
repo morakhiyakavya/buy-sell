@@ -62,7 +62,7 @@ from app import app, db, socketio
 # USER AUTHENTICATION
 # =========================================
 
-
+# Checked
 def flash_message():  # An base level error message function
     if current_user.is_authenticated:
         flash(f"As a {current_user.type} you are not authorized to view the page.")
@@ -71,20 +71,37 @@ def flash_message():  # An base level error message function
         flash("You are not authorized to view the page. Please Login first.")
         return redirect(url_for("login"))
 
-
+# Checked
 @app.route("/")
 def home():
     if current_user.is_authenticated: 
         return redirect(url_for("dashboard"))
     return render_template("home.html")
 
+@app.route("/all-links")
+@login_required
+def all_links():
+    if current_user.is_authenticated:
+        urls = {}
+        with app.test_request_context():
+            for rule in app.url_map.iter_rules():
+                # Skip endpoints that require arguments.
+                if "GET" in rule.methods and len(rule.arguments) == 0:
+                    try:
+                        urls[rule.endpoint] = url_for(rule.endpoint)
+                    except Exception as e:
+                        # Handle or log the error for endpoints that still can't be built
+                        print(f"Error building URL for endpoint '{rule.endpoint}': {e}")
+        return render_template("all_links.html", urls=urls)
 
-@app.route("/allotment_file")
-def allotment_file():
-    file_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder\\ENSER_COM_-_PANCARD_-_Copy.xlsx"
-    return send_file(file_path, as_attachment=True)
 
 
+# @app.route("/allotment_file")
+# def allotment_file():
+#     file_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder\\ENSER_COM_-_PANCARD_-_Copy.xlsx"
+#     return send_file(file_path, as_attachment=True)
+
+# Checked
 @app.route("/dashboard")
 def dashboard():
         if current_user.type == "buyer":
@@ -94,18 +111,14 @@ def dashboard():
         if current_user.type == "admin":
             return redirect(url_for("admin_profile"))
 
-@app.route("/idk")
-def idk():
-    return render_template("idk.html")
+
 # Login
-
-
+# Checked
 @app.route("/login", methods=["GET", "POST"])
 def login():
     """Login logic"""
     if current_user.is_authenticated:
-        if current_user.type == "buyer":
-            return redirect(url_for("dashboard"))
+        return redirect(url_for("dashboard"))
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
@@ -122,8 +135,7 @@ def login():
 
 
 # Logout
-
-
+# Checked
 @app.route("/logout")
 @login_required
 def logout():
@@ -134,7 +146,7 @@ def logout():
 
 # Request password reset
 
-
+# Not Checked for Buyer and Seller
 @app.route("/request-password-reset", methods=["GET", "POST"])
 def request_password_reset():
     """
@@ -163,8 +175,7 @@ def request_password_reset():
 
 
 # Reset password
-
-
+# Not Checked for Buyer and Seller
 @app.route("/reset-password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     """
@@ -193,18 +204,17 @@ def reset_password(token):
 
 
 # Buyer registration
-
-
+# Checked
+# Potential Updates : We might need to give other field to be filled by buyer and might send direct otp or link to user.
 @app.route("/register/buyer", methods=["GET", "POST"])
 def register_buyer():
     """Buyer registration logic"""
-    
     if current_user.type == "admin":
         form = BuyerRegistrationForm()
         if form.validate_on_submit():
             buyer = Buyer(
-                first_name=form.first_name.data,
-                last_name=form.last_name.data,
+                first_name=form.first_name.data.title(),
+                last_name=form.last_name.data.title(),
                 username=form.username.data,
                 email=form.email.data,
                 phone_number=form.phone_number.data,
@@ -234,7 +244,7 @@ def register_buyer():
             return redirect(url_for("dashboard"))
         return render_template(
             "auth/register_current_user.html",
-            title="Register As A Buyer",
+            title="Register A Buyer",
             form=form,
         )
     else:
@@ -242,8 +252,8 @@ def register_buyer():
 
 
 # seller registration
-
-
+# Checked
+# Potential Update : We need to check weather there is same username or not.
 @app.route("/register/seller", methods=["GET", "POST"])
 @login_required
 def register_seller():
@@ -290,13 +300,12 @@ def register_seller():
 
 
 # Admin registration
-
-
+# Checked
 @app.route("/register/admin", methods=["GET", "POST"])
 @login_required
 def register_admin():
     """Admin registration logic"""
-    if current_user.type == "admin":
+    if current_user.department == "Super Admin":
         form = AdminRegistrationForm()
         if form.validate_on_submit():
             admin = Admin(
@@ -358,16 +367,18 @@ def register_admin():
 # Admin profile
 # --------------------------------------
 
-
+# Admin profile
+# Checked
 @app.route("/admin/profile")
 @login_required
 def admin_profile():
-    return render_template("admin/profile.html", title="Admin Profile")
-
+    if current_user.type == "admin":
+        return render_template("admin/profile.html", title="Admin Profile")
+    else:
+        return flash_message()
 
 # Compose direct email to admin
-
-
+# Not Checked
 @app.route(
     "/dashboard/compose-direct-email-to-an-admin/<email>", methods=["GET", "POST"]
 )
@@ -403,8 +414,7 @@ def compose_direct_email_to_admin(email):
 
 
 # List of emails sent out to individual admin
-
-
+# Not Checked
 @app.route("/dashboard/emails-to-individual-admins")
 @login_required
 def emails_to_individual_admins():
@@ -420,62 +430,68 @@ def emails_to_individual_admins():
 
 
 # List all admins
-
-
+# Not Checked
 @app.route("/dashboard/all-admins")
 @login_required
 def all_admins():
-    admins = Admin.query.all()
-    all_registered_admins = len(admins)
-    return render_template(
-        "admin/all_admins.html",
-        title="All Admins",
-        admins=admins,
-        all_registered_admins=all_registered_admins,
-    )
+    if current_user.type == "admin":
+        admins = Admin.query.all()
+        all_registered_admins = len(admins)
+        return render_template(
+            "admin/all_admins.html",
+            title="All Admins",
+            admins=admins,
+            all_registered_admins=all_registered_admins,
+        )
+    else:
+        return flash_message()
 
 
 # Deactivate admin
-
-
+# Not Checked
 @app.route("/dashboard/deactivate-admin/<username>")
 @login_required
 def deactivate_admin(username):
-    admin = Admin.query.filter_by(username=username).first_or_404()
-    admin.active = False
-    db.session.add(admin)
-    db.session.commit()
-    flash(f"{admin.username} has been deactivated as an admin")
-    return redirect(url_for("all_admins"))
-
+    if current_user.department == "Super Admin":
+        admin = Admin.query.filter_by(username=username).first_or_404()
+        admin.active = False
+        db.session.add(admin)
+        db.session.commit()
+        flash(f"{admin.username} has been deactivated as an admin")
+        return redirect(url_for("all_admins"))
+    else:
+        return flash_message()
 
 # Reactivate admin
-
-
+# Not Checked
 @app.route("/dashboard/reactivate-admin/<username>")
 @login_required
 def reactivate_admin(username):
-    admin = Admin.query.filter_by(username=username).first_or_404()
-    admin.active = True
-    db.session.add(admin)
-    db.session.commit()
-    flash(f"{admin.username} has been reactivated as an admin")
-    return redirect(url_for("all_admins"))
-
+    if current_user.department == "Super Admin":
+        admin = Admin.query.filter_by(username=username).first_or_404()
+        admin.active = True
+        db.session.add(admin)
+        db.session.commit()
+        flash(f"{admin.username} has been reactivated as an admin")
+        return redirect(url_for("all_admins"))
+    else:
+        return flash_message()
 
 # Delete admin
-
-
+# Not Checked
 @app.route("/dashboard/delete-admin/<username>")
 @login_required
 def delete_admin(username):
-    admin = Admin.query.filter_by(username=username).first_or_404()
-    db.session.delete(admin)
-    db.session.commit()
-    flash(f"{admin.username} has been deleted as an admin")
-    return redirect(url_for("all_admins"))
-
-
+    if current_user.department == "Super Admin":
+        admin = Admin.query.filter_by(username=username).first_or_404()
+        db.session.delete(admin)
+        db.session.commit()
+        flash(f"{admin.username} has been deleted as an admin")
+        return redirect(url_for("all_admins"))
+    else:
+        return flash_message()
+    
+# Only for Initial Setup, Delete after use
 @app.route("/del")
 def delete_det():
     admin = Admin(
@@ -549,8 +565,7 @@ def delete_det():
 
 
 # Send email to individual admin
-
-
+# Not Checked
 @app.route("/send-email-to-admin/<id>")
 @login_required
 def send_admin_email(id):
@@ -575,8 +590,7 @@ def send_admin_email(id):
 
 
 # Edit sample email
-
-
+# Not Checked
 @app.route("/edit-admin-email/<id>", methods=["GET", "POST"])
 @login_required
 def edit_admin_email(id):
@@ -604,8 +618,7 @@ def edit_admin_email(id):
 
 
 # Delete email from database
-
-
+# Not Checked
 @app.route("/delete-email-sent-to-a-admin/<id>")
 @login_required
 def delete_admin_email(id):
@@ -630,17 +643,17 @@ def delete_admin_email(id):
 
 
 # Buyer profile
-
-
+# Checked
 @app.route("/buyer/profile")
 @login_required
 def buyer_profile():
-    return render_template("buyer/profile.html", title="Buyer Profile")
-
+    if current_user.type == "buyer":
+        return render_template("buyer/profile.html", title="Buyer Profile")
+    else :
+        return flash_message()
 
 # Deactivate own account
-
-
+# Not Checked
 @app.route("/buyer/deactivate-account")
 @login_required
 def buyer_deactivate_account():
@@ -660,8 +673,7 @@ def buyer_deactivate_account():
 
 
 # Compose direct email to buyer
-
-
+# Not Checked
 @app.route(
     "/dashboard/compose-direct-email-to-a-buyer/<email>", methods=["GET", "POST"]
 )
@@ -697,8 +709,7 @@ def compose_direct_email_to_buyer(email):
 
 
 # List of emails sent out to individual buyer
-
-
+# Not Checked
 @app.route("/dashboard/emails-to-individual-buyers")
 @login_required
 def emails_to_individual_buyers():
@@ -714,8 +725,7 @@ def emails_to_individual_buyers():
 
 
 # List all buyers
-
-
+# Not Checked
 @app.route("/dashboard/all-buyers")
 @login_required
 def all_buyers():
@@ -730,8 +740,7 @@ def all_buyers():
 
 
 # Deactivate buyer
-
-
+# Not Checked
 @app.route("/dashboard/deactivate-buyer/<username>")
 @login_required
 def deactivate_buyer(username):
@@ -744,8 +753,7 @@ def deactivate_buyer(username):
 
 
 # Reactivate buyer
-
-
+# Not Checked
 @app.route("/dashboard/reactivate-buyer/<username>")
 @login_required
 def reactivate_buyer(username):
@@ -758,8 +766,7 @@ def reactivate_buyer(username):
 
 
 # Delete buyer
-
-
+# Not Checked
 @app.route("/dashboard/delete-buyer/<username>")
 @login_required
 def delete_buyer(username):
@@ -771,8 +778,7 @@ def delete_buyer(username):
 
 
 # Send email to individual buyer
-
-
+# Not Checked
 @app.route("/send-email-to-buyer/<id>")
 @login_required
 def send_buyer_email(id):
@@ -797,8 +803,7 @@ def send_buyer_email(id):
 
 
 # Edit sample email
-
-
+# Not Checked
 @app.route("/edit-buyer-email/<id>", methods=["GET", "POST"])
 @login_required
 def edit_buyer_email(id):
@@ -826,8 +831,7 @@ def edit_buyer_email(id):
 
 
 # Delete email from database
-
-
+# Not Checked
 @app.route("/delete-email-sent-to-a-buyer/<id>")
 @login_required
 def delete_buyer_email(id):
@@ -852,8 +856,7 @@ def delete_buyer_email(id):
 
 
 # seller profile
-
-
+# Not Checked
 @app.route("/seller/profile", methods=["GET", "POST"])
 @login_required
 def seller_profile():
@@ -892,7 +895,8 @@ def seller_profile():
     else:
         return flash_message()
 
-
+# Deactivate seller
+# Not Checked
 @app.route("/seller/deactivate-account")
 @login_required
 def seller_deactivate_account():
@@ -912,8 +916,7 @@ def seller_deactivate_account():
 
 
 # Compose direct email to seller
-
-
+# Not Checked
 @app.route(
     "/dashboard/compose-direct-email-to-a-seller/<email>", methods=["GET", "POST"]
 )
@@ -952,8 +955,7 @@ def compose_direct_email_to_seller(email):
 
 
 # List of emails sent out to individual seller
-
-
+# Not Checked
 @app.route("/dashboard/emails-to-individual-sellers")
 @login_required
 def emails_to_individual_sellers():
@@ -967,23 +969,33 @@ def emails_to_individual_sellers():
         emails=emails,
     )
 
-
+# List all sellers
+# Not Checked
 @app.route("/dashboard/all-sellers")
 @login_required
 def all_sellers():
-    sellers = Seller.query.all()
-    all_registered_sellers = len(sellers)
-    return render_template(
-        "admin/all_sellers.html",
-        title="All sellers",
-        sellers=sellers,
-        all_registered_sellers=all_registered_sellers,
-    )
+    if current_user.type == "admin":
+        sellers = Seller.query.all()
+        all_registered_sellers = len(sellers)
+        return render_template(
+            "seller/all_sellers.html",
+            title="All sellers",
+            sellers=sellers,
+            all_registered_sellers=all_registered_sellers,
+        )
+    elif current_user.type == "buyer":
+        sellers = Seller.query.filter_by(buyer_id=current_user.id).all()
+        all_registered_sellers = len(sellers)
+        return render_template(
+            "seller/all_sellers.html",
+            title="All sellers",
+            sellers=sellers,
+            all_registered_sellers=all_registered_sellers,
+        )
 
 
 # Deactivate seller
-
-
+# Not Checked
 @app.route("/dashboard/deactivate-seller/<username>")
 @login_required
 def deactivate_seller(username):
@@ -996,8 +1008,7 @@ def deactivate_seller(username):
 
 
 # Reactivate seller
-
-
+# Not Checked
 @app.route("/dashboard/reactivate-seller/<username>")
 @login_required
 def reactivate_seller(username):
@@ -1010,8 +1021,7 @@ def reactivate_seller(username):
 
 
 # Delete seller
-
-
+# Not Checked
 @app.route("/dashboard/delete-seller/<username>")
 @login_required
 def delete_seller(username):
@@ -1023,8 +1033,7 @@ def delete_seller(username):
 
 
 # Send email to individual seller
-
-
+# Not Checked
 @app.route("/send-email-to-seller/<id>")
 @login_required
 def send_seller_email(id):
@@ -1049,8 +1058,7 @@ def send_seller_email(id):
 
 
 # Edit sample email
-
-
+# Not Checked
 @app.route("/edit-seller-email/<id>", methods=["GET", "POST"])
 @login_required
 def edit_seller_email(id):
@@ -1078,8 +1086,7 @@ def edit_seller_email(id):
 
 
 # Delete email from database
-
-
+# Not Checked
 @app.route("/delete-email-sent-to-a-seller/<id>")
 @login_required
 def delete_seller_email(id):
@@ -1133,7 +1140,7 @@ def delete_seller_email(id):
 #     # Add a return statement for cases when the current user type is not 'buyer'
 #     return flash_message()
 
-
+# This Deletes Everything from the table, only for testing purpose delete after use
 @app.route("/del-ipo-det")
 def add_ipo_det():
     product = Pan.query.all()
@@ -1144,6 +1151,7 @@ def add_ipo_det():
 
 
 # Getting current ipo from chittorgarh
+# Checked
 @app.route("/get-product") 
 def get_product():
     scraper = IPODetailsScraper(driver_path, "chittorgarh", headless=True)
@@ -1155,6 +1163,8 @@ def get_product():
     return redirect(url_for("view_product"))
 
 # ipo status and name assigninig
+# Checked
+# Potential Updates : Analysze more.
 def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua):
     # Process green IPOs - Add new
     # for ipo in ipo_details_green:
@@ -1183,6 +1193,8 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
     update_ipo_status(ipo_details_lightyellow, "closed")
     update_ipo_status(ipo_details_aqua, "listed")
 
+# Update ipo status
+# Checked
 def update_ipo_status(ipo_details, status):
     for ipo in ipo_details:
         name = clean_name(ipo["Name"])
@@ -1210,6 +1222,8 @@ def update_ipo_status(ipo_details, status):
             db.session.add(new_ipo)
             db.session.commit()
 
+# Make the ipo name smaller
+# Checked
 def clean_name(name):
     # Combine all patterns, prioritizing longer/more specific patterns to ensure they're matched first
     pattern = r'( PUBLIC LIMITED IPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?|LIMITED\.? ?| LTD\.? ?| IPO)$'
@@ -1218,13 +1232,13 @@ def clean_name(name):
     return cleaned_name
 
 
-# Update Product
-@app.route("/edit-product/<product_id>", methods=["GET", "POST"])
-@login_required
-def edit_product(product_id):
-    if current_user.type == "buyer":
+# # Update Product
+# @app.route("/edit-product/<product_id>", methods=["GET", "POST"])
+# @login_required
+# def edit_product(product_id):
+#     if current_user.type == "buyer":
 
-        return redirect(url_for("all_product"))
+#         return redirect(url_for("all_product"))
 
 
 # Read All Product
@@ -1263,7 +1277,8 @@ def edit_product(product_id):
 # View Product
 
 
-# Read All Product
+# Shows all the ipo's
+# Checked
 @app.route("/view-product")
 @login_required
 def view_product():  # Testing Feature
@@ -1322,6 +1337,7 @@ def view_product():  # Testing Feature
 
 
 # Create Pan
+# Checked
 @app.route("/add-pan", methods=["GET", "POST"])
 @login_required
 def add_pan():
@@ -1348,6 +1364,7 @@ def add_pan():
 
 
 # Update pan
+# Not Checked(left)
 @app.route("/edit-pan", methods=["GET", "POST"])
 @login_required
 def edit_pan():
@@ -1370,6 +1387,8 @@ def edit_pan():
         return render_template("Pan/add_pan.html", title="Add Pan", form=form)
     return redirect(url_for("all-pan"))
 
+# Multi Pan
+# For Adding too many pans at once, for testing purpose only delete after use
 @app.route("/multi-pan")
 def multi_pan():
     for i in range(10):
@@ -1393,18 +1412,13 @@ def multi_pan():
     return redirect(url_for("all_pan"))
 
 # Read Pan
+# Checked
+# Potential Updates : Buyer can not see the pan's of seller so we need to give something else in navbar
 @app.route("/all-pan")
 @login_required
 def all_pan():
-    seller_id = None  # Delfault value, for cases other than "buyer" or "seller"
-
     if current_user.type == "seller":
-        seller_id = current_user.id
-    elif current_user.type == "buyer":
-        seller_id = current_user.id
-
-    if seller_id is not None:
-        pans = Pan.query.filter_by(seller_id=seller_id).all()
+        pans = Pan.query.filter_by(seller_id=current_user.id).all()
         all_pans = len(pans)
         return render_template(
             "Pan/all_pans.html",
@@ -1426,6 +1440,7 @@ def all_pan():
 
 
 # Delete Pan
+# Checked
 @app.route("/delete-pan/<id>")
 @login_required
 def delete_pan(id):
@@ -1462,11 +1477,12 @@ def delete_pan(id):
 
 
 # Create Details
+# Checked
+# Potential Updates : We need to verify the transaction from the buyer side.
 @app.route("/add-details/<int:product_id>", methods=["GET", "POST"])
 @login_required
 def add_details(product_id):
     if current_user.type == "seller":
-        # print("Current ->", current_user)
         product_name = IPO.query.filter_by(id=product_id).first_or_404()
         if "temp_details" not in session:
             session["temp_details"] = []
@@ -1611,6 +1627,7 @@ def delete_subject(id):
 
 
 # Read Transaction
+# Checked
 @app.route("/all-transactions")
 @login_required
 def all_transaction():
@@ -1628,6 +1645,21 @@ def all_transaction():
             transactions=transactions,
             all_transactions=all_transactions,
         )
+    elif current_user.type == "buyer" or current_user.type == "admin":
+        seller_id = request.args.get("seller_id", type=int)
+        seller = Seller.query.filter_by(id=seller_id).first_or_404()
+        transactions = Transaction.query.filter_by(seller_id=seller.id).all()
+        for transaction in transactions:
+            transaction.items_processed = count_pan(transaction.id)
+        all_transactions = len(transactions)
+        return render_template(
+            "transaction/all_transactions.html",
+            title="All Transactions",
+            transactions=transactions,
+            all_transactions=all_transactions,
+        )
+    else:
+        return flash_message()
 
 def count_pan(transaction_id):
     count = TransactionPan.query.filter_by(transaction_id=transaction_id).count()
@@ -1637,6 +1669,8 @@ def count_pan(transaction_id):
 # End Of Curd On Transaction
 # ----------
 
+# Available Pans for transaction
+# Checked
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
@@ -1689,7 +1723,8 @@ def available_pans():
 # Related To Checking allotment
 # --------------------------------------
 
-
+# Checking Allotment
+# Checked
 @app.route("/checking-allotment", methods=["GET", "POST"])
 @login_required
 def checking_allotment():
@@ -1775,8 +1810,7 @@ def download_updated_file(filepath):
 
 
 # Bulk emails to all admins
-
-
+# Not Checked
 @app.route("/dashboard/bulk-emails/admins")
 @login_required
 def bulk_emails_admins():
@@ -1791,8 +1825,7 @@ def bulk_emails_admins():
 
 
 # Bulk emails to all buyers
-
-
+# Not Checked
 @app.route("/dashboard/bulk-emails/buyers")
 @login_required
 def bulk_emails_buyers():
@@ -1807,8 +1840,7 @@ def bulk_emails_buyers():
 
 
 # Bulk emails to all sellers
-
-
+# Not Checked
 @app.route("/dashboard/bulk-emails/sellers")
 @login_required
 def bulk_emails_sellers():

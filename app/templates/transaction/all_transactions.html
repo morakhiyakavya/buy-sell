@@ -30,7 +30,7 @@
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Timestamp</th>
-                            {% if current_user.type == "admin" %}
+                            {% if current_user.type == "buyer"%}
                             <th>Seller</th> <!-- New column for actions -->
                             {% endif %}
                             <th>Actions</th> <!-- New column for actions -->
@@ -40,14 +40,18 @@
                         <!-- Get all transactions from the database -->
                         {% for transaction in transactions %}
                         <tr>
-                            <td>{{ transaction.id }}</td>
+                            <td>{{ loop.index }}</td>
                             <td>{{ transaction.product.name }}</td>
                             <td>{{ transaction.details.subject }}</td>
                             <td>{{ transaction.details.formtype }}</td>
                             <td>{{ transaction.details.price }}</td>
+                            {% if current_user.type == "admin" or current_user.type == "buyer" %}
+                            <td> {{ transaction.items_processed }}/{{ transaction.details.quantity }}</td>
+                            {%else%}
                             <td> {{ transaction.items_processed }}/<a href="{{ url_for('available_pans',transaction_id = transaction.id ) }}">{{ transaction.details.quantity }}</a></td>
+                            {% endif %}
                             <td>{{ moment(transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
-                            {% if current_user.type == "admin" %}
+                            {% if current_user.type == "buyer" %}
                             <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }} </th>
                             {% endif %}
                             <!-- New column for actions -->

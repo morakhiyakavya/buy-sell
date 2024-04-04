@@ -232,7 +232,7 @@ class Scrape_Website(BaseScraper):
                         return True  # Success, proceed to data scraping
                     else:
                         print(f"{error_type} error, stopping retries.")
-                        # time.sleep(2) # Add a delay before moving to the next username
+                        time.sleep(2) # Add a delay before moving to the next username
                         return error_type  # For unknown errors, you might choose to stop or log and continue
                     
                 print("Max captcha retries reached, moving to next username.")
@@ -261,7 +261,7 @@ class Scrape_Website(BaseScraper):
         
         captcha_type = self.config['website_name']  # Replace with actual captcha type
         if captcha_type == 'bigshare' or captcha_type == 'kfintech':
-            captcha_input = predict_captcha(self.driver,captcha_type)# Replace with actual captcha solution logic
+            captcha_input = predict_captcha(self.driver,captcha_type)
             captcha_id = self.config['captcha_field']
             captcha_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, captcha_id)))
             captcha_field.clear()

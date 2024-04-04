@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+    {% include '_flash_message.html' %}
+    <h1 class="mt-4">{{ title }}</h1><br>
+<div class="row">
+    <p>All available Links</p>
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table id="data" class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Link</th>
+                        <td>here</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for url in urls %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for(url) }}" class="btn btn-primary">{{ url }}</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+</div>
+    {% endblock %}

@@ -42,7 +42,7 @@ def send_password_reset_email(user):
     """Send password reset email"""
     token = user.get_reset_password_token()
     send_email(
-        "[somaSOMA] Reset Your Password",
+        "[kavyaARYA] Reset Your Password",
         sender=app.config["MAIL_DEFAULT_SENDER"],
         recipients=[user.email],
         text_body=render_template("emails/reset_password.txt", user=user, token=token),
@@ -53,7 +53,7 @@ def send_password_reset_email(user):
 def send_login_details(user, user_password):
     """Once registered, users (teacher, buyer, admin) will be notified via email"""
     send_email(
-        "[somaSOMA] You have been registered!",
+        "[kavyaARYA] You have been registered!",
         sender=app.config["MAIL_DEFAULT_SENDER"],
         recipients=[user.email],
         text_body=render_template(
@@ -82,7 +82,7 @@ def send_login_details(user, user_password):
 def request_account_deletion(admin, seller):
     """Request to delete seller account sent to all admins"""
     send_email(
-        subject="[somaSOMA] Request to Deactivate Account",
+        subject="[kavyaARYA] Request to Deactivate Account",
         sender=app.config["MAIL_DEFAULT_SENDER"],
         recipients=[admin.email],
         text_body=render_template(
