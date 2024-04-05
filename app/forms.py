@@ -136,7 +136,8 @@ class UserForm(FlaskForm):
         render_kw={"placeholder": "morakhiyakavya@gmail.com"},
     )
     phone_number = StringField(
-        "Phone Number", validators=[DataRequired(), Length(min=2, max=10)],
+        "Phone Number",
+        validators=[DataRequired(), Length(min=2, max=10)],
         render_kw={"placeholder": "9876543210"},
     )
     password = PasswordField(
@@ -224,6 +225,7 @@ class AdminRegistrationForm(UserForm):
 # PRODUCT RELATED FORMS
 # ========================================
 
+
 class ProductForm(FlaskForm):
     """Product Form"""
 
@@ -239,6 +241,7 @@ class ProductForm(FlaskForm):
     )
 
     submit = SubmitField("Add Product")
+
 
 class EditProductForm(FlaskForm):
     name = StringField(
@@ -259,6 +262,7 @@ class EditProductForm(FlaskForm):
         if user is not None:
             raise ValidationError("Please use a different username.")
 
+
 class PanForm(FlaskForm):
     """Pan Form"""
 
@@ -277,7 +281,8 @@ class PanForm(FlaskForm):
         validators=[DataRequired(), Length(1, 64)],
         render_kw={"placeholder": "DP ID"},
     )
-    submit = SubmitField("Add Pan")    
+    submit = SubmitField("Add Pan")
+
 
 class DetailForm(FlaskForm):
     """Subject Form"""
@@ -286,13 +291,13 @@ class DetailForm(FlaskForm):
         "Subject",
         choices=[("Subject 1", "Subject 1"), ("Subject 2", "Subject 2")],
         validators=[DataRequired()],
-        default="Subject 1"  # Set the default choice
+        default="Subject 1",  # Set the default choice
     )
     formtype = SelectField(
         "Form Type",
         choices=[("Retail", "Retail"), ("HNI", "HNI"), ("SHNI", "SHNI")],
         validators=[DataRequired()],
-        default="Retail"  # Set the default choice
+        default="Retail",  # Set the default choice
     )
     price = IntegerField(
         "Price",
@@ -304,7 +309,7 @@ class DetailForm(FlaskForm):
         validators=[DataRequired()],
         render_kw={"placeholder": "Quantity"},
     )
-    
+
     submit = SubmitField("Add Details")
 
 
@@ -316,48 +321,57 @@ class DetailForm(FlaskForm):
 # ALLOTMENT Related Forms
 # ========================================
 
+
 class AllotmentForm(FlaskForm):
     """Allotment Form"""
 
     ipo = StringField(
         "Ipo Name",
         validators=[DataRequired(), Length(1, 64)],
-        render_kw={"autofocus": True, "placeholder": "Allotment Name", "id": "ipo_field"}
+        render_kw={
+            "autofocus": True,
+            "placeholder": "Allotment Name",
+            "id": "ipo_field",
+        },
     )
     listing_On = SelectField(
         "Listing On",
-        choices=[("linkin", "linkin"), ("kfintech", "kfintech"), ("bigshare", "bigshare"), ("skyline", "skyline"), ("purva", "purva")],
+        choices=[
+            ("linkin", "linkin"),
+            ("kfintech", "kfintech"),
+            ("bigshare", "bigshare"),
+            ("skyline", "skyline"),
+            ("purva", "purva"),
+        ],
         validators=[DataRequired()],
         default="linkin",
-        render_kw={"id": "listing_on_field"}
+        render_kw={"id": "listing_on_field"},
     )
     pan_Column = StringField(
         "Pan Column",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Pan Column(eg: A or 1)", "id": "pan_column_field"}
+        render_kw={"placeholder": "Pan Column(eg: A or 1)", "id": "pan_column_field"},
     )
     start_Row = IntegerField(
         "Pan Start Row",
         validators=[DataRequired()],
-        render_kw={"placeholder": "Pan Start Row(eg: 2)", "id": "start_row_field"}
+        render_kw={"placeholder": "Pan Start Row(eg: 2)", "id": "start_row_field"},
     )
     end_Row = IntegerField(
         "Pan End Row",
         validators=[Optional()],
-        render_kw={"placeholder": "Pan End Row(eg: 100, you can leave it blank)", "id": "end_row_field"}
+        render_kw={
+            "placeholder": "Pan End Row(eg: 100, you can leave it blank)",
+            "id": "end_row_field",
+        },
     )
     excel_file = FileField(
-        'Upload Excel File',
-        validators=[
-            FileRequired(),
-            FileAllowed(['xls', 'xlsx'], 'Excel files only!')
-        ],
-        render_kw={"id": "excel_file_field"}
+        "Upload Excel File",
+        validators=[FileRequired(), FileAllowed(["xls", "xlsx"], "Excel files only!")],
+        render_kw={"id": "excel_file_field"},
     )
-    submit = SubmitField(
-        "Add Allotment",
-        render_kw={"id": "submit_btn"}
-    )
+    submit = SubmitField("Add Allotment", render_kw={"id": "submit_btn"})
+
 
 # ========================================
 # END OF ALLOTMENT RELATED FORMS
@@ -448,7 +462,7 @@ class EditUsernameForm(FlaskForm):
     username = StringField(
         "Username", validators=[DataRequired(), Length(min=2, max=30)]
     )
-    submit = SubmitField("Update", render_kw={"class": "btn btn-danger"})
+    submit = SubmitField("Update", render_kw={"class": "btn btn-primary"})
 
     def validate_username(self, username):
         user = User.query.filter_by(username=username.data).first()
@@ -462,7 +476,7 @@ class EditEmailForm(FlaskForm):
         validators=[DataRequired(), Email(), Length(min=2, max=64)],
         render_kw={"placeholder": "You have access to this email address"},
     )
-    submit = SubmitField("Update", render_kw={"class": "btn btn-danger"})
+    submit = SubmitField("Update", render_kw={"class": "btn btn-primary"})
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
@@ -474,7 +488,7 @@ class EditPhoneForm(FlaskForm):
     phone = StringField(
         "Phone Number", validators=[DataRequired(), Length(min=2, max=30)]
     )
-    submit = SubmitField("Update", render_kw={"class": "btn btn-danger"})
+    submit = SubmitField("Update", render_kw={"class": "btn btn-primary"})
 
     def validate_phone(self, phone):
         p = phonenumbers.parse(phone.data)

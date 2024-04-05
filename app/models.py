@@ -6,6 +6,7 @@ import jwt
 from time import time
 from hashlib import md5
 from sqlalchemy import UniqueConstraint
+# from cryptography.fernet import Fernet
 
 @login.user_loader
 def load_user(id):
@@ -33,6 +34,7 @@ class User(db.Model, UserMixin):
     delete_account = db.Column(db.Boolean, default=False)
     registered_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     emails = db.relationship("Email", backref="author", lazy="dynamic")
+    # encrypted_key = db.Column(db.String(128))
 
     type = db.Column(db.String(64))
 
@@ -40,6 +42,12 @@ class User(db.Model, UserMixin):
 
     def __repr__(self):
         return f"User: {self.username} {self.verification_phone}"
+
+    # def generate_encryption_key(self):
+    #     key = Fernet.generate_key()
+    #     print("Key: ", key)
+    #     self.encrypted_key = key.decode()
+    #     print("Encrypted Key: ", self.encrypted_key)
 
     def two_factor_enabled(self):
         return self.verification_phone is not None
@@ -186,7 +194,10 @@ class Details(db.Model):
 
     # Relationships
     seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_details_seller_id"), nullable=False)
-    seller = db.relationship("Seller", backref="details", foreign_keys=[seller_id], passive_deletes=True)
+    # seller = db.relationship("Seller", backref="details", foreign_keys=[seller_id], passive_deletes=True)
+    seller = db.relationship("Seller", backref=db.backref("details", cascade="all, delete-orphan"), foreign_keys=[seller_id], passive_deletes=True)
+
+    
     ipo = db.relationship("IPO", backref="details")
 
 # Pan Detail
@@ -196,12 +207,14 @@ class Pan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=True)
     pan_number = db.Column(db.String(64), nullable=False)
+    # encrypt_pan = db.Column(db.String(64), nullable=False)
     dp_id = db.Column(db.String(64), nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=True)
 
     # Relationships
     seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_pan_seller_id"), nullable=False)
-    seller = db.relationship("Seller", backref="pan", foreign_keys=[seller_id], passive_deletes=True)
+    # seller = db.relationship("Seller", backref="pan", foreign_keys=[seller_id], passive_deletes=True)
+    seller = db.relationship("Seller", backref=db.backref("pan", cascade="all, delete-orphan"), foreign_keys=[seller_id], passive_deletes=True)
 
     __table_args__ = (UniqueConstraint('pan_number', 'seller_id', name='_seller_pan_uc'),)
 
@@ -224,7 +237,9 @@ class Transaction(db.Model):
     details = db.relationship('Details', backref='transactions', foreign_keys=[details_id], passive_deletes=True)
 
     seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_transaction_seller_id"), nullable=False)
-    seller = db.relationship("Seller", backref="transactions", foreign_keys=[seller_id], passive_deletes=True)
+    # seller = db.relationship("Seller", backref="transactions", foreign_keys=[seller_id], passive_deletes=True)
+    seller = db.relationship("Seller", backref=db.backref("transactions", cascade="all, delete-orphan"), foreign_keys=[seller_id], passive_deletes=True)
+
 
     buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE", name="fk_transaction_buyer_id"), nullable=False)
     buyer = db.relationship("Buyer", backref="transactions", foreign_keys=[buyer_id], passive_deletes=True)
@@ -238,6 +253,10 @@ class TransactionPan(db.Model):
     transaction = db.relationship('Transaction', backref=db.backref('transaction_pans', cascade='all, delete-orphan'))
     pan = db.relationship('Pan', backref=db.backref('pan_transactions', cascade='all, delete-orphan', overlaps = "pans, transactions"))
 
+# class Demo(db.Model):
+#     __tablename__ = "demo"
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(64), nullable=False)
 
 # =================
 # End of Application Users Purchase and Sell

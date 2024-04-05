@@ -1,4 +1,5 @@
 from datetime import datetime
+# from cryptography.fernet import Fernet
 import json
 import os
 import re
@@ -125,6 +126,9 @@ def login():
         if user is None or not user.check_password(form.password.data):
             flash("Invalid username or password")
             return redirect(url_for("login"))
+        if not user.is_active:
+            flash('Your account is not active. Please contact support.')
+            return redirect(url_for('home'))
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":
             next_page = url_for("dashboard")
@@ -228,6 +232,7 @@ def register_buyer():
 
             # Update database
             buyer.set_password(form.password.data)
+            # buyer.generate_encryption_key()
             db.session.add(buyer)
             db.session.commit()
 
@@ -278,6 +283,7 @@ def register_seller():
 
             # Update database
             seller.set_password(form.password.data)
+            # seller.generate_encryption_key()
             db.session.add(seller)
             db.session.commit()
 
@@ -324,6 +330,7 @@ def register_admin():
 
             # Update the database
             admin.set_password(form.password.data)
+            # admin.generate_encryption_key()
             db.session.add(admin)
             db.session.commit()
 
@@ -996,11 +1003,11 @@ def all_sellers():
 
 
 # Deactivate seller
-# Not Checked
+# Checked
 @app.route("/dashboard/deactivate-seller/<username>")
 @login_required
 def deactivate_seller(username):
-    if current_user.type == "buyer":
+    if current_user.type == "buyer" or current_user.type == "admin":
         seller = Seller.query.filter_by(username=username).first_or_404()
         seller.active = False
         db.session.add(seller)
@@ -1011,11 +1018,11 @@ def deactivate_seller(username):
         return flash_message()
 
 # Reactivate seller
-# Not Checked
+# Checked
 @app.route("/dashboard/reactivate-seller/<username>")
 @login_required
 def reactivate_seller(username):
-    if current_user.type == "buyer":
+    if current_user.type == "buyer" or current_user.type == "admin":
         seller = Seller.query.filter_by(username=username).first_or_404()
         seller.active = True
         db.session.add(seller)
@@ -1026,11 +1033,12 @@ def reactivate_seller(username):
         return flash_message()
 
 # Delete seller
-# Not Checked
+# Checked
 @app.route("/dashboard/delete-seller/<username>")
 @login_required
 def delete_seller(username):
-    if current_user.type == "admin" or current_user.type == "seller":
+    # if current_user.type == "admin" or current_user.type == "seller":
+    if current_user.is_authenticated:
         seller = Seller.query.filter_by(username=username).first_or_404()
         db.session.delete(seller)
         db.session.commit()
@@ -1297,7 +1305,7 @@ def view_product():  # Testing Feature
 
         products = IPO.query.all()
         view_products = len(products)
-        status_priority = {"open": 1, "close": 2, "listed": 3}
+        status_priority = {"open": 1, "closed": 2, "listed": 3}
         
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         return render_template(
@@ -1351,9 +1359,13 @@ def add_pan():
     if current_user.type == "seller":
         form = PanForm()
         if form.validate_on_submit():
+            # f = Fernet(current_user.encrypted_key)
+            # encrypt = form.pan_number.data.upper().encode()
+            # encrypted_data = f.encrypt(encrypt)
             pan = Pan(
                 name=form.name.data,
                 pan_number=form.pan_number.data.upper(),
+                # encrypt_pan=encrypted_data,
                 dp_id=form.dp_id.data,
                 seller=current_user,
             )
