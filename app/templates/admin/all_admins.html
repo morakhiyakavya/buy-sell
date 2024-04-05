@@ -94,7 +94,7 @@
                                                 <!-- They cannot deactivate themselves -->
                                                 <!-- Link is inactive -->
                                                 {% if admin.username == current_user.username %}
-                                                    <button style="background-color: red; color: white;" class="btn" data-toggle="modal" data-target="#adminModalCenter">
+                                                    <button style="background-color: red; color: white;" class="btn" data-bs-toggle="modal" data-bs-target="#adminModalCenter">
                                                         Deactivate
                                                     </button>
                                                     
@@ -104,7 +104,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                 <h3 class="modal-title" id="adminModalLongTitle">Are You Sure?</h3>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                                 </div>
@@ -120,7 +120,7 @@
                                                                 </p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -131,7 +131,7 @@
                                                 <!-- They can deactivate this admin -->
                                                 <!-- Link is active -->
                                                 {% else %}                                            
-                                                    <button style="background-color: red; color: white;" class="btn" data-toggle="modal" data-target="#admin2ModalCenter">
+                                                    <button style="background-color: red; color: white;" class="btn" data-bs-toggle="modal" data-bs-target="#admin2ModalCenter">
                                                         Deactivate
                                                     </button>
                                                     
@@ -141,7 +141,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                 <h3 class="modal-title" id="admin2ModalLongTitle">Are You Sure?</h3>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                                 </div>
@@ -157,7 +157,7 @@
                                                                 </p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -192,7 +192,7 @@
 
                                                 <!-- Admin cannot delete self -->
                                                 {% if admin.username == current_user.username %}
-                                                    <button style="background-color: red; color: white;" class="btn" data-toggle="modal" data-target="#{{admin.username}}ModalCenter">
+                                                    <button style="background-color: red; color: white;" class="btn" data-bs-toggle="modal" data-bs-target="#{{admin.username}}ModalCenter">
                                                         Delete
                                                     </button>
                                                     
@@ -202,7 +202,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                 <h3 class="modal-title" id="adminModalLongTitle">Are You Sure?</h3>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                                 </div>
@@ -218,7 +218,7 @@
                                                                 </p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -227,7 +227,7 @@
                                                 
                                                     <!-- Admin can delete others -->
                                                 {% else %}                                            
-                                                    <button style="background-color: red; color: white;" class="btn" data-toggle="modal" data-target="#{{admin.username}}2DeleteModalCenter">
+                                                    <button style="background-color: red; color: white;" class="btn" data-bs-toggle="modal" data-bs-target="#{{admin.username}}2DeleteModalCenter">
                                                         Delete
                                                     </button>
                                                     
@@ -237,7 +237,7 @@
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
                                                                 <h3 class="modal-title" id="admin2ModalLongTitle">Are You Sure?</h3>
-                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                                                                     <span aria-hidden="true">&times;</span>
                                                                 </button>
                                                                 </div>
@@ -263,7 +263,7 @@
                                                                 </p>
                                                                 </div>
                                                                 <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                                 </div>
                                                             </div>
                                                         </div>

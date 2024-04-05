@@ -856,7 +856,7 @@ def delete_buyer_email(id):
 
 
 # seller profile
-# Not Checked
+# Checked
 @app.route("/seller/profile", methods=["GET", "POST"])
 @login_required
 def seller_profile():
@@ -904,9 +904,8 @@ def seller_deactivate_account():
     seller = Seller.query.filter_by(username=current_user.username).first()
 
     # Send email to all admins about the request to delete account
-    admins = Admin.query.all()
-    for admin in admins:
-        request_account_deletion(admin, seller)
+    buyer = Buyer.query.filter_by(id=seller.buyer_id).first()
+    request_account_deletion(buyer, seller)
 
     flash(
         "Your request has been sent to the admins."
@@ -992,6 +991,8 @@ def all_sellers():
             sellers=sellers,
             all_registered_sellers=all_registered_sellers,
         )
+    else:
+        return flash_message()
 
 
 # Deactivate seller
@@ -999,38 +1000,44 @@ def all_sellers():
 @app.route("/dashboard/deactivate-seller/<username>")
 @login_required
 def deactivate_seller(username):
-    seller = Seller.query.filter_by(username=username).first_or_404()
-    seller.active = False
-    db.session.add(seller)
-    db.session.commit()
-    flash(f"{seller.username} has been deactivated as a seller")
-    return redirect(url_for("all_sellers"))
-
+    if current_user.type == "buyer":
+        seller = Seller.query.filter_by(username=username).first_or_404()
+        seller.active = False
+        db.session.add(seller)
+        db.session.commit()
+        flash(f"{seller.username} has been deactivated as a seller")
+        return redirect(url_for("all_sellers"))
+    else:
+        return flash_message()
 
 # Reactivate seller
 # Not Checked
 @app.route("/dashboard/reactivate-seller/<username>")
 @login_required
 def reactivate_seller(username):
-    seller = Seller.query.filter_by(username=username).first_or_404()
-    seller.active = True
-    db.session.add(seller)
-    db.session.commit()
-    flash(f"{seller.username} has been reactivated as a seller")
-    return redirect(url_for("all_sellers"))
-
+    if current_user.type == "buyer":
+        seller = Seller.query.filter_by(username=username).first_or_404()
+        seller.active = True
+        db.session.add(seller)
+        db.session.commit()
+        flash(f"{seller.username} has been reactivated as a seller")
+        return redirect(url_for("all_sellers"))
+    else:
+        return flash_message()
 
 # Delete seller
 # Not Checked
 @app.route("/dashboard/delete-seller/<username>")
 @login_required
 def delete_seller(username):
-    seller = Seller.query.filter_by(username=username).first_or_404()
-    db.session.delete(seller)
-    db.session.commit()
-    flash(f"{seller.username} has been deleted as a seller")
-    return redirect(url_for("all_sellers"))
-
+    if current_user.type == "admin" or current_user.type == "seller":
+        seller = Seller.query.filter_by(username=username).first_or_404()
+        db.session.delete(seller)
+        db.session.commit()
+        flash(f"{seller.username} has been deleted as a seller")
+        return redirect(url_for("all_sellers"))
+    else:
+        return flash_message()
 
 # Send email to individual seller
 # Not Checked
