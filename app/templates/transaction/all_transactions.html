@@ -48,11 +48,16 @@
                             {% if current_user.type == "admin" or current_user.type == "buyer" %}
                             <td> {{ transaction.items_processed }}/{{ transaction.details.quantity }}</td>
                             {%else%}
-                            <td> {{ transaction.items_processed }}/<a href="{{ url_for('available_pans',transaction_id = transaction.id ) }}">{{ transaction.details.quantity }}</a></td>
+                            <td> {{ transaction.items_processed }}/<a
+                                    href="{{ url_for('available_pans',transaction_id = transaction.id ) }}"
+                                    data-bs-toggle="tooltip" data-bs-placement="right"
+                                    data-bs-title="You have submitted {{transaction.items_processed}} ">{{
+                                    transaction.details.quantity }}</a></td>
                             {% endif %}
                             <td>{{ moment(transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
                             {% if current_user.type == "buyer" %}
-                            <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }} </th>
+                            <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }}
+                            </th>
                             {% endif %}
                             <!-- New column for actions -->
                             <td>
@@ -78,6 +83,9 @@
         var table = $('#data').DataTable();
         fixedHeader: true
     });
+
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
 </script>
 
 {% endblock %}

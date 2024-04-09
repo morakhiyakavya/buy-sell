@@ -33,7 +33,10 @@
         <div class="card card-large" id="top">
             <div class="flex flex-space-between flex-gap-8">
                 <div class="flex-row flex-wrap flex-align-center flex-grow">
-                    <h3 class="h3 shrink-text">{{product.name.upper()}}</h1>
+                    <h3 class="h3 shrink-text">{{product.name.upper()}}</h3>
+                    <a id="nostyle" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+                        <i class="fi fi-rr-angle-small-down" style="width: 20px; height: 20px;"></i>
+                      </a>
                         <div class="ink-600 show-from-tablet-landscape" style="opacity: 0.5;">
                             <i class="icon-dot"></i>
                         </div>
@@ -67,8 +70,8 @@
                  -->
             </div>
 
-
-            <div class="company-info">
+            
+            <div class="company-info" id="collapseExample">
                 <div class="company-ratios">
                     <ul id="top-ratios">
                         <li class="flex flex-space-between" data-source="default">

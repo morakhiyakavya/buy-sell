@@ -10,7 +10,7 @@
     <!-- Page title -->
     <div class="row">
         <div class="col-md-12">
-            <h1 class="mt-4 mb-4">{{ title }} ({{ all_products }})</h1>
+            <h1 class="mt-4 mb-4">{{ title }} ({{ view_products }})</h1>
         </div>
     </div>
     <!-- End of page title -->
@@ -25,32 +25,27 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Description</th>
-                            <th>Timestamp</th>
-                            {% if current_user.type == "admin" %}
-                            <th>Buyer</th> <!-- New column for actions -->
-                            {% endif %}
-                            <th>Actions</th> <!-- New column for actions -->
+                            <th>Listing On</th>
+                            <th>Listing Date</th>
+                            <th>Open Date</th>
+                            <th>Close Date</th>
+                            <th>Status</th>
+                            <th>Sell</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Get all products from the database -->
                         {% for product in products %}
                         <tr>
-                            <td>{{ product.id }}</td>
-                            <td>{{ product.name }}</td>
-                            <td>{{ product.description }}</td>
-                            <td>{{ moment(product.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
-                            {% if current_user.type == "admin" %}
-                            <th> {{ product.buyer.first_name.title() }} {{ product.buyer.last_name.title() }} </th>
-                            {% endif %}
-                            <!-- New column for actions -->
+                            <td>{{ loop.index }}</td>
+                            <td>{{ product.name.upper() }}</td>
+                            <td>{{ product.listing_at}}</td>
+                            <td>{{product.listing_date.strftime('%b %d, %Y')}}</td>
+                            <td>{{product.open_date.strftime('%b %d, %Y')}}</td>
+                            <td>{{product.close_date.strftime('%b %d, %Y')}}</td>
+                            <td>{{ product.status }}</td>
                             <td>
-                                {% if current_user == product.buyer %}
-                                <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-primary">Edit</a>
-                                <a href="{{ url_for('delete_product', id=product.id) }}"
-                                    class="btn btn-danger">Delete</a>
-                                {% endif %}
+                                    <a href="{{ url_for('add_details', product_id=product.id) }}" class="btn btn-primary">sell</a>
                             </td>
                         </tr>
                         {% endfor %}

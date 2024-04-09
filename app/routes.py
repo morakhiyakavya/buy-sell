@@ -1309,6 +1309,7 @@ def view_product():  # Testing Feature
         
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         return render_template(
+            #"Product/all_products.html",
             "transaction/view_products.html",
             title="Running Ipo's ",
             products=products,
