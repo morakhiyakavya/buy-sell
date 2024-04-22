@@ -1,5 +1,9 @@
 import pandas as pd
+import re
+import spacy
 
+# Load the spaCy model
+nlp = spacy.load("en_core_web_sm")
 # Function to extract specific column data from an Excel file
 
     
@@ -121,24 +125,68 @@ def get_column_data(file_path, column_identifier):
         raise ValueError("Invalid column identifier")
     
     return column_data
-    identifier_pan_Column = excel_col_to_index(identifier_column_letter)
-    identifier_column_name = df.columns[identifier_pan_Column]
 
-    for identifier, updates in updates_dict.items():
-        if identifier in df[identifier_column_name].values:
-            row_index = df.index[df[identifier_column_name] == identifier].tolist()[0]
-            starting_col_index = identifier_pan_Column + 1  # Start writing to the next column
-            for update in updates.values():
-                if starting_col_index >= len(df.columns):
-                    # Add a new column if we're beyond the existing ones
-                    new_col_name = f"NewCol_{starting_col_index}"
-                    df[new_col_name] = pd.NA  # Initialize new column
-                column_name = df.columns[starting_col_index]
-                df.at[row_index, column_name] = update
-                starting_col_index += 1
+
+
+# Define regular expressions for each data type
+PAN_PATTERN = re.compile(r'^[A-Z]{5}[0-9]{4}[A-Z]$')
+DP_ID_PATTERN = re.compile(r'^\d{8,10}$')
+# Updated pattern to capture more Indian name features and "HUF"
+INDIAN_NAME_PATTERN = re.compile(r'(kumar|singh|devi|reddy|patel|das|rao|sharma|shah|huf)', re.IGNORECASE)
+
+def check_confidence(column, pattern, threshold):
+    # Convert column to uppercase if checking PAN pattern
+    if pattern == PAN_PATTERN:
+        column = column.str.upper()
+    matches = column.apply(lambda x: bool(pattern.match(str(x))))
+    confidence = matches.sum() / len(column)
+    return confidence >= threshold, confidence
+
+def check_name_confidence(column, threshold):
+    name_counts = 0
+    for text in column:
+        doc = nlp(str(text))
+        person_found = any(ent.label_ == "PERSON" for ent in doc.ents)
+        heuristic_match = bool(INDIAN_NAME_PATTERN.search(str(text)))
+        if person_found or heuristic_match:
+            name_counts += 1
+    confidence = name_counts / len(column)
+    return confidence >= threshold, confidence
+
+def classify_columns(df):
+    results = {}
+    thresholds = {'pan': 0.8, 'dp_id': 0.5, 'name': 0.5}
+
+    for col in df.columns:
+        is_pan, pan_confidence = check_confidence(df[col], PAN_PATTERN, thresholds['pan'])
+        is_dp_id, dp_id_confidence = check_confidence(df[col], DP_ID_PATTERN, thresholds['dp_id'])
+        is_name, name_confidence = check_name_confidence(df[col], thresholds['name'])
+        
+        confidences = {'pan': (is_pan, pan_confidence), 'dp_id': (is_dp_id, dp_id_confidence), 'name': (is_name, name_confidence)}
+        assigned_label = max(confidences, key=lambda x: confidences[x][1] if confidences[x][0] else 0)
+        
+        # Ensure that no label is repeated and meets threshold criteria
+        if confidences[assigned_label][0] and all(res[0] != assigned_label for res in results.values()):
+            results[col] = (assigned_label, confidences[assigned_label][1])
         else:
-            print(f"Identifier '{identifier}' not found in column '{identifier_column_name}'.")
+            results[col] = ('unknown', 0)
 
+    # Keep up to 3 best classified columns based on confidence
+    if len(results) > 3:
+        results = dict(sorted(results.items(), key=lambda item: item[1][1], reverse=True)[:3])
+
+    return results
+
+def process_excel(file_path):
+    df = pd.read_excel(file_path, header=None)  # Assuming no header
+    df.dropna(how='all', inplace=True)  # Drop all rows with all NaN values
+    column_classifications = classify_columns(df)
+    
+    # Map new names and filter columns
+    new_columns = {k: v[0] for k, v in column_classifications.items() if v[0] != 'unknown'}
+    df = df[list(new_columns.keys())]
+    df.rename(columns=new_columns, inplace=True)
+    
     return df
 
 

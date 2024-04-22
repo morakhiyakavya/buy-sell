@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import os
 import re
+import sqlite3
 from flask import (
     render_template,
     redirect,
@@ -54,9 +55,10 @@ from werkzeug.utils import secure_filename
 
 # Check and Write Allotment in Excel.
 from app.allotment import scrape_data_from_websites, driver_path, IPODetailsScraper
-from app.excel import process_excel_data, write_in_excel
+from app.excel import process_excel_data, write_in_excel, process_excel
 
 from app import app, db, socketio
+from sqlalchemy.exc import IntegrityError
 
 
 # =========================================
@@ -1211,37 +1213,52 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
 # Update ipo status
 # Checked
 def update_ipo_status(ipo_details, status):
+    new_ipos = []
+    collected_names = set()  # This will be used later if status is 'listed'
+
     for ipo in ipo_details:
         name = clean_name(ipo["Name"])
+        collected_names.add(name)  # Used for checking listed IPOs later
+        
         ipo_db = IPO.query.filter_by(name=name).first()
         if ipo_db:
-            if status != "open": 
+            if status != "open":
                 ipo_db.status = status
-                db.session.commit()
-        else :
-            open_date_sort = datetime.strptime(ipo["Open Date"], "%b %d, %Y")
-            close_date_sort = datetime.strptime(ipo["Close Date"], "%b %d, %Y")
-            listing_date_sort = datetime.strptime(ipo["Listing Date"], "%b %d, %Y")
-            # name = clean_name(ipo["Name"])
+        else:
+            # Prepare new IPO records
             new_ipo = IPO(
                 name=name,
                 price=ipo["Price"],
                 issue_size=ipo["Issue Size"],
                 lot_size=ipo["Lot Size"],
-                open_date= open_date_sort,
-                close_date= close_date_sort,
-                listing_date= listing_date_sort,
+                open_date=datetime.strptime(ipo["Open Date"], "%b %d, %Y"),
+                close_date=datetime.strptime(ipo["Close Date"], "%b %d, %Y"),
+                listing_date=datetime.strptime(ipo["Listing Date"], "%b %d, %Y"),
                 listing_at=ipo["Listing At"],
                 status=status,
             )
-            db.session.add(new_ipo)
-            db.session.commit()
+            new_ipos.append(new_ipo)
+
+    # Bulk add new IPOs
+    if new_ipos:
+        db.session.bulk_save_objects(new_ipos)
+
+    if status == "listed":
+        # Fetch all listed IPOs not included in the collected_names and update them to 'complete'
+        IPO.query.filter(IPO.status == "listed", IPO.name.notin_(collected_names))\
+                 .update({IPO.status: "complete"}, synchronize_session=False)
+
+    # Commit all changes made in this session
+    db.session.commit()
+
+
+        
 
 # Make the ipo name smaller
 # Checked
 def clean_name(name):
     # Combine all patterns, prioritizing longer/more specific patterns to ensure they're matched first
-    pattern = r'( PUBLIC LIMITED IPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?|LIMITED\.? ?| LTD\.? ?| IPO)$'
+    pattern = r'( PUBLIC LIMITED IPO\.? ?| LIMITED FPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?| LIMITED\.? ?| LTD\.? ?| IPO)$'
     # Use re.IGNORECASE to make the pattern case-insensitive
     cleaned_name = re.sub(pattern, '', name, flags=re.IGNORECASE)
     return cleaned_name
@@ -1309,8 +1326,8 @@ def view_product():  # Testing Feature
         
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         return render_template(
-            #"Product/all_products.html",
-            "transaction/view_products.html",
+            "Product/all_products.html",
+            # "transaction/view_products.html",
             title="Running Ipo's ",
             products=products,
             view_products=view_products,
@@ -1372,40 +1389,74 @@ def add_pan():
             )
             db.session.add(pan)
             db.session.commit()
-            flash("Pan added successfully")
-            return redirect(url_for("all_pan"))
-
-        # Add the following return statement for cases when form validation fails
-        flash("Pan addition failed. Please check the form.")
+            flash(f"Pan {pan.name}({pan.pan_number}) added . Add More.")
+            return redirect(url_for("add_pan"))
         return render_template("Pan/add_pan.html", title="Add Pan", form=form)
 
     # Add a return statement for cases when the current user type is not 'buyer'
     return flash_message()
 
+@app.route('/edit-pans', methods=['POST'])
+@login_required
+def edit_pans():
+    if current_user.type == "seller":
+        data = request.get_json()
+        record_id = data['id']
+        new_value = data['newValue']
+        new_column = data['column']
+        
+        try:
+            pan = Pan.query.filter_by(id=record_id).first()
+            if not pan:
+                return jsonify({"status": "error", "message": "No record found with the given ID"}), 404
+
+            if new_column == "dp_id":
+                pan.dp_id = new_value
+            elif new_column == "name":
+                pan.name = new_value
+            elif new_column == "pan_number":
+                new_value = new_value.upper()
+                pan.pan_number = new_value
+            else:
+                return jsonify({"status": "error", "message": "Invalid column name"}), 400
+
+            db.session.commit()
+            return jsonify({"status": "success", "message": "Cell updated successfully"})
+
+        except IntegrityError as e:
+            db.session.rollback()  # Roll back the transaction so you can continue cleanly
+            # flash("You Already have a pan with this number")
+            return jsonify({"status": "error", "message": "You Already have a pan with this number "}), 400
+        except Exception as e:
+            db.session.rollback()  # Roll back the transaction on other exceptions too
+            print(e)  # Log the error in production code
+            return jsonify({"status": "error", "message": str(e)}), 500
+    else:
+        return flash_message()  # Assumes flash_message handles non-"seller" cases, ensure to return a valid response
 
 # Update pan
 # Not Checked(left)
-@app.route("/edit-pan", methods=["GET", "POST"])
-@login_required
-def edit_pan():
-    if current_user.type == "seller":
-        form = PanForm()
-        if form.validate_on_submit():
-            pan = Pan(
-                name=form.name.data,
-                pan_number=form.pan_number.data.upper(),
-                dp_id=form.dp_id.data,
-                seller=current_user,
-            )
-            db.session.add(pan)
-            db.session.commit()
-            flash("Pan added successfully")
-            return redirect(url_for("all_pan"))
+# @app.route("/edit-pan", methods=["GET", "POST"])
+# @login_required
+# def edit_pan():
+#     if current_user.type == "seller":
+#         form = PanForm()
+#         if form.validate_on_submit():
+#             pan = Pan(
+#                 name=form.name.data,
+#                 pan_number=form.pan_number.data.upper(),
+#                 dp_id=form.dp_id.data,
+#                 seller=current_user,
+#             )
+#             db.session.add(pan)
+#             db.session.commit()
+#             flash("Pan added successfully")
+#             return redirect(url_for("all_pan"))
 
-        # Add the following return statement for cases when form validation fails
-        flash("Pan addition failed. Please check the form.")
-        return render_template("Pan/add_pan.html", title="Add Pan", form=form)
-    return redirect(url_for("all-pan"))
+#         # Add the following return statement for cases when form validation fails
+#         flash("Pan addition failed. Please check the form.")
+#         return render_template("Pan/add_pan.html", title="Add Pan", form=form)
+#     return redirect(url_for("all-pan"))
 
 # Multi Pan
 # For Adding too many pans at once, for testing purpose only delete after use
@@ -1548,99 +1599,6 @@ def add_details(product_id):
     if current_user.type != "seller":
         return flash_message()
     
-# @app.route("/delete-subject")
-# @login_required
-# def delete_subject():
-#     if current_user.type == "seller":
-#         subject = Details.query.all()
-#         print("Subject ->",subject)
-#         for i in subject:
-#             db.session.delete(i)
-#             db.session.commit()
-#         # flash(f"The Subject {subject.name}({subject.subject_code}) has been deleted")
-#         return redirect(url_for("all_subject"))
-
-#     flash("You are not authorized to view this page.")
-#     return redirect(url_for("dashboard"))
-
-
-
-"""
-# Update Subject
-@app.route("/edit-subject", methods=["GET", "POST"])
-@login_required
-def edit_subject():
-    if current_user.type == "seller":
-        form = SubjectForm()
-        if form.validate_on_submit():
-            subject = Subject(subject_code=form.subject_code.data)
-            db.session.add(subject)
-            db.session.commit()
-            flash("Subject edited ")
-            return redirect(url_for("all_subject"))
-
-        # Add the following return statement for cases when form validation fails
-        flash("Subject addition failed. Please check the form.")
-        return render_template(
-            "Subject/add_subject.html", title="Add Subject", form=form
-        )
-    return redirect(url_for("all_subject"))
-
-
-# Read Subject
-@app.route("/all-subject")
-@login_required
-def all_subject():
-    seller_id = None
-
-    if current_user.type == "seller":
-        seller_id = current_user.id
-    elif current_user.type == "buyer":
-        seller_id = current_user.id
-
-    if seller_id is not None:
-        subjects = Subject.query.filter_by(seller_id=seller_id).all()
-        all_subjects = len(subjects)
-        return render_template(
-            "Subject/all_subjects.html",
-            title="All Subjects",
-            subjects=subjects,
-            all_subjects=all_subjects,
-        )
-    # elif current_user.type == "admin":
-
-    else:
-        flash("You are not authorized to view this page.")
-        return redirect(url_for("dashboard"))
-
-
-# Delete Subject
-@app.route("/delete-subject/<id>")
-@login_required
-def delete_subject(id):
-    if current_user.type == "seller":
-        subject = Subject.query.filter_by(
-            seller_id=current_user.id, id=id
-        ).first_or_404()
-        db.session.delete(subject)
-        db.session.commit()
-        flash(f"The Subject {subject.name}({subject.subject_code}) has been deleted")
-        return redirect(url_for("all_subject"))
-
-    flash("You are not authorized to view this page.")
-    return redirect(url_for("dashboard"))
-
-
-# --------------------------------------
-# End of Subject
-# --------------------------------------
-
-"""
-
-# ----------
-# End Of Curd On Subject
-# ----------
-
 # ----------
 # Curd On Transaction
 # ----------
@@ -1782,8 +1740,13 @@ def checking_allotment():
             results = scrape_data_from_websites(
                 driver_path, listing_On, ipo, usernames, room, socketio, headless=False
             )
-            with open(f"json/{ipo}.json", "w") as file:
-                json.dump(results, file)  # Save the results to a JSON file
+            if os.path.exists(f"json/{ipo}.json"):
+                with open(f"json/{ipo}.json", "w") as file:
+                    json.dump(results, file)  # Save the results to a JSON file
+            else:
+                os.makedirs("json")  # Create the folder if it does not exist
+                with open(f"json/{ipo}.json", "w") as file:
+                    json.dump(results, file)
             # Saving the results
             write_in_excel(filepath, results, pan_Column)
             file_ready = True
@@ -1828,7 +1791,42 @@ def download_updated_file(filepath):
 # Bulk emails
 # --------------------------------------
 
+@app.route("/rollback")
+def rollback():
+    pan = Pan.query.filter_by(seller = current_user)
+    for pans in pan:
+        db.session.delete(pans)
+        db.session.commit()
+    return redirect(url_for("all_pan"))
 
+@app.route("/add-pan-from-excel",methods=["GET","POST"])
+def add_pan_from_excel():
+    if current_user.type == "seller":   
+        file = request.files['file']
+        filename = secure_filename(file.filename)
+        print("Filename ->", filename)
+        content = file.read()
+        print("Content ->", content)
+        df = process_excel(content)
+        if df['pan'].isnull().any():
+            raise ValueError("PAN column contains null values, which are not allowed.")
+    
+        # Convert DataFrame to list of dictionaries
+        records = df.to_dict(orient='records')
+
+        # Insert each record
+        for record in records:
+            existing_record = Pan.query.filter_by(
+            pan_number=record.get('pan'), 
+            seller=current_user
+        ).first()
+
+            if not existing_record:
+                pan = Pan(name=record.get('name'), pan_number=record.get('pan'), dp_id=record.get('dp_id'), seller = current_user)
+                db.session.add(pan)
+                db.session.commit()
+
+    return redirect(url_for("all_pan"))
 # Bulk emails to all admins
 # Not Checked
 @app.route("/dashboard/bulk-emails/admins")

@@ -2,11 +2,11 @@
 
 {% block current_user_content %}
 <div class="container-fluid content">
-
-    <!-- Flash message -->
-    {% include '_flash_message.html' %}
-    <!-- End of flash message -->
-
+    <div id="flash-messages-container">
+        <!-- Flash message -->
+        {% include '_flash_message.html' %}
+        <!-- End of flash message -->
+    </div>
     <!-- Page title -->
     <div class="row">
         <div class="col-md-12">
@@ -23,12 +23,12 @@
                 <table id="data" class="table table-hover table-bordered">
                     <thead>
                         <tr>
-                            <th>Select <input type="checkbox" id="select-all"> </th>
-                            <th>Subject To <select name="def" id="def">
+                            <!-- <th>Select <input type="checkbox" id="select-all"> </th> -->
+                            <!-- <th>Subject To <select name="def" id="def">
                                     <option value="none" default="checked">None</option>
                                     <option value="Subject 1">Subject 1</option>
                                     <option value="Subject 2">Subject 2</option>
-                                </select> </th>
+                                </select> </th> -->
                             <th>Id</th>
                             <th>Name</th>
                             <th>Pan</th>
@@ -37,32 +37,30 @@
                             <th>Timestamp</th>
                             <th>Seller</th> <!-- New column for actions -->
                             {% endif %}
-                            <th>Actions</th> <!-- New column for actions -->
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <!-- Get all pans from the database -->
                         {% for pan in pans %}
                         <tr>
-                            <td><input type="checkbox" name="ID"></td>
-                            <td><select name="subject" id="sub">
+                            <!-- <td><input type="checkbox" name="ID"></td> -->
+                            <!-- <td><select name="subject" id="sub">
                                     <option value="none" default="checked">None</option>
                                     <option value="Subject 1">Subject 1</option>
                                     <option value="Subject 2">Subject 2</option>
-                                </select></td>
-                                <td> {{pan.id}} </td>
-                            <td>{{ pan.name }}</td>
-                            <td>{{ pan.pan_number }}</td>
-                            <td>{{ pan.dp_id }}</td>
+                                </select></td> -->
+                            <td> {{loop.index}} </td>
+                            <td data-id="{{ pan.id }}" data-column="name">{{ pan.name }}</td>
+                            <td data-id="{{ pan.id }}" data-column="pan_number">{{ pan.pan_number }}</td>
+                            <td data-id="{{ pan.id }}" data-column="dp_id">{{ pan.dp_id }}</td>
+                            <td><a href="{{url_for('delete_pan', id = pan.id)}}" class="btn btn-danger"> <i
+                                        class="fi fi-rr-trash" style="font-size: 0.875rem;"></i></a></td>
                             {% if current_user.type == "admin" %}
                             <td>{{ moment(pan.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
                             <th> {{ pan.seller.first_name.title() }} {{ pan.seller.last_name.title() }} </th>
                             {% endif %}
-                            <!-- New column for actions -->
-                            <td>
-                                <a href="{{ url_for('edit_pan', id=pan.id) }}" class="btn btn-primary">Edit</a>
-                                <a href="{{ url_for('delete_pan', id=pan.id) }}" class="btn btn-danger">Delete</a>
-                            </td>
+
                         </tr>
                         {% endfor %}
                         <!-- End of getting all pans from the database -->
@@ -94,53 +92,119 @@
     $(document).ready(function () {
         var table = $('#data').DataTable();
 
-    //     // Handle select all checkbox change event
+        //     // Handle select all checkbox change event
         $('#select-all').on('change', function () {
             var rows = table.rows({ page: 'current' }).nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
         });
 
         // Handle change event of the "Subject To" dropdown
-    $('#def').change(function () {
-        // Get the selected value
-        var selectedSubject = $(this).val();
+        $('#def').change(function () {
+            // Get the selected value
+            var selectedSubject = $(this).val();
 
-        // Update all corresponding cells in the table
-        $('tbody tr').each(function () {
-            // Find the select element in the current row
-            var subjectDropdown = $(this).find('select[name="subject"]');
+            // Update all corresponding cells in the table
+            $('tbody tr').each(function () {
+                // Find the select element in the current row
+                var subjectDropdown = $(this).find('select[name="subject"]');
 
-            // Update the selected value
-            subjectDropdown.val(selectedSubject);
+                // Update the selected value
+                subjectDropdown.val(selectedSubject);
 
-            // If you want to trigger the change event on the select element
-            // subjectDropdown.trigger('change');
+                // If you want to trigger the change event on the select element
+                // subjectDropdown.trigger('change');
+            });
+        });
+
+    });
+
+
+    // // For Subject To dropdown
+    //     $(document).ready(function () {
+    //     // Handle change event of the "Subject To" dropdown
+    //     $('#def').change(function () {
+    //         // Get the selected value
+    //         var selectedSubject = $(this).val();
+
+    //         // Update all corresponding cells in the table
+    //         $('tbody tr').each(function () {
+    //             // Find the select element in the current row
+    //             var subjectDropdown = $(this).find('select[name="subject"]');
+
+    //             // Update the selected value
+    //             subjectDropdown.val(selectedSubject);
+
+    //             // If you want to trigger the change event on the select element
+    //             // subjectDropdown.trigger('change');
+    //         });
+    //     });
+    // });
+
+    document.querySelectorAll('td').forEach(cell => {
+        let originalContent = "";  // Variable to store the original content of the cell
+
+        cell.addEventListener('dblclick', function () {
+            const column = this.getAttribute('data-column');
+            const editableColumns = ['name', 'dp_id', 'pan_number'];
+            if (editableColumns.includes(column)) {
+                originalContent = this.innerText;  // Save original content
+                this.setAttribute('contenteditable', 'true');
+                this.focus(); // Focus on the element to start editing immediately
+            }
+        });
+
+        cell.addEventListener('blur', function () {
+            if (this.hasAttribute('contenteditable')) {
+                this.removeAttribute('contenteditable');
+
+                const id = this.getAttribute('data-id');
+                const column = this.getAttribute('data-column');
+                const newValue = this.innerText.trim(); // Trim to clean unnecessary white space
+
+                fetch('/edit-pans', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ id: id, column: column, newValue: newValue })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            console.log('Success:', data.message);
+                            displayMessage(data.message, 'success');
+                        } else {
+                            console.error('Error:', data.message);
+                            displayMessage(data.message, 'error');
+                            this.innerText = originalContent;  // Restore the original content if error
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        displayMessage('Failed to update: ' + error.message, 'error');
+                        this.innerText = originalContent;  // Restore the original content on network error
+                    });
+            }
         });
     });
 
-    });
+    function displayMessage(message, category) {
+        const messagesContainer = document.getElementById('flash-messages-container');
+        messagesContainer.innerHTML = ''; // Clear previous messages
 
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `alert text-center mt-4 alert-${category}`;
+        messageDiv.style.backgroundColor = '#ffeac4';
+        messageDiv.innerHTML = `<small>${message}</small>`;
 
-// // For Subject To dropdown
-//     $(document).ready(function () {
-//     // Handle change event of the "Subject To" dropdown
-//     $('#def').change(function () {
-//         // Get the selected value
-//         var selectedSubject = $(this).val();
+        messagesContainer.appendChild(messageDiv);
 
-//         // Update all corresponding cells in the table
-//         $('tbody tr').each(function () {
-//             // Find the select element in the current row
-//             var subjectDropdown = $(this).find('select[name="subject"]');
+        // Optionally, remove the message after a set time
+        setTimeout(() => {
+            messagesContainer.removeChild(messageDiv);
+        }, 5000); // Adjust time as needed
+    }
 
-//             // Update the selected value
-//             subjectDropdown.val(selectedSubject);
-
-//             // If you want to trigger the change event on the select element
-//             // subjectDropdown.trigger('change');
-//         });
-//     });
-// });
 </script>
 
 {% endblock %}

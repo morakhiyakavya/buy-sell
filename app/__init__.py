@@ -9,22 +9,17 @@ import logging
 from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
 from config import Config
-from flask_ngrok import run_with_ngrok
+# from flask_ngrok import run_with_ngrok
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
-run_with_ngrok(app)
+# run_with_ngrok(app)
 app.config.from_object(Config)
 
 db = SQLAlchemy(app)
 from sqlalchemy import event, engine
 
-# @event.listens_for(engine.Engine, "connect")
-# def set_sqlite_pragma(dbapi_connection, connection_record):
-#     if connection_record.info.get('dialect_name') == "sqlite":
-#         cursor = dbapi_connection.cursor()
-#         cursor.execute("PRAGMA foreign_keys=ON")
-#         cursor.close()
+
 
 migrate = Migrate(app, db, render_as_batch=True)
 moment = Moment(app)

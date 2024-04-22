@@ -3,19 +3,63 @@
 
 
 {% block current_user_content %}
-  <!-- Login form -->
-  <div class="row align-items-center mb-1 gy-1">
-    <div class="col-lg-6">
-      <h2 class="text-center mb-4">{{ title }}</h2>
-      <!-- form-->
-      <div class="my-form">
-        <p>{{ wtf.quick_form(form, button_map={"submit":"warning"}) }}</p>
-      </div>        
-      <!-- End of form -->
+<!-- Flash message -->
+{% include '_flash_message.html' %}
+<!-- End of flash message -->
+<!-- Login form -->
+<div class="row align-items-center mb-1 gy-1">
+  <div class="col-lg-6">
+    <h2 class="text-center mb-4">{{ title }}</h2>
+    <!-- form-->
+    <div class="my-form">
+      <p>{{ wtf.quick_form(form, button_map={"submit":"warning"}) }}</p>
+      <hr>
+
+      <a href="{{ url_for('all_pan') }}" class="btn btn-primary">Proceed Ahead.</a>
+      <h5 class="middle">OR</h5>
+      <button onclick="uploadFile()" class="btn btn-primary">Upload from excel.</button>
+      <input type="file" id="fileInput"
+        accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+        style="display: none;" />
+        <script>
+          function uploadFile() {
+              // Trigger the hidden file input when the custom button is clicked
+              document.getElementById('fileInput').click();
+          }
+          
+          document.addEventListener('DOMContentLoaded', function () {
+              const fileInput = document.getElementById('fileInput');
+          
+              fileInput.addEventListener('change', function () {
+                  const formData = new FormData();
+                  formData.append('file', this.files[0]);
+          
+                  // Send the file to the Flask server
+                  fetch('/add-pan-from-excel', {
+                      method: 'POST',
+                      body: formData,
+                  })
+                  .then(response => response.json())
+                  .then(data => {
+                      console.log('Success:', data);
+                      // Optionally call another Flask function automatically here if needed
+                      if (data.success) {
+                          fetch('/another-flask-function')
+                          .then(response => response.json())
+                          .then(data => console.log('Second function executed', data))
+                          .catch(error => console.error('Error in second function:', error));
+                      }
+                  })
+                  .catch(error => console.error('Error:', error));
+              });
+          });
+          </script>
     </div>
-    <div class="col-lg-6">
-      <!-- Empty col -->
-    </div>
+    <!-- End of form -->
   </div>
-  <!-- End of login form -->
+  <div class="col-lg-6">
+    <!-- Empty col -->
+  </div>
+</div>
+<!-- End of login form -->
 {% endblock %}

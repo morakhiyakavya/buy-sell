@@ -185,7 +185,7 @@ class Details(db.Model):
     __tablename__ = "details"
 
     id = db.Column(db.Integer, primary_key=True)
-    product_id = db.Column(db.Integer, db.ForeignKey("ipos.id", name="fk_details_product_id"), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey("ipos.id", ondelete="CASCADE", name="fk_details_product_id"), nullable=False)
     subject = db.Column(db.String(10), nullable=False)
     formtype = db.Column(db.String(8), nullable=False)
     price = db.Column(db.Float, nullable=False)
@@ -198,7 +198,7 @@ class Details(db.Model):
     seller = db.relationship("Seller", backref=db.backref("details", cascade="all, delete-orphan"), foreign_keys=[seller_id], passive_deletes=True)
 
     
-    ipo = db.relationship("IPO", backref="details")
+    ipo = db.relationship("IPO", backref=db.backref("details", cascade="all, delete-orphan"), foreign_keys=[product_id], passive_deletes=True)
 
 # Pan Detail
 class Pan(db.Model):
@@ -231,10 +231,10 @@ class Transaction(db.Model):
 
     # Relationships
     product_id = db.Column(db.Integer, db.ForeignKey('ipos.id', name='fk_transaction_product_id'), nullable=False)
-    product = db.relationship('IPO', backref='transactions', foreign_keys=[product_id], passive_deletes=True)
+    product = db.relationship('IPO',  backref=db.backref("transactions", cascade="all, delete-orphan"), foreign_keys=[product_id], passive_deletes=True)
 
     details_id = db.Column(db.Integer, db.ForeignKey('details.id', name='fk_transaction_details_id'), nullable=False)
-    details = db.relationship('Details', backref='transactions', foreign_keys=[details_id], passive_deletes=True)
+    details = db.relationship('Details',  backref=db.backref("transactions", cascade="all, delete-orphan"), foreign_keys=[details_id], passive_deletes=True)
 
     seller_id = db.Column(db.Integer, db.ForeignKey("seller.id", ondelete="CASCADE", name="fk_transaction_seller_id"), nullable=False)
     # seller = db.relationship("Seller", backref="transactions", foreign_keys=[seller_id], passive_deletes=True)
@@ -242,7 +242,7 @@ class Transaction(db.Model):
 
 
     buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE", name="fk_transaction_buyer_id"), nullable=False)
-    buyer = db.relationship("Buyer", backref="transactions", foreign_keys=[buyer_id], passive_deletes=True)
+    buyer = db.relationship("Buyer",  backref=db.backref("transactions", cascade="all, delete-orphan"), foreign_keys=[buyer_id], passive_deletes=True)
 
 
 class TransactionPan(db.Model):
@@ -253,10 +253,10 @@ class TransactionPan(db.Model):
     transaction = db.relationship('Transaction', backref=db.backref('transaction_pans', cascade='all, delete-orphan'))
     pan = db.relationship('Pan', backref=db.backref('pan_transactions', cascade='all, delete-orphan', overlaps = "pans, transactions"))
 
-# class Demo(db.Model):
-#     __tablename__ = "demo"
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), nullable=False)
+class Demo(db.Model):
+    __tablename__ = "demo"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), nullable=False)
 
 # =================
 # End of Application Users Purchase and Sell
