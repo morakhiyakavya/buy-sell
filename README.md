@@ -9,54 +9,15 @@ Additionally, our system incorporates a robust buy-sell interface, structured to
 - **Multi-site Scraping**: Automated scraping from five different websites.
 - **CAPTCHA Resolution**: Integration of a TensorFlow-based model to solve CAPTCHAs on two websites.
 - **User Role Hierarchy**:
-  - **SuperAdmin**: Highest level of access, with capabilities to manage all users including deletion.
-  - **Admin**: Manages system data visibility and handles Buyer registrations.
-  - **Buyer**: Can register Sellers and initiate transactions.
-  - **Seller**: Manages inventory and transaction records with Buyers.
+ - **SuperAdmin**: Highest level of access, with capabilities to manage all users including deletion.
+ - **Admin**: Manages system data visibility and handles Buyer registrations.
+ - **Buyer**: Can register Sellers and initiate transactions.
+ - **Seller**: Manages inventory and transaction records with Buyers.
 - **Transaction Management**: Tracks and records transactions including details like PAN and form data exchanged between Buyers and Sellers.
 
 ## Project Structure
 
-
-Certainly! Below is a markdown-formatted README.md file that you can directly paste into your GitHub repository. This README includes all the details you specified, such as the project features, structure, setup instructions, user roles, contribution guidelines, and more. Just replace placeholders like yourusername and contact@yourwebsite.com with your actual GitHub username and contact information.
-
-markdown
-Copy code
-# Web Scraping Hub
-
-Welcome to the Web Scraping Hub! This repository houses the codebase for our advanced web scraping system that targets five distinct websites. Utilizing sophisticated scraping techniques and a custom-built TensorFlow model to solve CAPTCHAs on two of these sites, our project not only scrapes data efficiently but does so while navigating complex web security measures.
-
-Additionally, our system incorporates a robust buy-sell interface, structured to support multiple user roles including SuperAdmin, Admin, Buyer, and Seller, each with distinct privileges and capabilities. This README provides an overview of the project structure, setup instructions, user role definitions, and guidelines for contribution.
-
-## Features
-
-- **Multi-site Scraping**: Automated scraping from five different websites.
-- **CAPTCHA Resolution**: Integration of a TensorFlow-based model to solve CAPTCHAs on two websites.
-- **User Role Hierarchy**:
-  - **SuperAdmin**: Highest level of access, with capabilities to manage all users including deletion.
-  - **Admin**: Manages system data visibility and handles Buyer registrations.
-  - **Buyer**: Can register Sellers and initiate transactions.
-  - **Seller**: Manages inventory and transaction records with Buyers.
-- **Transaction Management**: Tracks and records transactions including details like PAN and form data exchanged between Buyers and Sellers.
-
-## Project Structure
-
-/web-scraping-hub/
-|-- data/
-| |-- scraped_data/
-| |-- model_data/
-|-- docs/
-|-- models/
-| |-- captcha_solver/
-|-- src/
-| |-- admin/
-| |-- buyer/
-| |-- seller/
-| |-- super_admin/
-|-- tests/
-|-- README.md
-|-- requirements.txt
-
+/web-scraping-hub/ |-- data/ | |-- scraped_data/ | |-- model_data/ |-- docs/ |-- models/ | |-- captcha_solver/ |-- src/ | |-- admin/ | |-- buyer/ | |-- seller/ | |-- super_admin/ |-- tests/ |-- README.md |-- requirements.txt
 
 
 ### Description
@@ -70,51 +31,50 @@ Additionally, our system incorporates a robust buy-sell interface, structured to
 ## Setup Instructions
 
 1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/yourusername/web-scraping-hub.git
-   cd web-scraping-hub
-pip install -r requirements.txt
-Environment Setup:
-Set up the required environment variables and any necessary API keys.
-Run the Scraper:
-Navigate to the appropriate directory in src/ for the role you are testing and execute the main script.
-Testing:
-Ensure all components are correctly installed and configured by running:
-python -m unittest discover tests
-User Roles and Privileges
-SuperAdmin:
-Full system access.
-Can delete any user.
-Inherits all Admin privileges.
-Admin:
-Monitor system data.
-Register and manage Buyers.
-View details about Sellers.
-Buyer:
-Register Sellers.
-Initiate and track transactions with Sellers.
-Seller:
-List and manage inventory.
-Record transactions with Buyers.
-Contribution Guidelines
+bash git clone https://github.com/yourusername/web-scraping-hub.git cd web-scraping-hub
+
+2. **Install Dependencies**:
+bash pip install -r requirements.txt
+
+3. **Environment Setup**:
+   Set up the required environment variables and any necessary API keys.
+4. **Run the Scraper**:
+   Navigate to the appropriate directory in `src/` for the role you are testing and execute the main script.
+5. **Testing**:
+   Ensure all components are correctly installed and configured by running:
+bash python -m unittest discover tests
+
+
+## User Roles and Privileges
+
+- **SuperAdmin**: Full system access. Can delete any user. Inherits all Admin privileges.
+- **Admin**: Monitor system data. Register and manage Buyers. View details about Sellers.
+- **Buyer**: Register Sellers. Initiate and track transactions with Sellers.
+- **Seller**: List and manage inventory. Record transactions with Buyers.
+
+## Contribution Guidelines
+
 We welcome contributions from the community! If you would like to contribute, please follow these steps:
 
-Fork the Repository:
-Create a fork of the main repository and clone it to your machine.
-Create a Feature Branch:
-git checkout -b feature-your-new-feature
-Commit Your Changes:
-git commit -am 'Add some feature'
-Push to the Branch:
-git push origin feature-your-new-feature
-Submit a Pull Request:
-Open a pull request to the original repository with a clear list of what you've done.
+1. **Fork the Repository**:
+   Create a fork of the main repository and clone it to your machine.
+2. **Create a Feature Branch**:
+bash git checkout -b feature-your-new-feature
+3. **Commit Your Changes**:
+bash git commit -am 'Add some feature'
+4. **Push to the Branch**:
+bash git push origin feature-your-new-feature
+5. **Submit a Pull Request**:
+   Open a pull request to the original repository with a clear list of what you've done.
+
 Before you submit a pull request, please ensure your changes adhere to the project coding conventions and all tests pass.
 
-License
+## License
+
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-Support
-For support, email contact@yourwebsite.com or open an issue in the GitHub repository.
+## Support
+
+For support, email morakhiyakavya@gmail.com or open an issue in the GitHub repository.
 
 Thank you for visiting our Web Scraping Hub repository, and we look forward to your contributions and improvements to this project!
