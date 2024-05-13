@@ -119,6 +119,7 @@ class Scrape_Website(BaseScraper):
         """
         
         super().__init__(driver_path, website, headless)
+        time.sleep(5)
         self.result_dict = {}
         self.message = ""
         self.allotment = 0

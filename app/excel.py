@@ -1,6 +1,8 @@
 import pandas as pd
 import re
 import spacy
+import json
+import os
 
 # Load the spaCy model
 nlp = spacy.load("en_core_web_sm")
@@ -101,6 +103,13 @@ def write_in_excel(file_path, results, pan_Column):
     return df
 
 def print_details(company, ipo, results):
+    if os.path.exists(f"json/{ipo}.json"):
+        with open(f"json/{ipo}.json", "w") as file:
+            json.dump(results, file)  # Save the results to a JSON file
+    # else:
+    #     os.makedirs("json")  # Create the folder if it does not exist
+    #     with open(f"json/{ipo}.json", "w") as file:
+    #         json.dump(results, file)
     print("*-----------------------------------------------------*")
 
     print(f"Comapany {company} and IPO {ipo}")
@@ -128,19 +137,19 @@ def get_column_data(file_path, column_identifier):
 
 
 
+
+
 # Define regular expressions for each data type
 PAN_PATTERN = re.compile(r'^[A-Z]{5}[0-9]{4}[A-Z]$')
-DP_ID_PATTERN = re.compile(r'^\d{8,10}$')
-# Updated pattern to capture more Indian name features and "HUF"
+DP_ID_PATTERN = re.compile(r'^\d{10,16}$')
 INDIAN_NAME_PATTERN = re.compile(r'(kumar|singh|devi|reddy|patel|das|rao|sharma|shah|huf)', re.IGNORECASE)
 
 def check_confidence(column, pattern, threshold):
-    # Convert column to uppercase if checking PAN pattern
     if pattern == PAN_PATTERN:
         column = column.str.upper()
     matches = column.apply(lambda x: bool(pattern.match(str(x))))
     confidence = matches.sum() / len(column)
-    return confidence >= threshold, confidence
+    return confidence >= threshold, confidence, matches  # Also return matches to use for cell-level filtering
 
 def check_name_confidence(column, threshold):
     name_counts = 0
@@ -158,35 +167,37 @@ def classify_columns(df):
     thresholds = {'pan': 0.8, 'dp_id': 0.5, 'name': 0.5}
 
     for col in df.columns:
-        is_pan, pan_confidence = check_confidence(df[col], PAN_PATTERN, thresholds['pan'])
-        is_dp_id, dp_id_confidence = check_confidence(df[col], DP_ID_PATTERN, thresholds['dp_id'])
+        is_pan, pan_confidence, pan_mask = check_confidence(df[col], PAN_PATTERN, thresholds['pan'])
+        is_dp_id, dp_id_confidence, _ = check_confidence(df[col], DP_ID_PATTERN, thresholds['dp_id'])
         is_name, name_confidence = check_name_confidence(df[col], thresholds['name'])
         
-        confidences = {'pan': (is_pan, pan_confidence), 'dp_id': (is_dp_id, dp_id_confidence), 'name': (is_name, name_confidence)}
+        confidences = {'pan': (is_pan, pan_confidence, pan_mask), 'dp_id': (is_dp_id, dp_id_confidence, None), 'name': (is_name, name_confidence, None)}
         assigned_label = max(confidences, key=lambda x: confidences[x][1] if confidences[x][0] else 0)
         
-        # Ensure that no label is repeated and meets threshold criteria
-        if confidences[assigned_label][0] and all(res[0] != assigned_label for res in results.values()):
-            results[col] = (assigned_label, confidences[assigned_label][1])
+        if confidences[assigned_label][0]:
+            results[col] = (assigned_label, confidences[assigned_label][2])  # Save mask if available
         else:
-            results[col] = ('unknown', 0)
-
-    # Keep up to 3 best classified columns based on confidence
-    if len(results) > 3:
-        results = dict(sorted(results.items(), key=lambda item: item[1][1], reverse=True)[:3])
+            results[col] = ('unknown', None)
 
     return results
 
 def process_excel(file_path):
-    df = pd.read_excel(file_path, header=None)  # Assuming no header
-    df.dropna(how='all', inplace=True)  # Drop all rows with all NaN values
-    column_classifications = classify_columns(df)
-    
-    # Map new names and filter columns
-    new_columns = {k: v[0] for k, v in column_classifications.items() if v[0] != 'unknown'}
+    df = pd.read_excel(file_path, header=None)
+    df.dropna(how='all', inplace=True)
+    column_labels = classify_columns(df)
+
+    # Filtering and removing rows based on confidence for PAN
+    for col, (label, mask) in column_labels.items():
+        if label == 'pan':
+            # Apply the mask and immediately drop rows where PAN is NaN
+            df[col] = df[col].where(mask)
+            df.dropna(subset=[col], inplace=True)  # Drop rows with NaN in PAN column
+
+    # Map new names and retain only relevant columns
+    new_columns = {col: label for col, (label, _) in column_labels.items() if label != 'unknown'}
     df = df[list(new_columns.keys())]
     df.rename(columns=new_columns, inplace=True)
-    
+    df.dropna(how='all', inplace=True)  # Further cleanup to remove any rows that are now empty due to filtering
+    print(df.head())
     return df
-
 

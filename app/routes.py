@@ -1204,7 +1204,19 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
     #         )
     #         db.session.add(new_ipo)
     #         db.session.commit()
-
+    # print("Here is ipo->",ipo_details_green)
+    all_names = [item['Name'] for item in ipo_details_green + ipo_details_aqua + ipo_details_lightyellow]
+    all_names_set = set(all_names)  # Convert list to set for efficient comparison
+    perfect_names = []
+    db_names_set = {ipo.name for ipo in IPO.query.all()}
+    for i in all_names_set:
+        name = clean_name(i)
+        perfect_names.append(name)
+    names_not_in_dicts = db_names_set - set(perfect_names)
+    for name in names_not_in_dicts:
+        ipo = IPO.query.filter_by(name=name).first()
+        ipo.status = "complete"
+        db.session.commit()
     # Process light yellow IPOs - Update existing
     update_ipo_status(ipo_details_green, "open")
     update_ipo_status(ipo_details_lightyellow, "closed")
@@ -1652,46 +1664,53 @@ def count_pan(transaction_id):
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
-    if current_user.type == "seller":
-        transaction_id = request.args.get("transaction_id", type=int)
-        transaction = Transaction.query.get_or_404(transaction_id)
-        count = count_pan(transaction_id)
-        if request.method == "GET":
-            pans = Pan.query.filter_by(seller_id=current_user.id).all()
-            all_pans = len(pans)
-            return render_template(
-                "transaction/available_pans.html",
-                title="All Pans",
-                pans=pans,
-                all_pans=all_pans,
-                transaction=transaction  # Pass transaction to template to use its details
-            )
-        elif request.method == "POST":
-            selected_ids = request.form.getlist("ID[]")
-            print("Selected Ids ->", selected_ids)
-            required_pans = transaction.details.quantity
-            print("Required Pans ->", required_pans)
-            
-            if len(selected_ids) > required_pans:
-                # Redirect back with an error message if the selected pans don't match required quantity exactly
-                flash(f"You must select exactly {required_pans} pans. You selected {len(selected_ids)}.")
-                return redirect(url_for("available_pans", transaction_id=transaction_id))
-            elif len(selected_ids) <= required_pans:
-                # Process exactly matched number of selected pans
-                for selected_id in selected_ids:
-                    print("transaction_id ->", transaction_id)
-                    transaction_pan = TransactionPan(
-                        transaction_id=transaction_id,
-                        pan_id=int(selected_id)
-                    )
-                    db.session.add(transaction_pan)
-                db.session.commit()
-                flash("The transaction has been updated successfully.")
-                return redirect(url_for("all_transaction"))
-    else:
-        # Handle non-seller users or redirect as needed
-        flash("You are not authorized to view this page.")
-        return redirect(url_for("index")) 
+    try:
+        if current_user.type == "seller":
+            transaction_id = request.args.get("transaction_id", type=int)
+            transaction = Transaction.query.get_or_404(transaction_id)
+            count = count_pan(transaction_id)
+            if request.method == "GET":
+                pans = Pan.query.filter_by(seller_id=current_user.id).all()
+                all_pans = len(pans)
+                return render_template(
+                    "transaction/available_pans.html",
+                    title="All Pans",
+                    pans=pans,
+                    all_pans=all_pans,
+                    transaction=transaction  # Pass transaction to template to use its details
+                )
+            elif request.method == "POST":
+                selected_ids = request.form.getlist("ID[]")
+                print("Selected Ids ->", selected_ids)
+                required_pans = transaction.details.quantity
+                print("Required Pans ->", required_pans)
+                
+                if len(selected_ids) > required_pans:
+                    # Redirect back with an error message if the selected pans don't match required quantity exactly
+                    flash(f"You must select exactly {required_pans} pans. You selected {len(selected_ids)}.")
+                    return redirect(url_for("available_pans", transaction_id=transaction_id))
+                elif len(selected_ids) <= required_pans:
+                    # Process exactly matched number of selected pans
+                    for selected_id in selected_ids:
+                        print("transaction_id ->", transaction_id)
+                        transaction_pan = TransactionPan(
+                            transaction_id=transaction_id,
+                            pan_id=int(selected_id)
+                        )
+                        db.session.add(transaction_pan)
+                    db.session.commit()
+                    flash("The transaction has been updated successfully.")
+                    return redirect(url_for("all_transaction"))
+        else:
+            # Handle non-seller users or redirect as needed
+            flash("You are not authorized to view this page.")
+            return redirect(url_for("index"))
+    except IntegrityError as e:
+        flash("You have already added this pan to the transaction")
+        return redirect(url_for("available_pans", transaction_id=transaction_id))
+    except Exception as e:
+        print(e)
+        return flash_message()
 # --------------------------------------
 # End of Related To Transaction
 # --------------------------------------
@@ -1740,13 +1759,13 @@ def checking_allotment():
             results = scrape_data_from_websites(
                 driver_path, listing_On, ipo, usernames, room, socketio, headless=False
             )
-            if os.path.exists(f"json/{ipo}.json"):
-                with open(f"json/{ipo}.json", "w") as file:
-                    json.dump(results, file)  # Save the results to a JSON file
-            else:
-                os.makedirs("json")  # Create the folder if it does not exist
-                with open(f"json/{ipo}.json", "w") as file:
-                    json.dump(results, file)
+            # if os.path.exists(f"json/{ipo}.json"):
+            #     with open(f"json/{ipo}.json", "w") as file:
+            #         json.dump(results, file)  # Save the results to a JSON file
+            # else:
+            #     os.makedirs("json")  # Create the folder if it does not exist
+            #     with open(f"json/{ipo}.json", "w") as file:
+            #         json.dump(results, file)
             # Saving the results
             write_in_excel(filepath, results, pan_Column)
             file_ready = True
@@ -1801,32 +1820,34 @@ def rollback():
 
 @app.route("/add-pan-from-excel",methods=["GET","POST"])
 def add_pan_from_excel():
-    if current_user.type == "seller":   
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        print("Filename ->", filename)
-        content = file.read()
-        print("Content ->", content)
-        df = process_excel(content)
-        if df['pan'].isnull().any():
-            raise ValueError("PAN column contains null values, which are not allowed.")
-    
-        # Convert DataFrame to list of dictionaries
-        records = df.to_dict(orient='records')
+    try:
+        if current_user.type == "seller":   
+            file = request.files['file']
+            filename = secure_filename(file.filename)
+            print("Filename ->", filename)
+            content = file.read()
+            df = process_excel(content)
+            if df['pan'].isnull().any():
+                raise ValueError("Pan column contains null values, which are not allowed.")
+            # Convert DataFrame to list of dictionaries
+            records = df.to_dict(orient='records')
+            # print("Records ->", records)
 
-        # Insert each record
-        for record in records:
-            existing_record = Pan.query.filter_by(
-            pan_number=record.get('pan'), 
-            seller=current_user
-        ).first()
+            # Insert each record
+            for record in records:
+                existing_record = Pan.query.filter_by(
+                pan_number=record.get('pan'), 
+                seller=current_user
+            ).first()
 
-            if not existing_record:
-                pan = Pan(name=record.get('name'), pan_number=record.get('pan'), dp_id=record.get('dp_id'), seller = current_user)
-                db.session.add(pan)
-                db.session.commit()
-
-    return redirect(url_for("all_pan"))
+                if not existing_record:
+                    pan = Pan(name=record.get('name'), pan_number=record.get('pan'), dp_id=record.get('dp_id'), seller = current_user)
+                    db.session.add(pan)
+                    db.session.commit()
+            return redirect(url_for("all_pan"))
+    except Exception as e:
+        print(e)
+        return e
 # Bulk emails to all admins
 # Not Checked
 @app.route("/dashboard/bulk-emails/admins")

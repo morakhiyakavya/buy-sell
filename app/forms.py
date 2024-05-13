@@ -490,13 +490,13 @@ class EditPhoneForm(FlaskForm):
     )
     submit = SubmitField("Update", render_kw={"class": "btn btn-primary"})
 
-    def validate_phone(self, phone):
-        p = phonenumbers.parse(phone.data)
-        try:
-            if not phonenumbers.is_valid_number(p):
-                raise ValueError()
-        except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
-            raise ValidationError("Invalid phone number.")
+    # def validate_phone(self, phone):
+    #     p = phonenumbers.parse(phone.data)
+    #     try:
+    #         if not phonenumbers.is_valid_number(p):
+    #             raise ValueError()
+    #     except (phonenumbers.phonenumberutil.NumberParseException, ValueError):
+    #         raise ValidationError("Invalid phone number.")
 
 
 # buyer

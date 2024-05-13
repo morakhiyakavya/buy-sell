@@ -69,9 +69,12 @@
             </div>
         </div>
     </div>
+    <div id="datatable-buttons" class="pagination"></div>
+
     <!-- End of list of all pans -->
     <hr>
     <br>
+
     <div class="row">
         <br>
         <h1>Add Pan</h1>
@@ -90,32 +93,44 @@
 {% block current_user_scripts %}
 <script>
     $(document).ready(function () {
-        var table = $('#data').DataTable();
+        var table = $('#data').DataTable({
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>' +
+                '<"row"<"col-md-12"tr>>' +
+                '<"row"<"col-md-5"i><"col-md-7"p>>',
+            buttons: [
+                {
+                    extend: 'excel',
+                    class: 'btn btn-primary',
+                    text: 'Excel'
+                },
+                {
+                    extend: 'pdf',
+                    class: 'btn btn-primary',
+                    text: 'Pdf'
+                },
+                // {
+                //     extend: 'print',
+                //     class: 'btn btn-primary',
+                //     text: 'Print'
+                // },
+            ],
+        });
 
-        //     // Handle select all checkbox change event
+        // Manually append buttons to your designated area
+        table.buttons().container().appendTo($('#datatable-buttons'));
+        // Existing code for select-all and dropdown change
         $('#select-all').on('change', function () {
             var rows = table.rows({ page: 'current' }).nodes();
             $('input[type="checkbox"]', rows).prop('checked', this.checked).trigger('change');
         });
 
-        // Handle change event of the "Subject To" dropdown
         $('#def').change(function () {
-            // Get the selected value
             var selectedSubject = $(this).val();
-
-            // Update all corresponding cells in the table
             $('tbody tr').each(function () {
-                // Find the select element in the current row
                 var subjectDropdown = $(this).find('select[name="subject"]');
-
-                // Update the selected value
                 subjectDropdown.val(selectedSubject);
-
-                // If you want to trigger the change event on the select element
-                // subjectDropdown.trigger('change');
             });
         });
-
     });
 
 
