@@ -38,15 +38,20 @@
                         {% for product in products %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>{{ product.name.upper() }}</td>
+                            <td> {{ product.name.upper() }}</td>
                             <td>{{ product.listing_at}}</td>
                             <td>{{product.listing_date.strftime('%b %d, %Y')}}</td>
                             <td>{{product.open_date.strftime('%b %d, %Y')}}</td>
                             <td>{{product.close_date.strftime('%b %d, %Y')}}</td>
                             <td>{{ product.status }}</td>
+                            {% if product.status != 'complete' %}
                             <td>
                                     <a href="{{ url_for('add_details', product_id=product.id) }}" class="btn btn-primary">sell</a>
                             </td>
+                            {% else %}
+                            <td>
+                            </td>
+                            {% endif %}
                         </tr>
                         {% endfor %}
                         <!-- End of getting all products from the database -->

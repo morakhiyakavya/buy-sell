@@ -1,4 +1,5 @@
 from datetime import datetime
+
 # from cryptography.fernet import Fernet
 import json
 import os
@@ -65,6 +66,7 @@ from sqlalchemy.exc import IntegrityError
 # USER AUTHENTICATION
 # =========================================
 
+
 # Checked
 def flash_message():  # An base level error message function
     if current_user.is_authenticated:
@@ -74,12 +76,14 @@ def flash_message():  # An base level error message function
         flash("You are not authorized to view the page. Please Login first.")
         return redirect(url_for("login"))
 
+
 # Checked
 @app.route("/")
 def home():
-    if current_user.is_authenticated: 
+    if current_user.is_authenticated:
         return redirect(url_for("dashboard"))
     return render_template("home.html")
+
 
 @app.route("/all-links")
 @login_required
@@ -98,21 +102,21 @@ def all_links():
         return render_template("all_links.html", urls=urls)
 
 
-
 # @app.route("/allotment_file")
 # def allotment_file():
 #     file_path = "C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\upload_folder\\ENSER_COM_-_PANCARD_-_Copy.xlsx"
 #     return send_file(file_path, as_attachment=True)
 
+
 # Checked
 @app.route("/dashboard")
 def dashboard():
-        if current_user.type == "buyer":
-            return redirect(url_for("buyer_profile"))
-        if current_user.type == "seller":
-            return redirect(url_for("seller_profile"))
-        if current_user.type == "admin":
-            return redirect(url_for("admin_profile"))
+    if current_user.type == "buyer":
+        return redirect(url_for("buyer_profile"))
+    if current_user.type == "seller":
+        return redirect(url_for("seller_profile"))
+    if current_user.type == "admin":
+        return redirect(url_for("admin_profile"))
 
 
 # Login
@@ -129,8 +133,8 @@ def login():
             flash("Invalid username or password")
             return redirect(url_for("login"))
         if not user.is_active:
-            flash('Your account is not active. Please contact support.')
-            return redirect(url_for('home'))
+            flash("Your account is not active. Please contact support.")
+            return redirect(url_for("home"))
         next_page = request.args.get("next")
         if not next_page or url_parse(next_page).netloc != "":
             next_page = url_for("dashboard")
@@ -151,6 +155,7 @@ def logout():
 
 
 # Request password reset
+
 
 # Not Checked for Buyer and Seller
 @app.route("/request-password-reset", methods=["GET", "POST"])
@@ -376,6 +381,7 @@ def register_admin():
 # Admin profile
 # --------------------------------------
 
+
 # Admin profile
 # Checked
 @app.route("/admin/profile")
@@ -385,6 +391,7 @@ def admin_profile():
         return render_template("admin/profile.html", title="Admin Profile")
     else:
         return flash_message()
+
 
 # Compose direct email to admin
 # Not Checked
@@ -471,6 +478,7 @@ def deactivate_admin(username):
     else:
         return flash_message()
 
+
 # Reactivate admin
 # Not Checked
 @app.route("/dashboard/reactivate-admin/<username>")
@@ -486,6 +494,7 @@ def reactivate_admin(username):
     else:
         return flash_message()
 
+
 # Delete admin
 # Not Checked
 @app.route("/dashboard/delete-admin/<username>")
@@ -499,7 +508,8 @@ def delete_admin(username):
         return redirect(url_for("all_admins"))
     else:
         return flash_message()
-    
+
+
 # Only for Initial Setup, Delete after use
 @app.route("/del")
 def delete_det():
@@ -511,7 +521,7 @@ def delete_det():
         phone_number="7016184560",
         current_residence="Ahmedabad,Gujarat",
         # confirm_password="kavyaarya123.",
-        department = "Super Admin",
+        department="Super Admin",
     )
 
     buyer = Buyer(
@@ -658,8 +668,9 @@ def delete_admin_email(id):
 def buyer_profile():
     if current_user.type == "buyer":
         return render_template("buyer/profile.html", title="Buyer Profile")
-    else :
+    else:
         return flash_message()
+
 
 # Deactivate own account
 # Not Checked
@@ -904,6 +915,7 @@ def seller_profile():
     else:
         return flash_message()
 
+
 # Deactivate seller
 # Not Checked
 @app.route("/seller/deactivate-account")
@@ -977,6 +989,7 @@ def emails_to_individual_sellers():
         emails=emails,
     )
 
+
 # List all sellers
 # Not Checked
 @app.route("/dashboard/all-sellers")
@@ -1019,6 +1032,7 @@ def deactivate_seller(username):
     else:
         return flash_message()
 
+
 # Reactivate seller
 # Checked
 @app.route("/dashboard/reactivate-seller/<username>")
@@ -1034,6 +1048,7 @@ def reactivate_seller(username):
     else:
         return flash_message()
 
+
 # Delete seller
 # Checked
 @app.route("/dashboard/delete-seller/<username>")
@@ -1048,6 +1063,7 @@ def delete_seller(username):
         return redirect(url_for("all_sellers"))
     else:
         return flash_message()
+
 
 # Send email to individual seller
 # Not Checked
@@ -1157,10 +1173,11 @@ def delete_seller_email(id):
 #     # Add a return statement for cases when the current user type is not 'buyer'
 #     return flash_message()
 
+
 # This Deletes Everything from the table, only for testing purpose delete after use
 @app.route("/del-ipo-det")
 def add_ipo_det():
-    product = Pan.query.all()
+    product = IPO.query.all()
     for i in product:
         db.session.delete(i)
         db.session.commit()
@@ -1169,7 +1186,7 @@ def add_ipo_det():
 
 # Getting current ipo from chittorgarh
 # Checked
-@app.route("/get-product") 
+@app.route("/get-product")
 def get_product():
     scraper = IPODetailsScraper(driver_path, "chittorgarh", headless=True)
 
@@ -1178,6 +1195,7 @@ def get_product():
     )
     process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_aqua)
     return redirect(url_for("view_product"))
+
 
 # ipo status and name assigninig
 # Checked
@@ -1205,7 +1223,10 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
     #         db.session.add(new_ipo)
     #         db.session.commit()
     # print("Here is ipo->",ipo_details_green)
-    all_names = [item['Name'] for item in ipo_details_green + ipo_details_aqua + ipo_details_lightyellow]
+    all_names = [
+        item["Name"]
+        for item in ipo_details_green + ipo_details_aqua + ipo_details_lightyellow
+    ]
     all_names_set = set(all_names)  # Convert list to set for efficient comparison
     perfect_names = []
     db_names_set = {ipo.name for ipo in IPO.query.all()}
@@ -1222,6 +1243,7 @@ def process_ipo_details(ipo_details_green, ipo_details_lightyellow, ipo_details_
     update_ipo_status(ipo_details_lightyellow, "closed")
     update_ipo_status(ipo_details_aqua, "listed")
 
+
 # Update ipo status
 # Checked
 def update_ipo_status(ipo_details, status):
@@ -1231,7 +1253,7 @@ def update_ipo_status(ipo_details, status):
     for ipo in ipo_details:
         name = clean_name(ipo["Name"])
         collected_names.add(name)  # Used for checking listed IPOs later
-        
+
         ipo_db = IPO.query.filter_by(name=name).first()
         if ipo_db:
             if status != "open":
@@ -1257,22 +1279,21 @@ def update_ipo_status(ipo_details, status):
 
     if status == "listed":
         # Fetch all listed IPOs not included in the collected_names and update them to 'complete'
-        IPO.query.filter(IPO.status == "listed", IPO.name.notin_(collected_names))\
-                 .update({IPO.status: "complete"}, synchronize_session=False)
+        IPO.query.filter(
+            IPO.status == "listed", IPO.name.notin_(collected_names)
+        ).update({IPO.status: "complete"}, synchronize_session=False)
 
     # Commit all changes made in this session
     db.session.commit()
 
 
-        
-
 # Make the ipo name smaller
 # Checked
 def clean_name(name):
     # Combine all patterns, prioritizing longer/more specific patterns to ensure they're matched first
-    pattern = r'( PUBLIC LIMITED IPO\.? ?| LIMITED FPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?| LIMITED\.? ?| LTD\.? ?| IPO)$'
+    pattern = r"( PUBLIC LIMITED IPO\.? ?| LIMITED FPO\.? ?| LIMITED IPO\.? ?| PUBLIC LIMITED\.? ?| LTD IPO\.? ?| LIMITED\.? ?| LTD\.? ?| IPO)$"
     # Use re.IGNORECASE to make the pattern case-insensitive
-    cleaned_name = re.sub(pattern, '', name, flags=re.IGNORECASE)
+    cleaned_name = re.sub(pattern, "", name, flags=re.IGNORECASE)
     return cleaned_name
 
 
@@ -1327,15 +1348,15 @@ def clean_name(name):
 @login_required
 def view_product():  # Testing Feature
     if session.get("temp_details") is not None:
-        session.pop('temp_details', None)
+        session.pop("temp_details", None)
         print("Session pop")
-    
-    if current_user.is_authenticated :
+
+    if current_user.is_authenticated:
 
         products = IPO.query.all()
         view_products = len(products)
         status_priority = {"open": 1, "closed": 2, "listed": 3}
-        
+
         products.sort(key=lambda x: (status_priority.get(x.status, 4), x.listing_date))
         return render_template(
             "Product/all_products.html",
@@ -1408,19 +1429,28 @@ def add_pan():
     # Add a return statement for cases when the current user type is not 'buyer'
     return flash_message()
 
-@app.route('/edit-pans', methods=['POST'])
+
+@app.route("/edit-pans", methods=["POST"])
 @login_required
 def edit_pans():
     if current_user.type == "seller":
         data = request.get_json()
-        record_id = data['id']
-        new_value = data['newValue']
-        new_column = data['column']
-        
+        record_id = data["id"]
+        new_value = data["newValue"]
+        new_column = data["column"]
+
         try:
             pan = Pan.query.filter_by(id=record_id).first()
             if not pan:
-                return jsonify({"status": "error", "message": "No record found with the given ID"}), 404
+                return (
+                    jsonify(
+                        {
+                            "status": "error",
+                            "message": "No record found with the given ID",
+                        }
+                    ),
+                    404,
+                )
 
             if new_column == "dp_id":
                 pan.dp_id = new_value
@@ -1430,21 +1460,37 @@ def edit_pans():
                 new_value = new_value.upper()
                 pan.pan_number = new_value
             else:
-                return jsonify({"status": "error", "message": "Invalid column name"}), 400
+                return (
+                    jsonify({"status": "error", "message": "Invalid column name"}),
+                    400,
+                )
 
             db.session.commit()
-            return jsonify({"status": "success", "message": "Cell updated successfully"})
+            return jsonify(
+                {"status": "success", "message": "Cell updated successfully"}
+            )
 
         except IntegrityError as e:
             db.session.rollback()  # Roll back the transaction so you can continue cleanly
             # flash("You Already have a pan with this number")
-            return jsonify({"status": "error", "message": "You Already have a pan with this number "}), 400
+            return (
+                jsonify(
+                    {
+                        "status": "error",
+                        "message": "You Already have a pan with this number ",
+                    }
+                ),
+                400,
+            )
         except Exception as e:
             db.session.rollback()  # Roll back the transaction on other exceptions too
             print(e)  # Log the error in production code
             return jsonify({"status": "error", "message": str(e)}), 500
     else:
-        return flash_message()  # Assumes flash_message handles non-"seller" cases, ensure to return a valid response
+        return (
+            flash_message()
+        )  # Assumes flash_message handles non-"seller" cases, ensure to return a valid response
+
 
 # Update pan
 # Not Checked(left)
@@ -1470,6 +1516,7 @@ def edit_pans():
 #         return render_template("Pan/add_pan.html", title="Add Pan", form=form)
 #     return redirect(url_for("all-pan"))
 
+
 # Multi Pan
 # For Adding too many pans at once, for testing purpose only delete after use
 @app.route("/multi-pan")
@@ -1479,20 +1526,24 @@ def multi_pan():
             import random
             import string
             from faker import Faker
+
             fake = Faker()
             name = fake.name()
-            random_string = ''.join(random.choice(string.ascii_letters) for _ in range(4))
+            random_string = "".join(
+                random.choice(string.ascii_letters) for _ in range(4)
+            )
             random_number = random.randint(1000, 9999)
-            one = ''.join(random.choice(string.ascii_letters) for _ in range(1))
+            one = "".join(random.choice(string.ascii_letters) for _ in range(1))
             pan = Pan(
                 name=f"{name}",
-                pan_number= f"{random_string}{random_number}{one}".upper(),
-                dp_id= random.randint(1000000000, 9999999999),
+                pan_number=f"{random_string}{random_number}{one}".upper(),
+                dp_id=random.randint(1000000000, 9999999999),
                 seller_id=3,
-        )
+            )
             db.session.add(pan)
             db.session.commit()
     return redirect(url_for("all_pan"))
+
 
 # Read Pan
 # Checked
@@ -1605,12 +1656,15 @@ def add_details(product_id):
             title="Add Details",
             form=form,
             product_name=product_name,
-            extra_details= Details.query.filter(Details.id.in_(session["temp_details"])).all(),
+            extra_details=Details.query.filter(
+                Details.id.in_(session["temp_details"])
+            ).all(),
         )
 
     if current_user.type != "seller":
         return flash_message()
-    
+
+
 # ----------
 # Curd On Transaction
 # ----------
@@ -1651,9 +1705,21 @@ def all_transaction():
     else:
         return flash_message()
 
+
 def count_pan(transaction_id):
     count = TransactionPan.query.filter_by(transaction_id=transaction_id).count()
     return count
+
+
+@app.route("/delete-transaction/<int:id>", methods=["GET", "POST"])
+@login_required
+def delete_transaction(id):
+    transaction = Transaction.query.filter_by(id=id).first_or_404()
+    db.session.delete(transaction)
+    db.session.commit()
+    flash(f"The transaction has been deleted")
+    return redirect(url_for("all_transaction"))
+
 
 # ----------
 # End Of Curd On Transaction
@@ -1661,6 +1727,8 @@ def count_pan(transaction_id):
 
 # Available Pans for transaction
 # Checked
+
+
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
@@ -1669,7 +1737,27 @@ def available_pans():
             transaction_id = request.args.get("transaction_id", type=int)
             transaction = Transaction.query.get_or_404(transaction_id)
             count = count_pan(transaction_id)
+            required_pans = transaction.details.quantity
+            # Check if same product already have give pan
+            happened_transactions = Transaction.query.filter_by(
+                seller_id=current_user.id, product_id=transaction.product.id
+            ).all()
+            # print("Happened Transactions ->", happened_transactions)
+            given_pans = []
+            for happened_transaction in happened_transactions:
+                get_pans = TransactionPan.query.filter_by(
+                    transaction_id=happened_transaction.id
+                ).all()
+                # print("Get Pans ->", get_pans)
+                given_pans.extend(get_pans)
+            print("Given Pans ->", given_pans)
+            # Before creating a new transaction pan record
             if request.method == "GET":
+                if count == required_pans:
+                    flash(
+                        f"You have already added {count} pans to this transaction. You can't add more."
+                    )
+                    return redirect(url_for("all_transaction"))
                 pans = Pan.query.filter_by(seller_id=current_user.id).all()
                 all_pans = len(pans)
                 return render_template(
@@ -1677,25 +1765,39 @@ def available_pans():
                     title="All Pans",
                     pans=pans,
                     all_pans=all_pans,
-                    transaction=transaction  # Pass transaction to template to use its details
+                    transaction=transaction,  # Pass transaction to template to use its details
                 )
             elif request.method == "POST":
                 selected_ids = request.form.getlist("ID[]")
                 print("Selected Ids ->", selected_ids)
-                required_pans = transaction.details.quantity
+                required_pan = required_pans - count
                 print("Required Pans ->", required_pans)
-                
-                if len(selected_ids) > required_pans:
+                print("Count ->", count)
+
+                for given_pan in given_pans:
+                    print("Given Pan ->", given_pan.pan.pan_number)
+                    if given_pan.pan_id in list(map(int, selected_ids)):
+                        flash(
+                            f"You have already added {given_pan.pan.pan_number} pan to the transaction"
+                        )
+                        return redirect(
+                            url_for("available_pans", transaction_id=transaction_id)
+                        )
+
+                if len(selected_ids) > required_pan:
                     # Redirect back with an error message if the selected pans don't match required quantity exactly
-                    flash(f"You must select exactly {required_pans} pans. You selected {len(selected_ids)}.")
-                    return redirect(url_for("available_pans", transaction_id=transaction_id))
+                    flash(
+                        f"You must select exactly {required_pan} pans. You selected {len(selected_ids)}."
+                    )
+                    return redirect(
+                        url_for("available_pans", transaction_id=transaction_id)
+                    )
                 elif len(selected_ids) <= required_pans:
                     # Process exactly matched number of selected pans
                     for selected_id in selected_ids:
-                        print("transaction_id ->", transaction_id)
+                        # print("transaction_id ->", transaction_id)
                         transaction_pan = TransactionPan(
-                            transaction_id=transaction_id,
-                            pan_id=int(selected_id)
+                            transaction_id=transaction_id, pan_id=int(selected_id)
                         )
                         db.session.add(transaction_pan)
                     db.session.commit()
@@ -1710,7 +1812,41 @@ def available_pans():
         return redirect(url_for("available_pans", transaction_id=transaction_id))
     except Exception as e:
         print(e)
+        return "error"
+
+
+# Details of the transaction
+@app.route("/transaction-details/<int:transaction_id>/<product_id>")
+@login_required
+def transaction_details(transaction_id, product_id):
+    if current_user.type == "seller":
+        transactions = Transaction.query.filter_by(
+            seller_id=current_user.id, product_id=product_id
+        ).all()
+        print("Transactions ->", transactions[0].id)
+        transaction_pans = []
+        for transaction in transactions:
+            transaction_pan = TransactionPan.query.filter_by(
+                transaction_id=transaction.id
+            ).all()
+            transaction_pans.extend(transaction_pan)
+        print("Transaction Pans ->", transaction_pans)
+        # print("Transaction Pan ID ->", transaction_pans[0].pan.pan_number)
+        # print("Transaction ->", transaction_pans[0].transaction)
+        # for tp in transaction_pans:
+        #     print("Transaction Pan ->", tp.pan.pan_number)
+        return render_template(
+            "transaction/details_transaction.html",
+            title="Transaction Details",
+            details=transactions[0].product.name,
+            transactions=transaction_pans,
+            total_transaction=len(transaction_pans),
+            # transaction_pans=transaction_pans
+        )
+    else:
         return flash_message()
+
+
 # --------------------------------------
 # End of Related To Transaction
 # --------------------------------------
@@ -1719,6 +1855,7 @@ def available_pans():
 # --------------------------------------
 # Related To Checking allotment
 # --------------------------------------
+
 
 # Checking Allotment
 # Checked
@@ -1757,15 +1894,19 @@ def checking_allotment():
             # # Scraping the website
             print("Socket ->", socketio)
             results = scrape_data_from_websites(
-                driver_path, listing_On, ipo, usernames, room, socketio, headless=False
+                driver_path, listing_On, ipo, usernames, room, socketio, headless=True
             )
-            # if os.path.exists(f"json/{ipo}.json"):
-            #     with open(f"json/{ipo}.json", "w") as file:
-            #         json.dump(results, file)  # Save the results to a JSON file
-            # else:
-            #     os.makedirs("json")  # Create the folder if it does not exist
-            #     with open(f"json/{ipo}.json", "w") as file:
-            #         json.dump(results, file)
+            if os.path.exists("json"):
+                if os.path.exists(f"json/{ipo}.json"):
+                    with open(f"json/{ipo}.json", "w") as file:
+                        json.dump(results, file)  # Save the results to a JSON file
+                else:
+                    with open(f"json/{ipo}.json", "w") as file:
+                        json.dump(results, file)
+            else:
+                os.makedirs("json")  # Create the folder if it does not exist
+                with open(f"json/{ipo}.json", "w") as file:
+                    json.dump(results, file)
             # Saving the results
             write_in_excel(filepath, results, pan_Column)
             file_ready = True
@@ -1775,16 +1916,18 @@ def checking_allotment():
             title="Checking Allotment",
             form=form,
             file_ready=file_ready,
-            room = room
+            room=room,
         )
     else:
         return flash_message()
 
-@socketio.on('join')
+
+@socketio.on("join")
 def on_join(data):
     room = current_user.id
     join_room(room)
     # emit('log', {'data': 'Connected to live log stream.'}, room=room)
+
 
 def download_updated_file(filepath):
 
@@ -1810,44 +1953,54 @@ def download_updated_file(filepath):
 # Bulk emails
 # --------------------------------------
 
+
 @app.route("/rollback")
 def rollback():
-    pan = Pan.query.filter_by(seller = current_user)
+    pan = Pan.query.filter_by(seller=current_user)
     for pans in pan:
         db.session.delete(pans)
         db.session.commit()
     return redirect(url_for("all_pan"))
 
-@app.route("/add-pan-from-excel",methods=["GET","POST"])
+
+@app.route("/add-pan-from-excel", methods=["GET", "POST"])
 def add_pan_from_excel():
     try:
-        if current_user.type == "seller":   
-            file = request.files['file']
+        if current_user.type == "seller":
+            file = request.files["file"]
             filename = secure_filename(file.filename)
             print("Filename ->", filename)
             content = file.read()
             df = process_excel(content)
-            if df['pan'].isnull().any():
-                raise ValueError("Pan column contains null values, which are not allowed.")
+            if df["pan"].isnull().any():
+                raise ValueError(
+                    "Pan column contains null values, which are not allowed."
+                )
             # Convert DataFrame to list of dictionaries
-            records = df.to_dict(orient='records')
+            records = df.to_dict(orient="records")
             # print("Records ->", records)
 
             # Insert each record
             for record in records:
                 existing_record = Pan.query.filter_by(
-                pan_number=record.get('pan'), 
-                seller=current_user
-            ).first()
+                    pan_number=record.get("pan"), seller=current_user
+                ).first()
 
                 if not existing_record:
-                    pan = Pan(name=record.get('name'), pan_number=record.get('pan'), dp_id=record.get('dp_id'), seller = current_user)
+                    pan = Pan(
+                        name=record.get("name"),
+                        pan_number=record.get("pan"),
+                        dp_id=record.get("dp_id"),
+                        seller=current_user,
+                    )
                     db.session.add(pan)
                     db.session.commit()
             return redirect(url_for("all_pan"))
     except Exception as e:
         print(e)
         return e
+
+
 # Bulk emails to all admins
 # Not Checked
 @app.route("/dashboard/bulk-emails/admins")

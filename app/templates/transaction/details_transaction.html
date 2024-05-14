@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
+
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h4 class="mt-4 mb-4">{{ title }} - {{ details }}</h4>
+        </div>
+    </div>
+    <!-- End of page title -->
+
+    <!-- List of all products -->
+    <div class="row products">
+        <div class="col-md-12">
+            <!-- Product list -->
+            <div class="table-responsive">
+                <table id="data" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            {% if current_user.type == "buyer" %}
+                            <th>Seller</th>
+                            {% endif %}
+                            <th>Name</th>
+                            <th>Pan Number</th>
+                            <th>Sub to</th>
+                            <th>Form Type</th>
+                            <th>Price</th>
+                            <th>Date</th>
+                            <!-- <th>Allotment Status</th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Get all products from the database -->
+                        {% for detailtransaction in transactions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            {% if current_user.type == "buyer" %}
+                            <td>
+                                {{ detailtransaction.transaction.seller.first_name.title() }}
+                            </td>
+                            {% endif %}
+                            <td> {{ detailtransaction.pan.name }} </td>
+                            <td> {{ detailtransaction.pan.pan_number }} </td>
+                            <td> {{ detailtransaction.transaction.details.subject }} </td>
+                            <td> {{ detailtransaction.transaction.details.formtype }} </td>
+                            <td> {{ detailtransaction.transaction.details.price }} </td>
+                            <td>{{ moment(detailtransaction.transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <!-- End of getting all transactions from the database -->
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th>Total:</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>{{ total_transaction }} </th>
+                            <th></th>
+                            <th></th>
+                           
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End of list of all transactions -->
+</div>
+{% endblock %}
+
+{% block current_user_scripts %}
+<script>
+   $(document).ready(function() {
+    // Initialize the DataTable and define a callback for when it's complete
+    var table = $('#data').DataTable();
+
+    // Function to update the total, taking 'table' as a parameter
+    // Calculate the sum of the third column (index 2)
+    table.on('draw', function() {
+        var total = table.column(5, {page:'current'}).data().reduce(function(a, b) {
+            return parseInt(a) + parseInt(b);
+        }, 0);
+
+        // Update the footer
+        $(table.column(5).footer()).html(total);
+    });
+
+    // Ensure the total updates on any table draw event such as pagination, search, filtering.
+    table.on('draw', function() {
+        updateTotal(table); // Pass 'table' to updateTotal when redrawing
+    });
+});
+
+</script>
+{% endblock %}

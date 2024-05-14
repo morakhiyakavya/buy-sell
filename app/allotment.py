@@ -20,7 +20,8 @@ from flask_socketio import emit
 # current_directory = os.getcwd()
 # driver_path = os.path.join(current_directory, 'chromedriver', 'chromedriver.exe')
 driver_path = 'C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\chromedriver\\chromedriver.exe'
-headless = False  # or True for headless mode
+# headless = False  # or True for headless mode
+headless = True  # or True for headless mode
 
 class BaseScraper:
     
@@ -35,7 +36,7 @@ class BaseScraper:
     Through this the driver is initialized and closed.
     """
     
-    def __init__(self, driver_path, website, headless=False):
+    def __init__(self, driver_path, website, headless=True):
         
         """
         Initialize the object.
@@ -108,7 +109,7 @@ class Scrape_Website(BaseScraper):
         message (str): A message to store any error or informational messages.
     """
 
-    def __init__(self, driver_path, website, room,socketio, headless=False):
+    def __init__(self, driver_path, website, room,socketio, headless=True):
         """
         Initialize the Scrape_Website class.
 
@@ -831,7 +832,7 @@ website_configs = {
     # Define configurations for other websites similarly
 }
 
-def scrape_data_from_websites(driver_path, company, ipo, usernames, room, socketio, headless=False):
+def scrape_data_from_websites(driver_path, company, ipo, usernames, room, socketio, headless=True):
     """
     Scrape data from multiple websites based on the given company and IPO.
 

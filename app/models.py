@@ -149,23 +149,6 @@ class Admin(User):
 # Application Users Purchase and Sell
 # =================
 
-# #product detail
-# class Product(db.Model):
-#     __tablename__ = "products"
-
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(64), nullable=False)
-#     description = db.Column(db.String(64), nullable=False)
-#     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-
-#     # Relationships
-#     buyer_id = db.Column(db.Integer, db.ForeignKey("buyer.id", ondelete="CASCADE"), nullable=False)
-#     buyer = db.relationship("Buyer", backref="products", foreign_keys=[buyer_id], passive_deletes=True)
-#     price_combinations = db.relationship('Details', backref='product', lazy=True)
-#     # Add a unique constraint on name and buyer_id
-#     __table_args__ = (UniqueConstraint('name', 'buyer_id'),)
-
-
 class IPO(db.Model):
     __tablename__ = 'ipos'
     id = db.Column(db.Integer, primary_key=True)
@@ -253,10 +236,8 @@ class TransactionPan(db.Model):
     transaction = db.relationship('Transaction', backref=db.backref('transaction_pans', cascade='all, delete-orphan'))
     pan = db.relationship('Pan', backref=db.backref('pan_transactions', cascade='all, delete-orphan', overlaps = "pans, transactions"))
 
-class Demo(db.Model):
-    __tablename__ = "demo"
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(64), nullable=False)
+    __table_args__ = (db.UniqueConstraint('transaction_id', 'pan_id'),)
+
 
 # =================
 # End of Application Users Purchase and Sell

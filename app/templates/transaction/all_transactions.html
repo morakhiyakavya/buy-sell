@@ -41,7 +41,7 @@
                         {% for transaction in transactions %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td>{{ transaction.product.name }}</td>
+                            <td> <a href="{{ url_for('transaction_details', transaction_id=transaction.id,product_id = transaction.product.id) }}"> {{ transaction.product.name }}</a></td>
                             <td>{{ transaction.details.subject }}</td>
                             <td>{{ transaction.details.formtype }}</td>
                             <td>{{ transaction.details.price }}</td>
@@ -62,7 +62,7 @@
                             <!-- New column for actions -->
                             <td>
                                 <a href="{{ url_for('edit_pans', id=transaction.id) }}" class="btn btn-primary">Edit</a>
-                                <a href="{{ url_for('delete_pan', id=transaction.id) }}"
+                                <a href="{{ url_for('delete_transaction', id=transaction.id) }}"
                                     class="btn btn-danger">Delete</a>
                             </td>
                         </tr>

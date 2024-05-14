@@ -110,7 +110,7 @@ def print_details(company, ipo, results):
     #     os.makedirs("json")  # Create the folder if it does not exist
     #     with open(f"json/{ipo}.json", "w") as file:
     #         json.dump(results, file)
-    print("*-----------------------------------------------------*")
+    print("\033[1m*-----------------------------------------------------*\033[0m")
 
     print(f"Comapany {company} and IPO {ipo}")
     print("--------------------------------------------")
@@ -121,7 +121,7 @@ def print_details(company, ipo, results):
             print(f"\t{key}: {value}")
         print("-------------")
 
-    print("*------------------------------------------------------------------*")
+    print("\033[1m*-----------------------------------------------------*\033[0m")
     return None
 
 def get_column_data(file_path, column_identifier):
