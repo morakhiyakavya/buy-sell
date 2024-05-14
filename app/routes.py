@@ -1732,87 +1732,76 @@ def delete_transaction(id):
 @app.route("/available-pans", methods=["GET", "POST"])
 @login_required
 def available_pans():
+    if current_user.type != "seller":
+        flash("You are not authorized to view this page.")
+        return redirect(url_for("index"))
+
+    transaction_id = request.args.get("transaction_id", type=int)
+    transaction = Transaction.query.get_or_404(transaction_id)
+
+    if not validate_pan_counts(transaction):
+        return redirect(url_for("all_transaction"))
+
+    if request.method == "GET":
+        return show_available_pans(transaction)
+    elif request.method == "POST":
+        return process_selected_pans(transaction)
+
+
+def validate_pan_counts(transaction):
+    count = count_pan(transaction.id)
+    if count >= transaction.details.quantity:
+        flash(f"You have already added {count} pans to this transaction. You cannot add more.")
+        return False
+    return True
+
+
+def show_available_pans(transaction):
+    pans = Pan.query.filter_by(seller_id=current_user.id).all()
+    return render_template(
+        "transaction/available_pans.html",
+        title="All Pans",
+        pans=pans,
+        all_pans=len(pans),
+        transaction=transaction
+    )
+
+
+def process_selected_pans(transaction):
+    selected_ids = request.form.getlist("ID[]")
+    required_pans = transaction.details.quantity - count_pan(transaction.id)
+
+    if len(selected_ids) > required_pans:
+        flash(f"You must select exactly {required_pans} pans. You selected {len(selected_ids)}.")
+        return redirect(url_for("available_pans", transaction_id=transaction.id))
+
     try:
-        if current_user.type == "seller":
-            transaction_id = request.args.get("transaction_id", type=int)
-            transaction = Transaction.query.get_or_404(transaction_id)
-            count = count_pan(transaction_id)
-            required_pans = transaction.details.quantity
-            # Check if same product already have give pan
-            happened_transactions = Transaction.query.filter_by(
-                seller_id=current_user.id, product_id=transaction.product.id
-            ).all()
-            # print("Happened Transactions ->", happened_transactions)
-            given_pans = []
-            for happened_transaction in happened_transactions:
-                get_pans = TransactionPan.query.filter_by(
-                    transaction_id=happened_transaction.id
-                ).all()
-                # print("Get Pans ->", get_pans)
-                given_pans.extend(get_pans)
-            print("Given Pans ->", given_pans)
-            # Before creating a new transaction pan record
-            if request.method == "GET":
-                if count == required_pans:
-                    flash(
-                        f"You have already added {count} pans to this transaction. You can't add more."
-                    )
-                    return redirect(url_for("all_transaction"))
-                pans = Pan.query.filter_by(seller_id=current_user.id).all()
-                all_pans = len(pans)
-                return render_template(
-                    "transaction/available_pans.html",
-                    title="All Pans",
-                    pans=pans,
-                    all_pans=all_pans,
-                    transaction=transaction,  # Pass transaction to template to use its details
-                )
-            elif request.method == "POST":
-                selected_ids = request.form.getlist("ID[]")
-                print("Selected Ids ->", selected_ids)
-                required_pan = required_pans - count
-                print("Required Pans ->", required_pans)
-                print("Count ->", count)
+        for selected_id in selected_ids:
+            if pan_already_assigned_to_product(transaction.product_id, int(selected_id)):
+                pan = Pan.query.get(int(selected_id))
+                flash(f"Pan number {pan.pan_number} has already been assigned to a transaction for Ipo {transaction.product.name}.")
+                return redirect(url_for("available_pans", transaction_id=transaction.id))
+            add_pan_to_transaction(transaction.id, int(selected_id))
+        db.session.commit()
+        flash("The transaction has been updated successfully.")
+        return redirect(url_for("all_transaction"))
+    except IntegrityError:
+        flash("A database error occurred.")
+        db.session.rollback()
+        return redirect(url_for("available_pans", transaction_id=transaction.id))
 
-                for given_pan in given_pans:
-                    print("Given Pan ->", given_pan.pan.pan_number)
-                    if given_pan.pan_id in list(map(int, selected_ids)):
-                        flash(
-                            f"You have already added {given_pan.pan.pan_number} pan to the transaction"
-                        )
-                        return redirect(
-                            url_for("available_pans", transaction_id=transaction_id)
-                        )
 
-                if len(selected_ids) > required_pan:
-                    # Redirect back with an error message if the selected pans don't match required quantity exactly
-                    flash(
-                        f"You must select exactly {required_pan} pans. You selected {len(selected_ids)}."
-                    )
-                    return redirect(
-                        url_for("available_pans", transaction_id=transaction_id)
-                    )
-                elif len(selected_ids) <= required_pans:
-                    # Process exactly matched number of selected pans
-                    for selected_id in selected_ids:
-                        # print("transaction_id ->", transaction_id)
-                        transaction_pan = TransactionPan(
-                            transaction_id=transaction_id, pan_id=int(selected_id)
-                        )
-                        db.session.add(transaction_pan)
-                    db.session.commit()
-                    flash("The transaction has been updated successfully.")
-                    return redirect(url_for("all_transaction"))
-        else:
-            # Handle non-seller users or redirect as needed
-            flash("You are not authorized to view this page.")
-            return redirect(url_for("index"))
-    except IntegrityError as e:
-        flash("You have already added this pan to the transaction")
-        return redirect(url_for("available_pans", transaction_id=transaction_id))
-    except Exception as e:
-        print(e)
-        return "error"
+def add_pan_to_transaction(transaction_id, pan_id):
+    transaction_pan = TransactionPan(transaction_id=transaction_id, pan_id=pan_id)
+    db.session.add(transaction_pan)
+
+
+def pan_already_assigned_to_product(product_id, pan_id):
+    # This function checks if the pan is already assigned to any transaction involving the same product.
+    existing_transactions = Transaction.query.filter_by(product_id=product_id).all()
+    existing_pans = [pan.pan_id for trans in existing_transactions for pan in TransactionPan.query.filter_by(transaction_id=trans.id).all()]
+    return pan_id in existing_pans
+
 
 
 # Details of the transaction
