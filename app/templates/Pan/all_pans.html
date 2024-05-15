@@ -100,24 +100,34 @@
             buttons: [
                 {
                     extend: 'excel',
-                    class: 'btn btn-primary',
-                    text: 'Excel'
+                    className: 'btn btn-primary',  // Custom class added here
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]  // Export only the first 3 columns
+                    }
                 },
                 {
                     extend: 'pdf',
-                    class: 'btn btn-primary',
-                    text: 'Pdf'
+                    className: 'btn btn-primary',  // Custom class added here
+                    text: 'Pdf',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]  // Export only the first 3 columns
+                    }
                 },
-                // {
-                //     extend: 'print',
-                //     class: 'btn btn-primary',
-                //     text: 'Print'
-                // },
+                {
+                    extend: 'print',
+                    className: 'btn btn-primary',  // You can also add a custom class here if needed
+                    text: 'Print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3]  // Export only the first 3 columns
+                    }
+                },
             ],
         });
 
         // Manually append buttons to your designated area
         table.buttons().container().appendTo($('#datatable-buttons'));
+
         // Existing code for select-all and dropdown change
         $('#select-all').on('change', function () {
             var rows = table.rows({ page: 'current' }).nodes();
@@ -132,7 +142,6 @@
             });
         });
     });
-
 
     // // For Subject To dropdown
     //     $(document).ready(function () {
@@ -203,9 +212,16 @@
         });
     });
 
+
+    function clearContainer(container) {
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
+    }
+
     function displayMessage(message, category) {
         const messagesContainer = document.getElementById('flash-messages-container');
-        messagesContainer.innerHTML = ''; // Clear previous messages
+        clearContainer(messagesContainer); // Assume this is defined as above
 
         const messageDiv = document.createElement('div');
         messageDiv.className = `alert text-center mt-4 alert-${category}`;
@@ -214,11 +230,12 @@
 
         messagesContainer.appendChild(messageDiv);
 
-        // Optionally, remove the message after a set time
+        // Optionally, hide the message after a set time
         setTimeout(() => {
-            messagesContainer.removeChild(messageDiv);
+            messageDiv.style.display = 'none';
         }, 5000); // Adjust time as needed
     }
+
 
 </script>
 
