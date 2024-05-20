@@ -41,7 +41,11 @@
                         {% for transaction in transactions %}
                         <tr>
                             <td>{{ loop.index }}</td>
+                            {% if current_user.type == "seller" %}
                             <td> <a href="{{ url_for('transaction_details', transaction_id=transaction.id,product_id = transaction.product.id) }}"> {{ transaction.product.name }}</a></td>
+                            {% elif current_user.type == "admin" or current_user.type == "buyer" %}
+                            <td>  {{ transaction.product.name }} </td>
+                            {% endif %}
                             <td>{{ transaction.details.subject }}</td>
                             <td>{{ transaction.details.formtype }}</td>
                             <td>{{ transaction.details.price }}</td>

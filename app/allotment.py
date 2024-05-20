@@ -1,6 +1,6 @@
 # Imports 
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup # type: ignore
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -13,11 +13,11 @@ from app.captcha import predict_captcha
 from app.excel import process_excel_data, write_in_excel, print_details
 import json
 import os
-from flask_socketio import emit
+from flask_socketio import emit # type: ignore
 
 # Configuration
 
-# current_directory = os.getcwd()
+# current_directory = os.getcwd()6
 # driver_path = os.path.join(current_directory, 'chromedriver', 'chromedriver.exe')
 driver_path = 'C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\chromedriver\\chromedriver.exe'
 # headless = False  # or True for headless mode
@@ -550,10 +550,10 @@ class Scrape_Website(BaseScraper):
                 if len(applicant_name) != 0:
                     shares_allotted = int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(3)")[0].text)
                     result_data = {
-                    'applicant_name' : div_element.find_elements(By.TAG_NAME,"p")[1].text.split(" : ")[1],
+                    'applicant_name': div_element.find_elements(By.TAG_NAME,"p")[1].text.split(" : ")[1],
                     'shares_allotted': shares_allotted,
                     'shares_applied': float(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(1)")[0].text),
-                    'pan_number' : div_element.find_elements(By.TAG_NAME,"p")[4].text.split(" : ")[1],
+                    'pan_number': div_element.find_elements(By.TAG_NAME,"p")[4].text.split(" : ")[1],
                     'application_amount': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(2)")[0].text),
                     'amount_adjusted': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(4)")[0].text),
                     'amount_refunded': int(div_element.find_elements(By.CSS_SELECTOR,".tablediv table tbody tr:nth-child(2) td:nth-child(2)")[0].text),

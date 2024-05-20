@@ -30,7 +30,9 @@
                             <th>Open Date</th>
                             <th>Close Date</th>
                             <th>Status</th>
+                            {% if current_user.type == "seller" %}
                             <th>Sell</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -38,12 +40,17 @@
                         {% for product in products %}
                         <tr>
                             <td>{{ loop.index }}</td>
+                            {% if current_user.type == "seller" %}
                             <td> {{ product.name.upper() }}</td>
+                            {% elif current_user.type == "buyer" or current_user.type == "admin" %}
+                            <td> <a href="{{ url_for('transaction_details', product_id=product.id) }}">{{ product.name.upper() }}</a></td>
+                            {% endif %}
                             <td>{{ product.listing_at}}</td>
                             <td>{{product.listing_date.strftime('%b %d, %Y')}}</td>
                             <td>{{product.open_date.strftime('%b %d, %Y')}}</td>
                             <td>{{product.close_date.strftime('%b %d, %Y')}}</td>
                             <td>{{ product.status }}</td>
+                            {% if current_user.type == "seller" %}
                             {% if product.status != 'complete' %}
                             <td>
                                     <a href="{{ url_for('add_details', product_id=product.id) }}" class="btn btn-primary">sell</a>
@@ -51,6 +58,7 @@
                             {% else %}
                             <td>
                             </td>
+                            {% endif %}
                             {% endif %}
                         </tr>
                         {% endfor %}

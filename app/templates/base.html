@@ -286,7 +286,79 @@
               aria-label="Toggle navigation">
               <i class="fas fa-align-justify"></i>
             </button> -->
-
+            {% if current_user.type == "seller" %}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="nav navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'view_product' else '' }}"
+                    href="{{ url_for('view_product') }}" alt="459 Not available at this moment">IPO's</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_pan' else '' }}"
+                    href="{{ url_for('all_pan') }}" alt="459 Not available at this moment">My Pan</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'add_pan' else '' }}"
+                    href="{{ url_for('add_pan') }}" alt="459 Not available at this moment">Add Pan</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_transaction' else '' }}"
+                    href="{{ url_for('all_transaction') }}" alt="459 Not available at this moment">Transactions</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'checking_allotment' else '' }}"
+                    href="{{ url_for('checking_allotment') }}" alt="459 Not available at this moment">Allotment</a>
+                </li>
+                <!-- User's username displayed; using the link_disabled class for consistency -->
+                <li class="nav-item ">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'dashboard' else '' }}"
+                    href="{{ url_for('dashboard') }}" alt="459 Not available at this moment">{{ current_user.username
+                    }}</a>
+                  <!-- <span class="nav-link">{{ current_user.username }}</span> -->
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'logout' else '' }}"
+                    href="{{ url_for('logout') }}" alt="459 Not available at this moment">Logout</a>
+                </li>
+              </ul>
+            </div>
+            {% elif current_user.type == "buyer" %}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="nav navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'view_product' else '' }}"
+                    href="{{ url_for('view_product') }}" alt="459 Not available at this moment">IPO's</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_sellers' else '' }}"
+                    href="{{ url_for('all_sellers') }}" alt="459 Not available at this moment">Sellers</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'register_seller' else '' }}"
+                    href="{{ url_for('register_seller') }}" alt="459 Not available at this moment">Register Seller</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_sellers' else '' }}"
+                    href="{{ url_for('all_sellers') }}" alt="459 Not available at this moment">Transactions</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'checking_allotment' else '' }}"
+                    href="{{ url_for('checking_allotment') }}" alt="459 Not available at this moment">Allotment</a>
+                </li>
+                <!-- User's username displayed; using the link_disabled class for consistency -->
+                <li class="nav-item ">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'dashboard' else '' }}"
+                    href="{{ url_for('dashboard') }}" alt="459 Not available at this moment">{{ current_user.username
+                    }}</a>
+                  <!-- <span class="nav-link">{{ current_user.username }}</span> -->
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'logout' else '' }}"
+                    href="{{ url_for('logout') }}" alt="459 Not available at this moment">Logout</a>
+                </li>
+              </ul>
+            </div>
+            {% elif current_user.type == "admin" %}
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
               <ul class="nav navbar-nav ms-auto">
                 <li class="nav-item">
@@ -329,9 +401,45 @@
                 </li>
               </ul>
             </div>
-
-
-          </div>
+            {% else %}
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="nav navbar-nav ms-auto">
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'view_product' else '' }}"
+                    href="{{ url_for('view_product') }}" alt="459 Not available at this moment">IPO's</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_pan' else '' }}"
+                    href="{{ url_for('all_pan') }}" alt="459 Not available at this moment">My Pan</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'add_pan' else '' }}"
+                    href="{{ url_for('add_pan') }}" alt="459 Not available at this moment">Add Pan</a>
+                </li>
+                {% if current_user.type == "admin" or current_user.type == "buyer" %}
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_sellers' else '' }}"
+                    href="{{ url_for('all_sellers') }}" alt="459 Not available at this moment">Transactions</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'all_transaction' else '' }}"
+                    href="{{ url_for('all_transaction') }}" alt="459 Not available at this moment">Transactions</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'checking_allotment' else '' }}"
+                    href="{{ url_for('checking_allotment') }}" alt="459 Not available at this moment">Allotment</a>
+                </li>
+                <!-- User's username displayed; using the link_disabled class for consistency -->
+                <li class="nav-item ">
+                  <a class="nav-link {{ 'link_disabled' if request.endpoint == 'dashboard' else '' }}"
+                    href="{{ url_for('dashboard') }}" alt="459 Not available at this moment">{{ current_user.username
+                    }}</a>
+                  <!-- <span class="nav-link">{{ current_user.username }}</span> -->
+                </li>
+            </div>
+            {% endif %}
         </nav>
 
         {% block current_user_content %}

@@ -1437,7 +1437,7 @@ def view_product():  # Testing Feature
     except Exception as e:
         # Handle the exception here
         print(f"An error occurred: {str(e)}")
-        return "An error occurred: {str(e)}", 400
+        return f"Error : {e}", 400
 
 
 # --------------
@@ -1729,10 +1729,10 @@ def add_details(product_id):
 @app.route("/all-transactions")
 @login_required
 def all_transaction():
-    try:
+    # try:
         if session.get("temp_details") is not None:
             session.pop("temp_details", None)
-            print("Session pop")
+            # print("Session pop")
         if current_user.type == "seller":
             transactions = Transaction.query.filter_by(seller_id=current_user.id).all()
             for transaction in transactions:
@@ -1759,14 +1759,17 @@ def all_transaction():
             )
         else:
             return flash_message()
-    except Exception as e:
-        # Handle the exception here
-        print(f"An error occurred: {str(e)}")
-        return f"Error : {e}", 400
+    # except Exception as e:
+    #     # Handle the exception here
+    #     print(f"An error occurred: {str(e)}")
+    #     return f"Error : {e}", 400
 
 def count_pan(transaction_id):
     count = TransactionPan.query.filter_by(transaction_id=transaction_id).count()
     return count
+
+
+
 
 
 @app.route("/delete-transaction/<int:id>", methods=["GET", "POST"])
@@ -1905,27 +1908,26 @@ def pan_already_assigned_to_product(product_id, pan_id):
         print(f"An error occurred: {e}")
         return f"Error : {e}", 400
 
+
 # Details of the transaction
-@app.route("/transaction-details/<int:transaction_id>/<product_id>")
+@app.route("/transaction-details/<int:product_id>")
 @login_required
-def transaction_details(transaction_id, product_id):
+def transaction_details(product_id):
     try:
         if current_user.type == "seller":
             transactions = Transaction.query.filter_by(
                 seller_id=current_user.id, product_id=product_id
             ).all()
-            print("Transactions ->", transactions[0].id)
-            transaction_pans = []
-            for transaction in transactions:
-                transaction_pan = TransactionPan.query.filter_by(
-                    transaction_id=transaction.id
-                ).all()
-                transaction_pans.extend(transaction_pan)
-            print("Transaction Pans ->", transaction_pans)
-            # print("Transaction Pan ID ->", transaction_pans[0].pan.pan_number)
-            # print("Transaction ->", transaction_pans[0].transaction)
-            # for tp in transaction_pans:
-            #     print("Transaction Pan ->", tp.pan.pan_number)
+            if not transactions:
+                flash("No transaction found")
+                return redirect(url_for("view_product"))
+            transaction_pans = pannum_trans(transactions)
+            # transaction_pans = []
+            # for transaction in transactions:
+            #     transaction_pan = TransactionPan.query.filter_by(
+            #         transaction_id=transaction.id
+            #     ).all()
+            #     transaction_pans.extend(transaction_pan)
             return render_template(
                 "transaction/details_transaction.html",
                 title="Transaction Details",
@@ -1934,10 +1936,34 @@ def transaction_details(transaction_id, product_id):
                 total_transaction=len(transaction_pans),
                 # transaction_pans=transaction_pans
             )
+        elif current_user.type == "buyer":
+                sellers = Seller.query.filter_by(buyer_id=current_user.id).all()
+                seller_pans = []            
+                for seller in sellers:
+                    transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
+                    # print("Transactions  here->", transactions)
+                    if transactions:
+                        transaction_pans = pannum_trans(transactions)
+                        seller_pans.extend(transaction_pans)
+                # print("Seller Pans ->", seller_pans)
+                if seller_pans:
+                    return render_template(
+                        "transaction/details_transaction.html",
+                        title="Transaction Details",
+                        details=seller_pans[0].transaction.product.name,
+                        transactions=seller_pans,
+                        total_transaction=len(seller_pans),
+                        # transaction_pans=transaction_pans
+                    )
+                else:
+                    flash("No transaction found")
+                    return redirect(url_for("view_product"))
         else:
             return flash_message()
     except Exception as e:
         print("An error occurred:", str(e))
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error details: {e.args}")
         return f"Error : {e}", 400
 
 # --------------------------------------
@@ -1945,9 +1971,56 @@ def transaction_details(transaction_id, product_id):
 # --------------------------------------
 
 
+def pannum_trans(transactions):
+    transaction_pans = []
+    for transaction in transactions:
+        transaction_pan = TransactionPan.query.filter_by(
+        transaction_id=transaction.id
+    ).all()
+        transaction_pans.extend(transaction_pan)
+    return transaction_pans
+
+
 # --------------------------------------
 # Related To Checking allotment
 # --------------------------------------
+
+@app.route("/allotment/<product_id>/<ipo>", methods=["GET", "POST"])
+@login_required
+def allotment(product_id, ipo, listing_On="bigshare"):
+    if current_user.type == "buyer":
+        if not os.path.exists(f"json_file/{ipo}/{current_user.id}.json"):
+            print("Product id ->", product_id)
+            print("Listing On ->", listing_On)
+            print("Ipo ->", ipo)
+            buyer_id = current_user.id
+            sellers = Seller.query.filter_by(buyer_id=buyer_id).all()
+            usernames = []   
+            room = current_user.id         
+            for seller in sellers:
+                transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
+                if transactions:
+                    transaction_pans = pannum_trans(transactions)
+                    for transaction_pan in transaction_pans:
+                        usernames.append(transaction_pan.pan.pan_number)        
+            results = scrape_data_from_websites(
+                driver_path, listing_On, ipo, usernames, room, socketio, headless=True)
+            if os.path.exists("json_file/{ipo}"):
+                if not os.path.exists(f"json_file/{ipo}/{buyer_id}"):
+                    with open(f"json_file/{ipo}/{buyer_id}", "w") as file:
+                        json.dump(results, file)
+            else:
+                os.makedirs(f"json_file/{ipo}")  # Create the folder if it does not exist
+                with open(f"json_file/{ipo}/{buyer_id}.json", "w") as file:
+                    json.dump(results, file)
+            print("Results ->", jsonify(results))
+            return jsonify(results)
+        else:
+            return jsonify({"message": "We have already checked the allotment for this product."})
+    else:
+        return flash_message()
+        
+        
 
 
 # Checking Allotment
@@ -1985,6 +2058,7 @@ def checking_allotment():
 
                 # Reading the file
                 usernames = process_excel_data(filepath, pan_Column, start_Row, end_Row)
+                print("Usernames ->", type(usernames))
                 # # Scraping the website
                 print("Socket ->", socketio)
                 results = scrape_data_from_websites(

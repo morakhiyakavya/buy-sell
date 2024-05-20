@@ -232,13 +232,63 @@ class TransactionPan(db.Model):
     __tablename__ = "transaction_pan"
     transaction_id = db.Column(db.Integer, db.ForeignKey('transactions.id', name='fk_transaction_pan_transaction_id'), primary_key=True)
     pan_id = db.Column(db.Integer, db.ForeignKey('pan.id', name='fk_transaction_pan_pan_id'), primary_key=True)
-    
     transaction = db.relationship('Transaction', backref=db.backref('transaction_pans', cascade='all, delete-orphan'))
     pan = db.relationship('Pan', backref=db.backref('pan_transactions', cascade='all, delete-orphan', overlaps = "pans, transactions"))
 
+    name = db.Column(db.String(64), nullable=True)
+    category = db.Column(db.String(64), nullable=True)
+    alloted = db.Column(db.String(64), nullable=True)
+    applied = db.Column(db.String(12), default=False)
+    pan_number = db.Column(db.String(64), nullable=True)
+    client_id = db.Column(db.String(64), nullable=True)
+    application_number = db.Column(db.String(64), nullable=True)
+    dp_id = db.Column(db.String(64), nullable=True)
+    error = db.Column(db.String(64), nullable=True)
+
     __table_args__ = (db.UniqueConstraint('transaction_id', 'pan_id'),)
 
+# 'name'
+# 'category'
+# 'applied'
+# 'securities_allotted'
+# 'pan'
+# 'client_id'
+# 'application_number'
+# 'error'
 
+# 'name'
+# 'applied'
+# 'alloted'
+# 'dp_id'
+# 'application_no'
+# 'error'
+
+# '''
+# applicant_name
+# Type
+# shares_applied
+# shares_allotted
+# application_amount
+# amount_adjusted
+# multiple_pan
+# '''
+
+# 'applicant_name'
+# 'shares_allotted'
+# 'shares_applied'
+# 'pan_number'
+# 'application_amount'
+# 'amount_adjusted'
+# 'amount_refunded'
+# 'status'
+
+# 'name'
+# 'application_number'
+# 'category'
+# 'client_id'
+# 'pan'
+# 'applied'
+# 'securities_allotted'
 # =================
 # End of Application Users Purchase and Sell
 # =================

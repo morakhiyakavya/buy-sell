@@ -10,7 +10,7 @@
     <!-- Page title -->
     <div class="row">
         <div class="col-md-12">
-            <h4 class="mt-4 mb-4">{{ title }} - {{ details }}</h4>
+            <h4 class="mt-4 mb-4">{{ title }} - {{ details }}  &nbsp ({{ total_transaction }})</h4>
         </div>
     </div>
     <!-- End of page title -->
@@ -60,10 +60,13 @@
                     <tfoot>
                         <tr>
                             <th>Total:</th>
+                            {% if current_user.type == "buyer" %}
+                            <th></th>
+                            {% endif %}
                             <th></th>
                             <th></th>
                             <th></th>
-                            <th>{{ total_transaction }} </th>
+                            <th></th>
                             <th></th>
                             <th></th>
                            
@@ -74,31 +77,38 @@
         </div>
     </div>
     <!-- End of list of all transactions -->
+    <div id="datatable-buttons" class="pagination"></div>
+</div>
+
+<div>
+    <a href="{{ url_for('allotment', product_id = transactions[0].transaction.product.id, ipo = transactions[0].transaction.product.name) }}" class="btn btn-primary">Check Allotment</a>
 </div>
 {% endblock %}
 
 {% block current_user_scripts %}
 <script>
-   $(document).ready(function() {
-    // Initialize the DataTable and define a callback for when it's complete
-    var table = $('#data').DataTable();
-
-    // Function to update the total, taking 'table' as a parameter
-    // Calculate the sum of the third column (index 2)
-    table.on('draw', function() {
-        var total = table.column(5, {page:'current'}).data().reduce(function(a, b) {
-            return parseInt(a) + parseInt(b);
-        }, 0);
-
-        // Update the footer
-        $(table.column(5).footer()).html(total);
+    $(document).ready(function() {
+        var table = $('#data').DataTable({
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>' +
+                '<"row"<"col-md-12"tr>>' +
+                '<"row"<"col-md-5"i><"col-md-7"p>>',
+            buttons: [
+                { extend: 'excel', className: 'btn btn-primary', text: 'Excel' },
+                { extend: 'pdf', className: 'btn btn-primary', text: 'Pdf' },
+                { extend: 'print', className: 'btn btn-primary', text: 'Print' }
+            ],
+            "footerCallback": function (row, data, start, end, display) {
+                var api = this.api(), total;
+                var columnIndex = {% if current_user.type == "buyer" %} 6 {% else %} 5 {% endif %};
+                total = api.column(columnIndex, { page: 'current' }).data().reduce(function (a, b) {
+                    return Number(a) + Number(b.replace(/[\$,]/g, ''));
+                }, 0);
+                $(api.column(columnIndex).footer()).html(total.toFixed(2));
+            }
+        });
+    
+        // Manually append buttons to your designated area
+        table.buttons().container().appendTo($('#datatable-buttons'));
     });
-
-    // Ensure the total updates on any table draw event such as pagination, search, filtering.
-    table.on('draw', function() {
-        updateTotal(table); // Pass 'table' to updateTotal when redrawing
-    });
-});
-
 </script>
 {% endblock %}

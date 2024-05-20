@@ -51,7 +51,7 @@
                                     <td>{{ seller.first_name }} {{ seller.last_name }}</td>
                                     <td> <a href="{{ url_for('all_transaction',seller_id = seller.id) }}">{{ seller.username }}</a></td>
                                     <td>{{ seller.email }}</td>
-                                    <td><a href="https://wa.me/{{ seller.phone_number | replace('+', '') }}?text=Hello%20From%20somaSOMA" target="_blank">{{ seller.phone_number }}</a></td>
+                                    <td><a href="https://wa.me/{{ seller.phone_number | replace('+', '') }}?text=Hello%20From%20KavyaArya" target="_blank">{{ seller.phone_number }}</a></td>
                                     <td><strong>{{ seller.buyer.first_name }} {{ seller.buyer.last_name }}</strong></td>
                                     {% if seller.two_factor_enabled() %}
                                         <td><span class="label label-info"> Enabled </span></td>
