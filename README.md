@@ -73,7 +73,13 @@ Before you submit a pull request, please ensure your changes adhere to the proje
 
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-## Support
+## Support and require updates
+
+Adding Form Details should be Done on buyer side.
+
+Adding Average of form sold and give precise details on the buyer end.
+
+Detail Analysis of an Ipo on the Buyer Side like how much allotment is there, how much more shares do we need etc etc.
 
 For support, email morakhiyakavya@gmail.com or open an issue in the GitHub repository.
 
