@@ -1,4 +1,5 @@
 # Imports
+from datetime import datetime
 import re
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -958,16 +959,26 @@ class IPODetailsScraper(BaseScraper):
         ipo_details_aqua = []
 
         # Function to extract details from a row
+        
         def extract_details(row):
+            name = row.find_element(By.XPATH, ".//td[1]/a").text
+            open_date = row.find_element(By.XPATH, ".//td[2]").text
+            close_date = row.find_element(By.XPATH, ".//td[3]").text
+            listing_date = row.find_element(By.XPATH, ".//td[4]").text
+            price = row.find_element(By.XPATH, ".//td[5]").text
+            issue_size = row.find_element(By.XPATH, ".//td[6]").text
+            lot_size = row.find_element(By.XPATH, ".//td[7]").text
+            listing_at = row.find_element(By.XPATH, ".//td[8]").text
+
             return {
-                "Name": row.find_element(By.XPATH, ".//td[1]/a").text,
-                "Open Date": row.find_element(By.XPATH, ".//td[2]").text,
-                "Close Date": row.find_element(By.XPATH, ".//td[3]").text,
-                "Listing Date": row.find_element(By.XPATH, ".//td[4]").text,
-                "Price": row.find_element(By.XPATH, ".//td[5]").text,
-                "Issue Size": row.find_element(By.XPATH, ".//td[6]").text,
-                "Lot Size": row.find_element(By.XPATH, ".//td[7]").text,
-                "Listing At": row.find_element(By.XPATH, ".//td[8]").text,
+                "Name": name,
+                "Open Date" : dateSetup(open_date),
+                "Close Date" : dateSetup(close_date),
+                "Listing Date": dateSetup(listing_date), 
+                "Price": price,
+                "Issue Size": issue_size,
+                "Lot Size": lot_size,
+                "Listing At": listing_at,
             }
 
         # Iterate over each row and add details to the corresponding list based on its class
@@ -988,3 +999,27 @@ class IPODetailsScraper(BaseScraper):
         # print("Aqua IPOs:", ipo_details_aqua)  # Adjust usage based on actual presence
         self.close()
         return ipo_details_green, ipo_details_lightyellow, ipo_details_aqua
+
+
+def dateSetup(date_string):
+    if date_string:
+        if isinstance(date_string, str):
+            try:
+                print(f"Parsing date string: {date_string}")
+                date_object = datetime.strptime(date_string, '%b %d, %Y')
+                print(f"Converted date: {date_object}")
+            except ValueError as e:
+                print(f"Error parsing date: {e}")
+                # Fallback to current date if parsing fails
+                date_object = datetime.now()
+        elif isinstance(date_string, datetime):
+            print(f"Received datetime object: {date_string}")
+            date_object = date_string
+        else:
+            print("Invalid type for date_string. Expected str or datetime.")
+            date_object = datetime.now()
+    else:
+        print("Date string is empty.")
+        date_object = datetime.now()
+    
+    return date_object

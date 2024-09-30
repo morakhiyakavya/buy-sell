@@ -63,6 +63,31 @@ from app.excel import process_excel_data, write_in_excel, process_excel
 
 from app import app, db, socketio
 from sqlalchemy.exc import IntegrityError
+import requests
+import threading
+import time
+
+@app.route('/checkup', methods=['GET'])
+def checkup():
+    return jsonify(status='healthy', message='The server is running smoothly!')
+
+def check_server():
+    while True:
+        try:
+            response = requests.get('https://buy-sell-1tuu.onrender.com/checkup')  # Adjust to your deployment URL
+            if response.status_code == 200:
+                print("Server is healthy:", response.json())
+            else:
+                print("Server returned an error:", response.status_code)
+        except requests.exceptions.RequestException as e:
+            print("Error connecting to the server:", e)
+        
+        time.sleep(40)  # Wait for 40 seconds before the next check
+
+# Start the background thread
+thread = threading.Thread(target=check_server)
+thread.daemon = True  # Allows the thread to exit when the main program exits
+thread.start()
 
 
 # =========================================
@@ -1983,6 +2008,35 @@ def pannum_trans(transactions):
         transaction_pans.extend(transaction_pan)
     return transaction_pans
 
+@app.route("/seller-transaction/<int:product_id>")
+def seller_transaction(product_id):
+    try:
+        # Get all the sellers of our buyer
+        if current_user.type == "buyer":
+            sellers = Seller.query.filter_by(buyer_id=current_user.id).all()
+            print("Sellers ->", sellers)
+            
+            transactions = []  # Initialize an empty list to collect transactions
+            for seller in sellers:
+                seller_transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
+                print(f"Transactions for Seller {seller.id} ->", seller_transactions)
+                transactions.extend(seller_transactions)  # Collect transactions
+            
+            if not transactions:  # Check if the list is empty
+                flash("No transactions found")
+                return redirect(url_for("view_product"))
+            return render_template(
+                "transaction/seller_transaction.html",
+                title="Transaction Details",
+                transactions=transactions,
+                total_transaction=len(transactions),
+            )
+    except Exception as e:
+        print("An error occurred:", str(e))
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error details: {e.args}")
+        return f"Error : {e}", 400
+
 
 # --------------------------------------
 # Related To Checking allotment
@@ -2007,7 +2061,7 @@ def allotment(product_id, ipo, listing_On="bigshare"):
                     for transaction_pan in transaction_pans:
                         usernames.append(transaction_pan.pan.pan_number)        
             results = scrape_data_from_websites(
-                driver_path, listing_On, ipo, usernames, room, socketio, headless=False)
+                driver_path, listing_On, ipo, usernames, room, socketio, headless=True)
             if os.path.exists("json_file/{ipo}"):
                 if not os.path.exists(f"json_file/{ipo}/{buyer_id}"):
                     with open(f"json_file/{ipo}/{buyer_id}", "w") as file:
@@ -2065,7 +2119,7 @@ def checking_allotment():
                 # # Scraping the website
                 print("Socket ->", socketio)
                 results = scrape_data_from_websites(
-                    driver_path, listing_On, ipo, usernames, room, socketio, headless=False
+                    driver_path, listing_On, ipo, usernames, room, socketio, headless=True
                 )
                 if os.path.exists("json"):
                     if os.path.exists(f"json/{ipo}.json"):
@@ -2335,7 +2389,7 @@ def generate_password(length=8):
 def submit_form():
     data = request.json
     # Process the form data as needed
-    ipo = data.get('ipoName')
+    ipoName = data.get('ipoName')
     seller_name = data.get('sellerName')
     extradetails = data.get('extradetails')
     number = data.get('sellerNumber')
@@ -2344,9 +2398,13 @@ def submit_form():
     option = data.get('option')
     subject = data.get('subject')
     date_time = data.get('dateTime')
-    
+    date_time = datetime.fromisoformat(date_time)
+
+
+    print(data)
     if len(number) > 10:
         number = number[-10:]
+    
     seller = Seller.query.filter_by(phone_number=number).first()
 
     if not seller:
@@ -2356,6 +2414,7 @@ def submit_form():
         pass_word = generate_password()
         seller = Seller(
             first_name=seller_name,
+            last_name = "",
             username = seller_name,
             email = pass_word+'@gmail.com',
             password_hash = pass_word,
@@ -2367,30 +2426,22 @@ def submit_form():
         db.session.commit()
         print("Seller Added")
         seller = Seller.query.filter_by(phone_number=number).first()
-    ipo = IPO.query.filter_by(name=ipo).first()
-    print(ipo)
+    
+    ipo = IPO.query.filter_by(name=ipoName).first()
+
     if not ipo:
         print("Ipo not found")
         # So Add that into Ipo table
-        ipo = IPO(name=ipo)
+        ipo = IPO(name=ipoName,
+            status = "open",
+            listing_date = date_time,
+            open_date = date_time,
+            close_date = date_time)
         db.session.add(ipo)
         db.session.commit()
         print("Ipo Added")
-        ipo = IPO.query.filter_by(name=ipo).first()
-        details = Details(
-            product_id=ipo.id,
-            subject=subject,
-            formtype=option,
-            price=rate,
-            quantity=number_of_forms,
-            extra_details = extradetails,
-            seller = seller,
-        )
-        db.session.add(details)
-        db.session.commit()
-        print("Details Added")
-    else:
-        print("Ipo Found")
+        ipo = IPO.query.filter_by(name=ipoName).first()
+        
     # Now Add the details into the Details table
     details = Details(
         product_id=ipo.id,
@@ -2403,7 +2454,7 @@ def submit_form():
     )
     db.session.add(details)
     db.session.commit()
-    print("Details Added")
+    
     transaction = Transaction(
                     details_id=details.id,
                     product_id=ipo.id,

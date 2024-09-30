@@ -43,7 +43,7 @@
                             {% if current_user.type == "seller" %}
                             <td> {{ product.name.upper() }}</td>
                             {% elif current_user.type == "buyer" or current_user.type == "admin" %}
-                            <td> <a href="{{ url_for('transaction_details', product_id=product.id) }}">{{ product.name.upper() }}</a></td>
+                            <td> <a href="{{ url_for('seller_transaction', product_id=product.id) }}">{{ product.name.upper() }}</a></td>
                             {% endif %}
                             <td>{{ product.listing_at}}</td>
                             <td>{{product.listing_date.strftime('%b %d, %Y')}}</td>

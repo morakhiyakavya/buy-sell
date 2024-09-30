@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block current_user_content %}
+<div class="container-fluid content">
+
+    <!-- Flash message -->
+    {% include '_flash_message.html' %}
+    <!-- End of flash message -->
+
+    <!-- Page title -->
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-4 mb-4">{{ title }} ({{ total_transaction }})</h1>
+        </div>
+    </div>
+    <!-- End of page title -->
+
+    <!-- List of all products -->
+    <div class="row products">
+        <div class="col-md-12">
+            <!-- Product list -->
+            <div class="table-responsive">
+                <table id="data" class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Number</th>
+                            <th>Form Tpye</th>
+                            <th>Subject</th>
+                            <th>Forms</th>
+                            <th>Rate</th>
+                            <th>Deal By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Get all products from the database -->
+                        {% for transaction in transactions %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td> {{ transaction.seller.first_name.upper() + transaction.seller.last_name.upper() }}</td>
+                            <td> {{ transaction.seller.phone_number.upper() }}</td>
+                            <td> {{ transaction.details.formtype.upper() }}</td>
+                            <td> {{ transaction.details.subject.upper() }}</td>
+                            <td> {{ transaction.details.quantity }}</td>
+                            <td> {{ transaction.details.price }}</td>
+                            <td> {{ transaction.details.extra_details.upper() }} </td>
+
+                            </tr>
+                        {% endfor %}
+                        <!-- End of getting all products from the database -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <!-- End of list of all products -->
+    <div id="datatable-buttons" class="pagination"></div>
+</div>
+{% endblock %}
+
+{% block current_user_scripts %}
+<script>
+    $(document).ready(function () {
+        var table = $('#data').DataTable({
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>' +
+                '<"row"<"col-md-12"tr>>' +
+                '<"row"<"col-md-5"i><"col-md-7"p>>',
+            buttons: [
+                { extend: 'excel', className: 'btn btn-primary', text: 'Excel' },
+                { extend: 'pdf', className: 'btn btn-primary', text: 'Pdf' },
+                { extend: 'print', className: 'btn btn-primary', text: 'Print' }
+            ],
+        });
+
+    // Manually append buttons to your designated area
+    table.buttons().container().appendTo($('#datatable-buttons'));
+    });
+</script>
+{% endblock %}
