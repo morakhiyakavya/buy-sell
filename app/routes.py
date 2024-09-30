@@ -2289,89 +2289,89 @@ def bulk_emails_sellers():
 # ==========
 
 
-@app.route("/rollback")
-def rollback():
-    pan = Pan.query.filter_by(seller=current_user)
-    for pans in pan:
-        db.session.delete(pans)
-        db.session.commit()
-    return redirect(url_for("all_pan"))
+# @app.route("/rollback")
+# def rollback():
+#     pan = Pan.query.filter_by(seller=current_user)
+#     for pans in pan:
+#         db.session.delete(pans)
+#         db.session.commit()
+#     return redirect(url_for("all_pan"))
 
-# Only for Initial Setup, Delete after use
-@app.route("/del")
-def delete_det():
-    admin = Admin(
-        first_name="kavya",
-        last_name="Morakhiya",
-        username="kavya",
-        email="morakhiyakavya@gmail.com",
-        phone_number="7016184560",
-        current_residence="Ahmedabad,Gujarat",
-        # confirm_password="kavyaarya123.",
-        department="Super Admin",
-    )
+# # Only for Initial Setup, Delete after use
+# @app.route("/del")
+# def delete_det():
+#     admin = Admin(
+#         first_name="kavya",
+#         last_name="Morakhiya",
+#         username="kavya",
+#         email="morakhiyakavya@gmail.com",
+#         phone_number="7016184560",
+#         current_residence="Ahmedabad,Gujarat",
+#         # confirm_password="kavyaarya123.",
+#         department="Super Admin",
+#     )
 
-    buyer = Buyer(
-        first_name="Shrenik",
-        last_name="Morakhiya",
-        username="shrenik",
-        email="shrenik888@gmail.com",
-        phone_number="7016184560",
-        current_residence="Ahmedabad,Gujarat",
-        confirm_password="kavyaarya123.",
-    )
+#     buyer = Buyer(
+#         first_name="Shrenik",
+#         last_name="Morakhiya",
+#         username="shrenik",
+#         email="shrenik888@gmail.com",
+#         phone_number="7016184560",
+#         current_residence="Ahmedabad,Gujarat",
+#         confirm_password="kavyaarya123.",
+#     )
 
-    seller = Seller(
-        first_name="arya",
-        last_name="Morakhiya",
-        username="arya",
-        email="morakhiyakavya17@gmail.com",
-        phone_number="7016184560",
-        current_residence="Ahmedabad,Gujarat",
-        confirm_password="kavyaarya123.",
-        buyer_id=2,
-    )
+#     seller = Seller(
+#         first_name="arya",
+#         last_name="Morakhiya",
+#         username="arya",
+#         email="morakhiyakavya17@gmail.com",
+#         phone_number="7016184560",
+#         current_residence="Ahmedabad,Gujarat",
+#         confirm_password="kavyaarya123.",
+#         buyer_id=2,
+#     )
 
-    # Show actual admin password in registration email
-    session["password"] = "kavyaarya123."
-    user_password = session["password"]
+#     # Show actual admin password in registration email
+#     session["password"] = "kavyaarya123."
+#     user_password = session["password"]
 
-    # Update the database
-    admin.set_password(user_password)
-    buyer.set_password(user_password)
-    seller.set_password(user_password)
-    db.session.add(admin)
-    db.session.add(buyer)
-    db.session.add(seller)
-    db.session.commit()
+#     # Update the database
+#     admin.set_password(user_password)
+#     buyer.set_password(user_password)
+#     seller.set_password(user_password)
+#     db.session.add(admin)
+#     db.session.add(buyer)
+#     db.session.add(seller)
+#     db.session.commit()
 
-    # Send admin an email with login credentials
-    send_login_details(admin, user_password)
-    send_login_details(buyer, user_password)
-    send_login_details(seller, user_password)
+#     # Send admin an email with login credentials
+#     send_login_details(admin, user_password)
+#     send_login_details(buyer, user_password)
+#     send_login_details(seller, user_password)
 
-    # Delete seller password session
-    del session["password"]
+#     # Delete seller password session
+#     del session["password"]
 
-    flash(
-        f"Successfully registered your admin {admin.username}! "
-        "An email has been sent to the admin on the next steps."
-    )
-    return "done"
+#     flash(
+#         f"Successfully registered your admin {admin.username}! "
+#         "An email has been sent to the admin on the next steps."
+#     )
+#     return "done"
 
 
-# This Deletes Everything from the table Pan and IPO, only for testing purpose delete after use
-@app.route("/del-ipo-det")
-def add_ipo_det():
-    product = User.query.all()
-    for i in product:
-        db.session.delete(i)
-        db.session.commit()
-    # pan = Pan.query.all()
-    # for i in pan:
-    #     db.session.delete(i)
-    #     db.session.commit()
-    return redirect(url_for("dashboard"))
+# # This Deletes Everything from the table Pan and IPO, only for testing purpose delete after use
+# @app.route("/del-ipo-det")
+# def add_ipo_det():
+#     product = User.query.all()
+#     for i in product:
+#         db.session.delete(i)
+#         db.session.commit()
+#     # pan = Pan.query.all()
+#     # for i in pan:
+#     #     db.session.delete(i)
+#     #     db.session.commit()
+#     return redirect(url_for("dashboard"))
 
 
 # =========================================
@@ -2381,7 +2381,7 @@ def add_ipo_det():
 """FLUTTER ROUTES"""
 
 def generate_password(length=8):
-    characters = string.ascii_letters + string.digits + string.punctuation
+    characters = string.ascii_letters + string.digits
     password = ''.join(random.choice(characters) for i in range(length))
     return password
 
