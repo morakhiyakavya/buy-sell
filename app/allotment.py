@@ -1,6 +1,6 @@
-# Imports 
-
-from bs4 import BeautifulSoup # type: ignore
+# Imports
+import re
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait, Select
@@ -13,7 +13,7 @@ from app.captcha import predict_captcha
 from app.excel import process_excel_data, write_in_excel, print_details
 import json
 import os
-from flask_socketio import emit # type: ignore
+from flask_socketio import emit 
 
 # Configuration
 
@@ -22,6 +22,119 @@ from flask_socketio import emit # type: ignore
 driver_path = 'C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\chromedriver\\chromedriver.exe'
 # headless = False  # or True for headless mode
 headless = True  # or True for headless mode
+
+
+website_configs = {
+
+    'kfintech': {
+        'website_name': 'kfintech',
+        'website_url': 'https://evault.kfintech.com/ipostatus/',
+        # 'dropdown': 'ddl_ipo', # ID
+        'dropdown': '/html/body/div/div/div/div[2]/div/button', # xpath
+        'pan': 'pan',
+        # 'username_field': 'txt_pan', # ID
+        'username_field': 'outlined-start-adornment', # ID
+        # 'captcha_field': 'txt_captcha',
+        # 'submit_button': 'btn_submit_query',
+        'submit_button': '/html/body/div/div/div/div[2]/div/div/div/div/table/tbody[3]/tr/td/button',
+        # 'back_button': 'lnk_new',
+        'back_button': '/html/body/div[1]/div/div/div[2]/div/div/div/div/div/div[2]/div/button',
+        # 'error_message': 'jconfirm-content',
+        'error_message': '/html/body/div[2]/div[3]/div/div[1]/p', # xpath
+        # 'error_message': 'MuiDialogContentText-root MuiTypography-root MuiTypography-body1 css-j90wp2',
+        # 'close_dialog': 'btn.btn-blue',
+        'close_dialog': '/html/body/div[2]/div[3]/div/div[2]/button', # xpath
+        'refresh_button': 'refresh', # CLASS_NAME
+        # Add other necessary identifiers
+    },
+
+    'bigshare': {
+        'website_name': 'bigshare',
+        'website_url': 'https://ipo.bigshareonline.com/IPO_Status.html',
+        # 'website_url': 'https://ipo1.bigshareonline.com/IPO_Status.html',
+        'dropdown': 'ddlCompany', # ID
+        'pan': 'ddlSelectionType',
+        'username_field': 'txtpan', # ID
+        'captcha_field': 'captcha-input',
+        'submit_button': 'btnSearch',
+        'back_button': False,
+        'error_message': 'confirm',
+        'close_dialog': 'confirm',
+        'refresh_button': False,
+        # 'refresh_button': 'refresh-captcha',
+        # Add other necessary identifiers
+    },
+
+    'linkin': {
+        'website_name': 'linkin',
+        'website_url': 'https://www.linkintime.co.in/Initial_Offer/public-issues.html',
+        'dropdown': 'ddlCompany', # ID
+        'pan': 349,
+        'username_field': 'txtStat', # ID
+        'captcha_field': False,
+        'submit_button': 'btnsearc',
+        'back_button': 'chknextAppln', # ID
+        'error_message': 'lblMessage', # ID
+        'close_dialog': 'showcss', # CLASS_NAME
+        'refresh_button': False,
+        # Add other necessary identifiers
+    },
+
+    'skyline': {# Skyline is left cux of error message
+        'website_name': 'skyline',
+        'website_url': 'https://www.skylinerta.com/ipo.php',
+        'dropdown': 'company',# ID
+        'pan': False,
+        'username_field': 'pan', # ID
+        'captcha_field': False,
+        'submit_button': 'iposearch', #CLASS_NAME
+        'back_button': False,
+        # 'error_message': 'jconfirm-content',
+        # 'close_dialog': 'btn.btn-blue',
+        # 'refresh_button': 'refresh',
+        # Add other necessary identifiers
+    },
+
+    'purva': { #Purva is left to done.
+        'website_name': 'purva',
+        'website_url': 'https://purvashare.com/investor-service/ipo-query',
+        'dropdown': 'company_id', #ID
+        'pan': False,
+        'username_field': 'panNumber',#NAME
+        'captcha_field': False,
+        'submit_button': 'submit', #'//input[@value=" Search "]'  XPATH or 'submit' NAME
+        'back_button': False,
+        'error_message': 'div.alert b',#CSS SELECTOR
+        'close_dialog': 'div.alert button.btn-close',#CSS SELECTOR  
+        'refresh_button': False,
+        # Add other necessary identifiers
+    },
+    # 'cameoindia': {
+    #     'website_name': 'cameoindia',
+    #     'website_url': 'https://ipo.cameoindia.com/',
+    #     'dropdown': 'company_id', #ID
+    #     'pan': False,
+    #     'username_field': 'panNumber',#NAME
+    #     'captcha_field': True,
+    #     'submit_button': 'submit', #'//input[@value=" Search "]'  XPATH or 'submit' NAME
+    #     'back_button': False,
+    #     'error_message': 'div.alert b',#CSS SELECTOR
+    #     'close_dialog': 'div.alert button.btn-close',#CSS SELECTOR  
+    #     'refresh_button': False,
+    # },
+    # Making the configuration for chittorgarh so we get details about the ongoing IPO's
+    'chittorgarh': {
+        'website_name': 'chittorgarh',
+        'website_url': 'https://www.chittorgarh.com/report/ipo-in-india-list-main-board-sme/82/?year=2024',
+        'green': 'color-green',
+        'lightyellow': 'color-lightyellow',
+        'aqua': 'color-aqua',
+
+    },
+    # Define configurations for other websites similarly
+}
+
+
 
 class BaseScraper:
     
@@ -149,30 +262,36 @@ class Scrape_Website(BaseScraper):
         """
         try:
             dropdown_id = self.config['dropdown']
-            dropdown_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, dropdown_id)))
-            dropdown = Select(dropdown_element)
-            available_options = [opt.text for opt in dropdown.options]
-            user_input = ipo.title()
-            matching_option, confidence = process.extractOne(user_input, available_options)
-            print(f"Matching option: {matching_option}, confidence: {confidence}")
-            if confidence >= 20:
-                dropdown.select_by_visible_text(matching_option)
-                print(f"Selected option: {matching_option}")
-                self.log({"type": "selected_option", "ipo": matching_option}, self.room)
+            if self.config['website_name'] == 'kfintech':
+                dropdown_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, dropdown_id)))
+                dropdown_element.click()
+                print("Clicked on dropdown")
             else:
-                self.message = "No matching options found for the specified IPO."
-                return False
-            website = self.config['website_name']
-            pan_id = self.config['pan']
-            if website != 'bigshare':
-                if pan_id:
-                    select_element = self.driver.find_element(By.ID, pan_id)
-                    select_element.click()
-            if website == 'bigshare':
-                select_element = Select(self.driver.find_element(By.ID, pan_id))
-                desired_option_text = 'PAN Number'
-                select_element.select_by_visible_text(desired_option_text)
-            return True
+                dropdown_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, dropdown_id)))
+                dropdown = Select(dropdown_element)
+                available_options = [opt.text for opt in dropdown.options]
+                user_input = ipo.title()
+                matching_option, confidence = process.extractOne(user_input, available_options)
+                print(f"Matching option: {matching_option}, confidence: {confidence}")
+                if confidence >= 20:
+                    dropdown.select_by_visible_text(matching_option)
+                    print(f"Selected option: {matching_option}")
+                    self.log({"type": "selected_option", "ipo": matching_option}, self.room)
+                else:
+                    self.message = "No matching options found for the specified IPO."
+                    return False
+            if self.config['website_name'] != 'kfintech':
+                website = self.config['website_name']
+                pan_id = self.config['pan']
+                if website != 'bigshare':
+                    if pan_id:
+                        select_element = self.driver.find_element(By.ID, pan_id)
+                        select_element.click()
+                if website == 'bigshare':
+                    select_element = Select(self.driver.find_element(By.ID, pan_id))
+                    desired_option_text = 'PAN Number'
+                    select_element.select_by_visible_text(desired_option_text)
+                return True
         except Exception as e:
             print(f"Error selecting dropdown option: {e}")
             raise
@@ -201,7 +320,8 @@ class Scrape_Website(BaseScraper):
                     if self.config['website_name'] == 'purva':
                         username_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.NAME, username_field_id)))
                     else:
-                        username_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, username_field_id)))
+                        username_field = WebDriverWait(self.driver, 5).until(EC.visibility_of_element_located((By.ID, username_field_id)))
+                    print(f"Username field found: {username_field}")
                     username_field.clear()
                     username_field.send_keys(username.replace(" ", "").strip().upper())
                     # Assuming captcha solving is required here; implement as needed.
@@ -262,7 +382,7 @@ class Scrape_Website(BaseScraper):
         """
         
         captcha_type = self.config['website_name']  # Replace with actual captcha type
-        if captcha_type == 'bigshare' or captcha_type == 'kfintech':
+        if captcha_type == 'bigshare':
             captcha_input = predict_captcha(self.driver,captcha_type)
             captcha_id = self.config['captcha_field']
             captcha_field = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, captcha_id)))
@@ -273,6 +393,8 @@ class Scrape_Website(BaseScraper):
             submit_button = self.driver.find_element(By.CLASS_NAME, submit_id)
         elif self.config['website_name'] == 'purva':
             submit_button = self.driver.find_element(By.NAME, submit_id)
+        elif self.config['website_name'] == 'kfintech':
+            submit_button = self.driver.find_element(By.XPATH, submit_id)
         else:
             submit_button = self.driver.find_element(By.ID, submit_id)
         submit_button.click()
@@ -295,20 +417,31 @@ class Scrape_Website(BaseScraper):
         
         if self.config['website_name'] == 'kfintech':
             try:
+                div_lookup = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, '/html/body/div[2]/div[3]/div')))
+                if div_lookup:
+                    print("Dialog box found")
                 error_message = self.config['error_message']
-                message_element = WebDriverWait(self.driver, 2).until(
-                    EC.presence_of_element_located((By.CLASS_NAME, error_message)))
+                
+                message_element = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.XPATH, error_message)))
                 message_text = message_element.text
+                print(f"Message text HERE : {message_text}")
                 close_dialog = self.config['close_dialog']
                 if close_dialog:
-                    close_button = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.CLASS_NAME, close_dialog)))
+                    close_button = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.XPATH, close_dialog)))
+                    print("Close Dialog : ",close_dialog)
                     close_button.click()
-                
-                    known_captcha_errors = ["CAPTCHA is invalid or Expired", "Captcha is invalid."]
-                    # Check if the message matches known captcha errors
-                    matching_option, confidence = process.extractOne(message_text, known_captcha_errors)
-                    if confidence >= 90:  # Adjust threshold as needed    
-                        return "captcha_error"
+                    if div_lookup:
+                        print("Dialog box found")
+                        # refresh driver
+                        self.driver.refresh()
+                        self.select_dropdown_option(self)
+
+                    # known_captcha_errors = ["CAPTCHA is invalid or Expired", "Captcha is invalid."]
+                    # # Check if the message matches known captcha errors
+                    # matching_option, confidence = process.extractOne(message_text, known_captcha_errors)
+                    # if confidence >= 90:  # Adjust threshold as needed    
+                    #     return "captcha_error"
                 return message_text
             except TimeoutException:
                 return "no_error"  # No error message was found
@@ -350,21 +483,6 @@ class Scrape_Website(BaseScraper):
 
         elif self.config['website_name'] == 'linkin':
             try:
-                # try:
-                #     # Wait up to 2 seconds for the alert to be present
-                #     WebDriverWait(self.driver, 2).until(EC.alert_is_present())
-
-                #     # Switch to the alert
-                #     alert = self.driver.switch_to.alert
-
-                #     # You can now accept (OK) or dismiss (Cancel) the alert
-                #     alert.accept()
-                #     # alert.dismiss()  # Use this if you want to cancel/dismiss the alert
-                #     return "undefined"
-
-                # except TimeoutException:
-                #     pass
-
                 try:
                     alert = self.driver.switch_to.alert
                     alert.accept()
@@ -421,33 +539,76 @@ class Scrape_Website(BaseScraper):
         """
         
         if self.config['website_name'] == 'kfintech':
-            html_content = self.driver.page_source  # If you're using Selenium to get to the page
-            soup = BeautifulSoup(html_content, 'html.parser')
             try:
-                card_body = soup.find('div', class_='card-body')
-                securities_allotted = int(card_body.find('span', id='grid_results_lbl_allot_0').text)
-                # securities_allotted = int(WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text)
-                result_data = {
-                    'name': card_body.find('span', id='grid_results_Label2_0').text,
-                    'category': card_body.find('span', id='grid_results_Label1_0').text,
-                    'securities_allotted': securities_allotted,
-                    'applied': int(card_body.find('span', id='grid_results_Label5_0').text),
-                    'pan': card_body.find('span', id='grid_results_lbl_pan_0').text,
-                    'client_id': card_body.find('span', id='grid_results_lbl_dpclid_0').text,
-                    'application_number': card_body.find('span', id='grid_results_l1_0').text,
-                    'error': None
-                    }
-                if securities_allotted > 0:
-                    self.allotment += 1
-                    self.total_shares += securities_allotted
-                    print(f" Alloted : {self.allotment}")
-                    self.log({"type": "alloted", "allotment": self.allotment}, self.room)
-                    print(f" Total shares : {self.total_shares}")
-                    self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
-                return result_data
+                # Wait for the main table container to be visible
+                output_element = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'MuiTableContainer-root')))
+                
+                if output_element:
+                    html_source = self.driver.page_source
+                    # Parse the HTML
+                    soup = BeautifulSoup(html_source, 'html.parser')
+
+                    # Initialize result_data dictionary
+                    result_data = {}
+
+                    # Find all relevant divs
+                    divs = soup.find_all('div', class_='MuiCardContent-root css-1qw96cp')
+
+                    # Define the order of keys
+                    keys = [
+                        'application_number',
+                        'category',
+                        'name',
+                        'dp_id_client_id',
+                        'pan',
+                        'applied',
+                        'allotted'
+                    ]
+
+                    # Iterate over each div and extract data
+                    for i, div in enumerate(divs, start=1):
+                        
+                        # Extract bold text from the div
+                        bold_texts = div.find_all('b')
+                        
+                        # Initialize a dictionary to hold data for the current div
+                        current_data = {}
+                        securities_allotted = int(bold_texts[6].text.strip())
+                        print(f"Securities Allotted: {securities_allotted}")
+                        if securities_allotted > 0:
+                            self.allotment += 1
+                            self.total_shares += securities_allotted
+                            print(f" Allotted : {self.allotment}")
+                            self.log({"type": "allotted", "allotment": self.allotment}, self.room)
+                            print(f" Total shares : {self.total_shares}")
+                            self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
+                            # Assign bold text to keys in the defined order
+                        for index, bold in enumerate(bold_texts):
+                            text = bold.get_text(strip=True)
+                            if index < len(keys):
+                                key = keys[index]
+                                current_data[f"{key}_{i}"] = re.sub(r'\s+', ' ', text.strip())
+                        
+                    
+                        # Merge current data into result_data
+                        result_data.update(current_data)
+                            # If any shares are allotted, update the counters
+
+                            # # Store the results in the dictionary
+                            # result_data[f'applicant_name_{i}'] = name
+                            # result_data[f'application_number_{i}'] = application_number
+                            # result_data[f'category_{i}'] = category
+                            # result_data[f'dp_id_{i}'] = dp_id
+                            # result_data[f'pan_{i}'] = pan
+                            # result_data[f'shares_allotted_{i}'] = securities_allotted
+                            # result_data[f'shares_applied_{i}'] = securities_applied
+                    print(result_data)
+                    return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
                 return None
+
+
 
         elif self.config['website_name'] == 'bigshare':
             try:
@@ -729,7 +890,10 @@ class Scrape_Website(BaseScraper):
             try:
                 back_id = self.config['back_button']
                 if back_id:
-                    back_button = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, back_id)))
+                    if self.config['website_name'] == 'kfintech':
+                        back_button = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, back_id)))
+                    else:
+                        back_button = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.ID, back_id)))
                     back_button.click()
                     # print("Going back to the initial form...")
                 else:
@@ -741,96 +905,6 @@ class Scrape_Website(BaseScraper):
             except Exception as e:
                 print(f"Error preparing for next username: {str(e)}")
                 raise
-
-website_configs = {
-
-    'kfintech': {
-        'website_name': 'kfintech',
-        'website_url': 'https://evault.kfintech.com/ipostatus/',
-        'dropdown': 'ddl_ipo', # ID
-        'pan': 'pan',
-        'username_field': 'txt_pan', # ID
-        'captcha_field': 'txt_captcha',
-        'submit_button': 'btn_submit_query',
-        'back_button': 'lnk_new',
-        'error_message': 'jconfirm-content',
-        'close_dialog': 'btn.btn-blue',
-        'refresh_button': 'refresh', # CLASS_NAME
-        # Add other necessary identifiers
-    },
-
-    'bigshare': {
-        'website_name': 'bigshare',
-        'website_url': 'https://ipo.bigshareonline.com/IPO_Status.html',
-        # 'website_url': 'https://ipo1.bigshareonline.com/IPO_Status.html',
-        'dropdown': 'ddlCompany', # ID
-        'pan': 'ddlSelectionType',
-        'username_field': 'txtpan', # ID
-        'captcha_field': 'captcha-input',
-        'submit_button': 'btnSearch',
-        'back_button': False,
-        'error_message': 'confirm',
-        'close_dialog': 'confirm',
-        'refresh_button': False,
-        # 'refresh_button': 'refresh-captcha',
-        # Add other necessary identifiers
-    },
-
-    'linkin': {
-        'website_name': 'linkin',
-        'website_url': 'https://www.linkintime.co.in/Initial_Offer/public-issues.html',
-        'dropdown': 'ddlCompany', # ID
-        'pan': 349,
-        'username_field': 'txtStat', # ID
-        'captcha_field': False,
-        'submit_button': 'btnsearc',
-        'back_button': 'chknextAppln', # ID
-        'error_message': 'lblMessage', # ID
-        'close_dialog': 'showcss', # CLASS_NAME
-        'refresh_button': False,
-        # Add other necessary identifiers
-    },
-
-    'skyline': {# Skyline is left cux of error message
-        'website_name': 'skyline',
-        'website_url': 'https://www.skylinerta.com/ipo.php',
-        'dropdown': 'company',# ID
-        'pan': False,
-        'username_field': 'pan', # ID
-        'captcha_field': False,
-        'submit_button': 'iposearch', #CLASS_NAME
-        'back_button': False,
-        # 'error_message': 'jconfirm-content',
-        # 'close_dialog': 'btn.btn-blue',
-        # 'refresh_button': 'refresh',
-        # Add other necessary identifiers
-    },
-
-    'purva': { #Purva is left to done.
-        'website_name': 'purva',
-        'website_url': 'https://purvashare.com/investor-service/ipo-query',
-        'dropdown': 'company_id', #ID
-        'pan': False,
-        'username_field': 'panNumber',#NAME
-        'captcha_field': False,
-        'submit_button': 'submit', #'//input[@value=" Search "]'  XPATH or 'submit' NAME
-        'back_button': False,
-        'error_message': 'div.alert b',#CSS SELECTOR
-        'close_dialog': 'div.alert button.btn-close',#CSS SELECTOR  
-        'refresh_button': False,
-        # Add other necessary identifiers
-    },
-    # Making the configuration for chittorgarh so we get details about the ongoing IPO's
-    'chittorgarh': {
-        'website_name': 'chittorgarh',
-        'website_url': 'https://www.chittorgarh.com/report/ipo-in-india-list-main-board-sme/82/?year=2024',
-        'green': 'color-green',
-        'lightyellow': 'color-lightyellow',
-        'aqua': 'color-aqua',
-
-    },
-    # Define configurations for other websites similarly
-}
 
 def scrape_data_from_websites(driver_path, company, ipo, usernames, room, socketio, headless=True):
     """

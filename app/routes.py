@@ -1,10 +1,13 @@
+import ast
 from datetime import datetime
-
+import random
+from random import randint
 # from cryptography.fernet import Fernet
 import json
 import os
 import re
 import sqlite3
+import string
 from flask import (
     render_template,
     redirect,
@@ -1047,7 +1050,7 @@ def seller_deactivate_account():
     "/dashboard/compose-direct-email-to-a-seller/<email>", methods=["GET", "POST"]
 )
 @login_required
-def compose_direct_email_to_seller(email):
+def compose_direct_email_to_seller(email):  
     try:
         """Write email to individual seller"""
         # Get the buyer
@@ -1938,7 +1941,7 @@ def transaction_details(product_id):
             )
         elif current_user.type == "buyer":
                 sellers = Seller.query.filter_by(buyer_id=current_user.id).all()
-                seller_pans = []            
+                seller_pans = []
                 for seller in sellers:
                     transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
                     # print("Transactions  here->", transactions)
@@ -2004,7 +2007,7 @@ def allotment(product_id, ipo, listing_On="bigshare"):
                     for transaction_pan in transaction_pans:
                         usernames.append(transaction_pan.pan.pan_number)        
             results = scrape_data_from_websites(
-                driver_path, listing_On, ipo, usernames, room, socketio, headless=True)
+                driver_path, listing_On, ipo, usernames, room, socketio, headless=False)
             if os.path.exists("json_file/{ipo}"):
                 if not os.path.exists(f"json_file/{ipo}/{buyer_id}"):
                     with open(f"json_file/{ipo}/{buyer_id}", "w") as file:
@@ -2062,7 +2065,7 @@ def checking_allotment():
                 # # Scraping the website
                 print("Socket ->", socketio)
                 results = scrape_data_from_websites(
-                    driver_path, listing_On, ipo, usernames, room, socketio, headless=True
+                    driver_path, listing_On, ipo, usernames, room, socketio, headless=False
                 )
                 if os.path.exists("json"):
                     if os.path.exists(f"json/{ipo}.json"):
@@ -2268,7 +2271,7 @@ def delete_det():
         first_name="arya",
         last_name="Morakhiya",
         username="arya",
-        email="arya@gmail.com",
+        email="morakhiyakavya17@gmail.com",
         phone_number="7016184560",
         current_residence="Ahmedabad,Gujarat",
         confirm_password="kavyaarya123.",
@@ -2306,17 +2309,151 @@ def delete_det():
 # This Deletes Everything from the table Pan and IPO, only for testing purpose delete after use
 @app.route("/del-ipo-det")
 def add_ipo_det():
-    product = IPO.query.all()
+    product = User.query.all()
     for i in product:
         db.session.delete(i)
         db.session.commit()
-    pan = Pan.query.all()
-    for i in pan:
-        db.session.delete(i)
-        db.session.commit()
+    # pan = Pan.query.all()
+    # for i in pan:
+    #     db.session.delete(i)
+    #     db.session.commit()
     return redirect(url_for("dashboard"))
 
 
 # =========================================
 # END OF AUTHENTICATED USERS
 # =========================================
+
+"""FLUTTER ROUTES"""
+
+def generate_password(length=8):
+    characters = string.ascii_letters + string.digits + string.punctuation
+    password = ''.join(random.choice(characters) for i in range(length))
+    return password
+
+@app.route('/submit-form', methods=['POST'])
+def submit_form():
+    data = request.json
+    # Process the form data as needed
+    ipo = data.get('ipoName')
+    seller_name = data.get('sellerName')
+    extradetails = data.get('extradetails')
+    number = data.get('sellerNumber')
+    rate = data.get('rate')
+    number_of_forms = data.get('numberOfForms')
+    option = data.get('option')
+    subject = data.get('subject')
+    date_time = data.get('dateTime')
+    
+    if len(number) > 10:
+        number = number[-10:]
+    seller = Seller.query.filter_by(phone_number=number).first()
+
+    if not seller:
+        print("Seller not found")
+        # So Add that into Seller table
+        # create a random 8 len password
+        pass_word = generate_password()
+        seller = Seller(
+            first_name=seller_name,
+            username = seller_name,
+            email = pass_word+'@gmail.com',
+            password_hash = pass_word,
+            confirm_password = pass_word,
+            phone_number=number,
+            buyer_id=2,
+        )
+        db.session.add(seller)
+        db.session.commit()
+        print("Seller Added")
+        seller = Seller.query.filter_by(phone_number=number).first()
+    ipo = IPO.query.filter_by(name=ipo).first()
+    print(ipo)
+    if not ipo:
+        print("Ipo not found")
+        # So Add that into Ipo table
+        ipo = IPO(name=ipo)
+        db.session.add(ipo)
+        db.session.commit()
+        print("Ipo Added")
+        ipo = IPO.query.filter_by(name=ipo).first()
+        details = Details(
+            product_id=ipo.id,
+            subject=subject,
+            formtype=option,
+            price=rate,
+            quantity=number_of_forms,
+            extra_details = extradetails,
+            seller = seller,
+        )
+        db.session.add(details)
+        db.session.commit()
+        print("Details Added")
+    else:
+        print("Ipo Found")
+    # Now Add the details into the Details table
+    details = Details(
+        product_id=ipo.id,
+        subject=subject,
+        formtype=option,
+        price=rate,
+        quantity=number_of_forms,
+        extra_details = extradetails,
+        seller = seller,
+    )
+    db.session.add(details)
+    db.session.commit()
+    print("Details Added")
+    transaction = Transaction(
+                    details_id=details.id,
+                    product_id=ipo.id,
+                    buyer_id=2,
+                    seller_id=seller.id,
+                )
+    db.session.add(transaction)
+    db.session.commit()
+    # Process or save the data to the database here
+    response = {
+        'status': 'success',
+        'message': 'Form submitted successfully',
+        'data': data
+    }
+    print(response)
+    return jsonify(response), 200
+
+
+@app.route('/submit-contacts', methods=['POST'])
+def submit_contacts():
+    data = request.get_json()
+    contacts = data.get('contacts', [])
+    
+    # Process the contacts as needed
+    for contact in contacts:
+        name = contact.get('name')
+        number = contact.get('number')
+        print("\n---------------------------------------------\n")
+        print(f"Name: {name}, Number: {number}")
+        print("\n---------------------------------------------\n")
+    return jsonify({"message": "Contacts received successfully"}), 200
+
+
+@app.route('/give-ipo',methods=['POST'])
+def give_ipo():
+    products = IPO.query.all()
+    view_products = len(products)
+    status_priority = {"open": 1, "closed": 2, "listed": 3}
+
+    products.sort(
+        key=lambda x: (status_priority.get(x.status, 4), x.listing_date)
+    )
+    product_list =[
+                {
+                    "name": product.name,
+                }
+                for product in products
+            ]
+    return jsonify({"products": product_list})
+
+
+
+# ================================================

@@ -23,12 +23,12 @@ class User(db.Model, UserMixin):
 
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(64), index=True, default="First Name", nullable=False)
-    last_name = db.Column(db.String(64), index=True, default="Last Name", nullable=False)
+    last_name = db.Column(db.String(64), index=True, nullable=True)
     username = db.Column(db.String(64), index=True, unique=True, nullable=False)
-    email = db.Column(db.String(128), index=True, unique=True, nullable=False)
+    email = db.Column(db.String(128), index=True, nullable=False)
     password_hash = db.Column(db.String(128))
     confirm_password = db.Column(db.String(128))
-    phone_number = db.Column(db.String(20), default="7016184560", nullable=False)
+    phone_number = db.Column(db.String(20), nullable=False, unique = True)
     verification_phone = db.Column(db.String(20))
     active = db.Column(db.Boolean, nullable=False, default=True)
     delete_account = db.Column(db.Boolean, default=False)
@@ -160,7 +160,7 @@ class IPO(db.Model):
     close_date = db.Column(db.DateTime, nullable=True)
     listing_date = db.Column(db.DateTime, nullable=True)
     listing_at = db.Column(db.String(255), nullable=True)
-    status = db.Column(db.String(255), nullable=False)
+    status = db.Column(db.String(255), nullable=True)
 
 
 # Subject Detail
@@ -173,6 +173,7 @@ class Details(db.Model):
     formtype = db.Column(db.String(8), nullable=False)
     price = db.Column(db.Float, nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
+    extra_details = db.Column(db.String(25), nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships

@@ -11,6 +11,7 @@ import os
 from config import Config
 # from flask_ngrok import run_with_ngrok
 from flask_socketio import SocketIO
+from flask_cors import CORS
 
 app = Flask(__name__)
 # run_with_ngrok(app)
@@ -27,6 +28,8 @@ login.login_view = "login"
 mail = Mail(app)
 boostrap = Bootstrap(app)
 socketio = SocketIO(app, cors_allowed_origins='*') #remove cross origin in production / Deployment
+CORS(app)   
+
 
 if not app.debug:
     if app.config["MAIL_SERVER"]:

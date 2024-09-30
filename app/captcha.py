@@ -8,7 +8,6 @@ import typing
 from PIL import Image, ImageEnhance
 from skimage import exposure
 from mltu.utils.text_utils import ctc_decoder, get_cer
-
 from mltu.configs import BaseModelConfigs
 from mltu.inferenceModel import OnnxInferenceModel
 
