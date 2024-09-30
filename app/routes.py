@@ -81,8 +81,8 @@ def check_server():
                 print("Server returned an error:", response.status_code)
         except requests.exceptions.RequestException as e:
             print("Error connecting to the server:", e)
-        
-        time.sleep(40)  # Wait for 40 seconds before the next check
+        random_time = randint(10, 50)  # Random time between 30 and 60 seconds
+        time.sleep(random_time)  # Wait for 40 seconds before the next check
 
 # Start the background thread
 thread = threading.Thread(target=check_server)
