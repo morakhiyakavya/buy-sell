@@ -614,7 +614,7 @@ def reactivate_admin(username):
 @login_required
 def delete_admin(username):
     try:
-        if current_user.department == "Super Admin":
+        if current_user.department == "Super Admin" or current_user.username == username:
             admin = Admin.query.filter_by(username=username).first_or_404()
             db.session.delete(admin)
             db.session.commit()
@@ -894,10 +894,14 @@ def reactivate_buyer(username):
 def delete_buyer(username):
     try:
         buyer = Buyer.query.filter_by(username=username).first_or_404()
-        db.session.delete(buyer)
-        db.session.commit()
-        flash(f"{buyer.username} has been deleted as a buyer")
-        return redirect(url_for("all_buyers"))
+        if current_user.department == "Super Admin" or current_user.id == buyer.id:
+            db.session.delete(buyer)
+            db.session.commit()
+            flash(f"{buyer.username} has been deleted as a buyer")
+            return redirect(url_for("all_buyers"))
+        else:
+            flash("You do not have enough permissions.")
+            return redirect(url_for("dashboard"))
     except Exception as e:
         flash("An error occurred while deleting the buyer.")
         print(f"An error occurred: {e}")
@@ -1221,6 +1225,14 @@ def delete_seller(username):
     try:
         if current_user.is_authenticated:
             seller = Seller.query.filter_by(username=username).first_or_404()
+            if current_user.type == "buyer":
+                if seller.buyer_id == current_user.id or current_user.department == "Super Admin" or current_user.id == seller.id:
+                    db.session.delete(seller)
+                    db.session.commit()
+                    flash(f"{seller.username} has been deleted as a seller")
+                    return redirect(url_for("all_sellers"))
+                else:
+                    return flash_message()
             db.session.delete(seller)
             db.session.commit()
             flash(f"{seller.username} has been deleted as a seller")
@@ -1466,7 +1478,23 @@ def view_product():  # Testing Feature
         # Handle the exception here
         print(f"An error occurred: {str(e)}")
         return f"Error : {e}", 400
-
+    
+@app.route("/delete-product/<int:id>")
+@login_required
+def delete_product(id):
+    try:
+        if current_user.type == "admin" or current_user.type == "Super Admin":
+            product = IPO.query.filter_by(id=id).first_or_404()
+            db.session.delete(product)
+            db.session.commit()
+            flash(f"{product.name} has been deleted")
+            return redirect(url_for("view_product"))
+        else:
+            return flash_message()
+    except Exception as e:
+        # Handle the exception here
+        print(f"An error occurred: {str(e)}")
+        return f"Error : {e}", 400
 
 # --------------
 # End Of Curd On Products

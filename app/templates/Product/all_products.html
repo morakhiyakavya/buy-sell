@@ -33,6 +33,9 @@
                             {% if current_user.type == "seller" %}
                             <th>Sell</th>
                             {% endif %}
+                            {% if current_user.type == "admin" or current_user.type == "Super Admin" %}
+                            <th>Actions</th>
+                            {% endif %}
                         </tr>
                     </thead>
                     <tbody>
@@ -61,7 +64,13 @@
                             </td>
                             {% endif %}
                             {% endif %}
+                            {% if current_user.type == "admin" or current_user.type == "Super Admin" %}
+                            <td>
+                                <a href="{{ url_for('delete_product', id=product.id) }}" class="btn btn-danger">Delete</a>
+                            </td>
+                            {% endif %}
                         </tr>
+
                         {% endfor %}
                         <!-- End of getting all products from the database -->
                     </tbody>
