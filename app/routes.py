@@ -63,32 +63,11 @@ from app.excel import process_excel_data, write_in_excel, process_excel
 
 from app import app, db, socketio
 from sqlalchemy.exc import IntegrityError
-import requests
-import threading
-import time
+from sqlalchemy import inspect, MetaData
 
-@app.route('/checkup', methods=['GET'])
+@app.route('/healthz', methods=['GET'])
 def checkup():
     return jsonify(status='healthy', message='The server is running smoothly!')
-
-def check_server():
-    while True:
-        try:
-            response = requests.get('https://buy-sell-1tuu.onrender.com/checkup')  # Adjust to your deployment URL
-            if response.status_code == 200:
-                print("Server is healthy:", response.json())
-            else:
-                print("Server returned an error:", response.status_code)
-        except requests.exceptions.RequestException as e:
-            print("Error connecting to the server:", e)
-        random_time = randint(10, 50)  # Random time between 30 and 60 seconds
-        time.sleep(random_time)  # Wait for 40 seconds before the next check
-
-# Start the background thread
-thread = threading.Thread(target=check_server)
-thread.daemon = True  # Allows the thread to exit when the main program exits
-thread.start()
-
 
 # =========================================
 # USER AUTHENTICATION
@@ -2042,23 +2021,27 @@ def seller_transaction(product_id):
         # Get all the sellers of our buyer
         if current_user.type == "buyer":
             sellers = Seller.query.filter_by(buyer_id=current_user.id).all()
-            print("Sellers ->", sellers)
-            
-            transactions = []  # Initialize an empty list to collect transactions
-            for seller in sellers:
-                seller_transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
-                print(f"Transactions for Seller {seller.id} ->", seller_transactions)
-                transactions.extend(seller_transactions)  # Collect transactions
-            
-            if not transactions:  # Check if the list is empty
-                flash("No transactions found")
-                return redirect(url_for("view_product"))
-            return render_template(
-                "transaction/seller_transaction.html",
-                title="Transaction Details",
-                transactions=transactions,
-                total_transaction=len(transactions),
-            )
+        elif current_user.type == "admin":
+            sellers = Seller.query.all()
+        else:
+            return flash_message()    
+        print("Sellers ->", sellers)
+        
+        transactions = []  # Initialize an empty list to collect transactions
+        for seller in sellers:
+            seller_transactions = Transaction.query.filter_by(seller_id=seller.id, product_id=product_id).all()
+            print(f"Transactions for Seller {seller.id} ->", seller_transactions)
+            transactions.extend(seller_transactions)  # Collect transactions
+        
+        if not transactions:  # Check if the list is empty
+            flash("No transactions found")
+            return redirect(url_for("view_product"))
+        return render_template(
+            "transaction/seller_transaction.html",
+            title="Transaction Details",
+            transactions=transactions,
+            total_transaction=len(transactions),
+        )
     except Exception as e:
         print("An error occurred:", str(e))
         print(f"Error type: {type(e).__name__}")
@@ -2533,6 +2516,37 @@ def give_ipo():
             ]
     return jsonify({"products": product_list})
 
+
+@app.route('/show-tables')
+@login_required
+def show_tables():
+    if current_user.type == "admin":
+        inspector = inspect(db.engine)
+        metadata = MetaData()
+        metadata.reflect(bind=db.engine)
+
+        all_tables_data = {}
+
+        # Get all table names
+        table_names = inspector.get_table_names()
+
+        for table_name in table_names:
+            table = metadata.tables[table_name]
+
+            # Fetch all rows from the table
+            query = db.session.query(table).all()
+
+            # Get column names
+            columns = table.columns.keys()
+
+            # Format rows as dictionaries
+            table_data = [dict(zip(columns, row)) for row in query]
+            all_tables_data[table_name] = table_data
+
+        # Pass data to a template for display
+        return render_template('show_tables.html', all_tables_data=all_tables_data)
+    else:
+        return flash_message()
 
 
 # ================================================
