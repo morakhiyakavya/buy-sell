@@ -2432,7 +2432,8 @@ def submit_form():
     subject = data.get('subject')
     date_time = data.get('dateTime')
     date_time = datetime.fromisoformat(date_time)
-
+    seller_name = seller_name.split(" ")[0]
+    print(seller_name)
 
     print(data)
     if len(number) > 10:
@@ -2450,11 +2451,12 @@ def submit_form():
             last_name = "",
             username = seller_name,
             email = pass_word+'@gmail.com',
-            password_hash = pass_word,
             confirm_password = pass_word,
             phone_number=number,
             buyer_id=2,
+        
         )
+        seller.set_password(pass_word)
         db.session.add(seller)
         db.session.commit()
         print("Seller Added")
