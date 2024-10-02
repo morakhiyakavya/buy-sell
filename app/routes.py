@@ -2432,7 +2432,7 @@ def submit_form():
     subject = data.get('subject')
     date_time = data.get('dateTime')
     date_time = datetime.fromisoformat(date_time)
-    seller_name = seller_name.split(" ")[0]
+    seller_name = seller_name.split("(")[0].strip()
     print(seller_name)
 
     print(data)
