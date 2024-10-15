@@ -2610,5 +2610,14 @@ def show_tables():
     else:
         return flash_message()
 
+@app.route('/download_db', methods=['GET'])
+@login_required
+def download_db():
+    try:
+        if current_user.type == "admin":
+            basedir = os.path.abspath(os.path.dirname(__file__))
+            return send_file(os.path.join(basedir, 'app.db'), as_attachment=True, attachment_filename='app.db')
+    except Exception as e:
+        return str(e)
 
 # ================================================
