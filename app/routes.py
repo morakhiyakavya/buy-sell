@@ -2615,8 +2615,14 @@ def show_tables():
 def download_db():
     try:
         if current_user.type == "admin":
+            # Current directory of the file
             basedir = os.path.abspath(os.path.dirname(__file__))
-            return send_file(os.path.join(basedir, 'app.db'), as_attachment=True, attachment_filename='app.db')
+
+            # Go one directory back
+            basedir = os.path.abspath(os.path.join(basedir, os.pardir))
+            
+            print(basedir)
+            return send_file(os.path.join(basedir, 'app.db'), as_attachment=True, download_name='app.db')
     except Exception as e:
         return str(e)
 
