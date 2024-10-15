@@ -342,6 +342,7 @@ class AllotmentForm(FlaskForm):
             ("bigshare", "bigshare"),
             ("skyline", "skyline"),
             ("purva", "purva"),
+            ("maashilta", "maashilta"),
         ],
         validators=[DataRequired()],
         default="linkin",

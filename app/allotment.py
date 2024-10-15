@@ -110,6 +110,21 @@ website_configs = {
         'refresh_button': False,
         # Add other necessary identifiers
     },
+    
+    'maashilta': {
+        'website_name': 'maashilta',
+        'website_url': 'https://maashitla.com/allotment-status/public-issues',
+        'dropdown': 'txtCompany', # ID
+        'pan': 'pan', # ID
+        'username_field': 'txtSearch', # ID
+        'captcha_field': False,
+        'submit_button': 'btnSearch', # ID
+        'back_button': False,
+        'error_message': 'contact-form-error alert alert-danger mt-4', # CLASS_NAME
+        'close_dialog': False, # CSS_SELECTOR
+        'refresh_button': False,
+    },
+    
     # 'cameoindia': {
     #     'website_name': 'cameoindia',
     #     'website_url': 'https://ipo.cameoindia.com/',
@@ -528,6 +543,20 @@ class Scrape_Website(BaseScraper):
             except Exception as e:
                 print(f"Error handling dialog box: {str(e)}")
                 raise
+        
+        elif self.config['website_name'] == 'maashilta':
+            error_message = self.config['error_message']
+            try:
+                message_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.CLASS_NAME, error_message)))
+                message_text = message_element.text
+                print(f"Error message maashilta: {message_text}")
+                return message_text
+            except TimeoutException:
+                return "no_error"
+            except Exception as e:
+                print(f"Error handling dialog box: {str(e)}")
+                raise
+
         else:
             return "no_error"
 
@@ -608,8 +637,6 @@ class Scrape_Website(BaseScraper):
             except Exception as e:
                 print(f"Error scraping data: {e}")
                 return None
-
-
 
         elif self.config['website_name'] == 'bigshare':
             try:
@@ -762,6 +789,63 @@ class Scrape_Website(BaseScraper):
                     'securities_allotted': WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.XPATH, "//span[@id='grid_results_ctl02_lbl_allot']"))).text,
                     'error' : None
                 }
+                return result_data
+            except Exception as e:
+                print(f"Error scraping data: {e}")
+                return None
+
+        elif self.config['website_name'] == 'maashilta':
+            try:
+                # start_time = time.time()
+                div_element = WebDriverWait(self.driver, 2).until(EC.visibility_of_element_located((By.CLASS_NAME, "contact-form-success")))
+                
+                if div_element :
+                    print("Div element found")
+                    content = div_element.text.strip()
+                    # fetch_time = time.time()
+                    # Split the content by lines
+                    lines = content.splitlines()
+                    result_data = {}
+                    name = lines[0].split("Name:")[1].strip() or "N/A"
+                    application_no = lines[1].split("Application No.:")[1].strip() or "N/A"
+                    share_applied = lines[2].split("Share Applied:")[1].strip() or "0"
+                    share_allotted = lines[3].split("Share Alloted:")[1].strip() or "0"
+                    if name == "N/A":
+                        error = "No data found"
+                        self.mistakes += 1
+                        self.log({"type": "mistakes", "count": self.mistakes}, self.room)
+                        print(f"Error: {error}")
+                    else:
+                        error = None
+
+                    if int(share_allotted) > 0:
+                        self.allotment += 1
+                        self.total_shares += int(share_allotted)
+                        print(f" Alloted : {self.allotment}")
+                        self.log({"type": "alloted", "allotment": self.allotment}, self.room)
+                        print(f" Total shares : {self.total_shares}")
+                        self.log({"type": "total_shares", "total_share": self.total_shares}, self.room)
+                    
+                    result_data[f'applicant_name'] = name
+                    result_data[f'application_no'] = application_no
+                    result_data[f'shares_allotted'] = share_allotted
+                    result_data[f'shares_applied'] = share_applied
+                    result_data['error'] = error
+
+                    print(f"Name: {name}")
+                    print(f"Application No: {application_no}")
+                    print(f"Share Applied: {share_applied}")
+                    print(f"Share Alloted: {share_allotted}")
+                    # parse_time = time.time()
+                    # Calculate the durations
+                    # duration_fetch = fetch_time - start_time
+                    # duration_parse = parse_time - soup_time
+                    # total_duration = parse_time - start_time
+                    
+                    # print(f"Time to fetch page: {duration_fetch} seconds")
+                    # print(f"Time to parse HTML and extract data: {duration_parse} seconds")
+                    # print(f"Total time: {total_duration} seconds")
+
                 return result_data
             except Exception as e:
                 print(f"Error scraping data: {e}")
