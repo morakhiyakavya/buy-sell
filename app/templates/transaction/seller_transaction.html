@@ -26,6 +26,7 @@
                             <th>ID</th>
                             <th>Name</th>
                             <th>Number</th>
+                            <th>Date</th>
                             <th>Form Tpye</th>
                             <th>Subject</th>
                             <th>Forms</th>
@@ -38,14 +39,14 @@
                         {% for transaction in transactions %}
                         <tr>
                             <td>{{ loop.index }}</td>
-                            <td> {{ transaction.seller.first_name.upper() + transaction.seller.last_name.upper() }}</td>
+                            <td> {{ transaction.seller.first_name.upper()}}</td>
                             <td> {{ transaction.seller.phone_number.upper() }}</td>
+                            <td> {{ moment(transaction.details.timestamp).format('Do MMMM YYYY, h:mm:ss a') }} </td>
                             <td> {{ transaction.details.formtype.upper() }}</td>
                             <td> {{ transaction.details.subject.upper() }}</td>
                             <td> {{ transaction.details.quantity }}</td>
                             <td> {{ transaction.details.price }}</td>
                             <td> {{ transaction.details.extra_details.upper() }} </td>
-
                             </tr>
                         {% endfor %}
                         <!-- End of getting all products from the database -->

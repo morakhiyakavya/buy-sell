@@ -1,5 +1,6 @@
 import ast
 from datetime import datetime
+import logging
 import random
 from random import randint
 # from cryptography.fernet import Fernet
@@ -8,6 +9,7 @@ import os
 import re
 import sqlite3
 import string
+import traceback
 from flask import (
     render_template,
     redirect,
@@ -83,7 +85,8 @@ def check_server():
         except requests.exceptions.RequestException as e:
             print("Error connecting to the server:", e)
         random_time = randint(10, 50)  # Random time between 30 and 60 seconds
-        time.sleep(random_time)  # Wait for 40 seconds before the next check
+        # time.sleep(random_time)  # Wait for 40 seconds before the next check
+        time.sleep(5000)  # Wait for 40 seconds before the next check
 
 # Start the background thread
 thread = threading.Thread(target=check_server)
@@ -2420,93 +2423,125 @@ def generate_password(length=8):
 
 @app.route('/submit-form', methods=['POST'])
 def submit_form():
-    data = request.json
-    # Process the form data as needed
-    ipoName = data.get('ipoName')
-    seller_name = data.get('sellerName')
-    extradetails = data.get('extradetails')
-    number = data.get('sellerNumber')
-    rate = data.get('rate')
-    number_of_forms = data.get('numberOfForms')
-    option = data.get('option')
-    subject = data.get('subject')
-    date_time = data.get('dateTime')
-    date_time = datetime.fromisoformat(date_time)
-    seller_name = seller_name.split("(")[0].strip()
-    print(seller_name)
+    try:
+        data = request.json
+        # Process the form data as needed
+        ipoName = data.get('ipoName')
+        seller_name = data.get('sellerName')
+        extradetails = data.get('extradetails')
+        number = data.get('sellerNumber')
+        rate = data.get('rate')
+        number_of_forms = data.get('numberOfForms')
+        option = data.get('option')
+        subject = data.get('subject')
+        date_time = data.get('dateTime')
+        buysell = data.get('buysell')
+        if buysell == "Sell":
+            number_of_forms = -number_of_forms
+        date_time = datetime.fromisoformat(date_time)
+        seller_name = seller_name.split("(")[0].strip()
+        print(seller_name)
 
-    print(data)
-    if len(number) > 10:
-        number = number[-10:]
-    
-    seller = Seller.query.filter_by(phone_number=number).first()
+        print(data)
+        if len(number) > 10:
+            number = number[-10:]
+        try:
+            seller = Seller.query.filter_by(phone_number=number).first()
 
-    if not seller:
-        print("Seller not found")
-        # So Add that into Seller table
-        # create a random 8 len password
-        pass_word = generate_password()
-        seller = Seller(
-            first_name=seller_name,
-            last_name = "",
-            username = seller_name,
-            email = pass_word+'@gmail.com',
-            confirm_password = pass_word,
-            phone_number=number,
-            buyer_id=2,
-        
-        )
-        seller.set_password(pass_word)
-        db.session.add(seller)
-        db.session.commit()
-        print("Seller Added")
-        seller = Seller.query.filter_by(phone_number=number).first()
-    
-    ipo = IPO.query.filter_by(name=ipoName).first()
-
-    if not ipo:
-        print("Ipo not found")
-        # So Add that into Ipo table
-        ipo = IPO(name=ipoName,
-            status = "open",
-            listing_date = date_time,
-            open_date = date_time,
-            close_date = date_time)
-        db.session.add(ipo)
-        db.session.commit()
-        print("Ipo Added")
-        ipo = IPO.query.filter_by(name=ipoName).first()
-        
-    # Now Add the details into the Details table
-    details = Details(
-        product_id=ipo.id,
-        subject=subject,
-        formtype=option,
-        price=rate,
-        quantity=number_of_forms,
-        extra_details = extradetails,
-        seller = seller,
-    )
-    db.session.add(details)
-    db.session.commit()
-    
-    transaction = Transaction(
-                    details_id=details.id,
-                    product_id=ipo.id,
+            if not seller:
+                print("Seller not found")
+                # So Add that into Seller table
+                # create a random 8 len password
+                pass_word = generate_password()
+                seller = Seller(
+                    first_name=seller_name,
+                    last_name = "",
+                    username = seller_name,
+                    email = pass_word+'@gmail.com',
+                    confirm_password = pass_word,
+                    phone_number=number,
                     buyer_id=2,
-                    seller_id=seller.id,
+                
                 )
-    db.session.add(transaction)
-    db.session.commit()
-    # Process or save the data to the database here
-    response = {
-        'status': 'success',
-        'message': 'Form submitted successfully',
-        'data': data
-    }
-    print(response)
-    return jsonify(response), 200
+                seller.set_password(pass_word)
+                db.session.add(seller)
+                db.session.commit()
+                print("Seller Added")
+                seller = Seller.query.filter_by(phone_number=number).first()
+        except IntegrityError as e:
+            db.session.rollback()
+            seller = Seller(
+                first_name=seller_name,
+                last_name = "",
+                username = seller_name + "_" + str(random.randint(1000, 9999)),
+                email = pass_word + '@gmail.com',
+                confirm_password = pass_word,
+                phone_number=number,
+                buyer_id=2,
+            )
+            seller.set_password(pass_word)
+            db.session.add(seller)
+            db.session.commit()
+        ipo = IPO.query.filter_by(name=ipoName).first()
 
+        if not ipo:
+            print("Ipo not found")
+            # So Add that into Ipo table
+            ipo = IPO(name=ipoName,
+                status = "open",
+                listing_date = date_time,
+                open_date = date_time,
+                close_date = date_time)
+            db.session.add(ipo)
+            db.session.commit()
+            print("Ipo Added")
+            ipo = IPO.query.filter_by(name=ipoName).first()
+            
+        # Now Add the details into the Details table
+        details = Details(
+            product_id=ipo.id,
+            subject=subject,
+            formtype=option,
+            price=rate,
+            quantity=number_of_forms,
+            extra_details = extradetails,
+            seller = seller,
+        )
+        db.session.add(details)
+        db.session.commit()
+        
+        transaction = Transaction(
+                        details_id=details.id,
+                        product_id=ipo.id,
+                        buyer_id=2,
+                        seller_id=seller.id,
+                    )
+        db.session.add(transaction)
+        db.session.commit()
+        # Process or save the data to the database here
+        response = {
+            'status': 'success',
+            'message': 'Form submitted successfully',
+            'data': data
+        }
+        print(response)
+        return jsonify(response), 200
+    except Exception as e:
+        # Get the full traceback
+        print(e)
+        tb_str = traceback.format_exception(etype=type(e), value=e, tb=e.__traceback__)
+        full_traceback = "".join(tb_str)
+
+        # Log the error
+        logging.error(full_traceback)
+
+        return jsonify({
+            "error": {
+                "code": "server_error",
+                "message": "An unexpected error occurred.",
+                "details": full_traceback  # Include the full traceback here
+            }
+        }), 500  # Internal Server Error
 
 @app.route('/submit-contacts', methods=['POST'])
 def submit_contacts():
@@ -2525,20 +2560,23 @@ def submit_contacts():
 
 @app.route('/give-ipo',methods=['POST'])
 def give_ipo():
-    products = IPO.query.all()
-    view_products = len(products)
-    status_priority = {"open": 1, "closed": 2, "listed": 3}
+    try:
+        products = IPO.query.all()
+        view_products = len(products)
+        status_priority = {"open": 1, "closed": 2, "listed": 3}
 
-    products.sort(
-        key=lambda x: (status_priority.get(x.status, 4), x.listing_date)
-    )
-    product_list =[
-                {
-                    "name": product.name,
-                }
-                for product in products
-            ]
-    return jsonify({"products": product_list})
+        products.sort(
+            key=lambda x: (status_priority.get(x.status, 4), x.listing_date)
+        )
+        product_list =[
+                    {
+                        "name": product.name,
+                    }
+                    for product in products
+                ]
+        return jsonify({"products": product_list})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 @app.route('/show-tables')

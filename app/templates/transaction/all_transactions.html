@@ -30,7 +30,7 @@
                             <th>Price</th>
                             <th>Quantity</th>
                             <th>Timestamp</th>
-                            {% if current_user.type == "buyer"%}
+                            {% if current_user.type == "buyer" or current_user.type == "admin" %}
                             <th>Seller</th> <!-- New column for actions -->
                             {% endif %}
                             <th>Actions</th> <!-- New column for actions -->
