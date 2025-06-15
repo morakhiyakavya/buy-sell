@@ -46,11 +46,16 @@ def predict_captcha(driver,image_type):
         - str: The predicted text
         """
         # Assuming these are your model initialization lines adjusted for both models
-        if image_type == 'bigshare':
-            captcha = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "captcha")))
-        elif image_type == 'kfintech':
-            captcha = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'captchaimg')))
-        image = captcha.screenshot(os.path.join(current_directory, f'captcha.png'))
+        if driver is not None:
+            if image_type == 'bigshare':
+                captcha = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, "captcha")))
+            elif image_type == 'kfintech':
+                captcha = WebDriverWait(driver, 10).until(EC.visibility_of_element_located((By.ID, 'captchaimg')))
+            
+                
+            image = captcha.screenshot(os.path.join(current_directory, f'captcha.png'))
+        else:
+            pass
         img = os.path.join(current_directory, f'captcha.png')
 
         # Load the image.
@@ -109,3 +114,4 @@ def predict_captcha(driver,image_type):
     except Exception as e:
         print(f"Error in predict_captcha: {e}")
         raise
+    

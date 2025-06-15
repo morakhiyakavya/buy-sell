@@ -29,8 +29,9 @@
                             <th>Date</th>
                             <th>Form Tpye</th>
                             <th>Subject</th>
-                            <th>Forms</th>
                             <th>Rate</th>
+                            <th>Forms</th>
+                            <th>Amount</th>
                             <th>Deal By</th>
                         </tr>
                     </thead>
@@ -44,8 +45,9 @@
                             <td> {{ moment(transaction.details.timestamp).format('Do MMMM YYYY, h:mm:ss a') }} </td>
                             <td> {{ transaction.details.formtype.upper() }}</td>
                             <td> {{ transaction.details.subject.upper() }}</td>
-                            <td> {{ transaction.details.quantity }}</td>
                             <td> {{ transaction.details.price }}</td>
+                            <td> {{ transaction.details.quantity }}</td>
+                            <td> {{ transaction.details.price * transaction.details.quantity }} </td>
                             <td> {{ transaction.details.extra_details.upper() }} </td>
                             </tr>
                         {% endfor %}
@@ -64,6 +66,10 @@
 <script>
     $(document).ready(function () {
         var table = $('#data').DataTable({
+            "pageLength": -1, // Display all rows by default
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "stateSave": true, // Save the state of the table
+
             dom: '<"row"<"col-md-6"l><"col-md-6"f>>' +
                 '<"row"<"col-md-12"tr>>' +
                 '<"row"<"col-md-5"i><"col-md-7"p>>',

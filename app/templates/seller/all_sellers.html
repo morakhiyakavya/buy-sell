@@ -308,7 +308,13 @@
 {% block current_user_scripts %}
     <script>
         $(document).ready(function() {
-            $('#data').DataTable();
+            $('#data').DataTable(
+                {
+                    "pageLength": -1, // Display all rows by default
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+                    "stateSave": true, // Save the state of the table
+                }
+            );
         });
     </script>
 {% endblock %}

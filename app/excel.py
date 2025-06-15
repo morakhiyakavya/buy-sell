@@ -201,3 +201,67 @@ def process_excel(file_path):
     print(df.head())
     return df
 
+
+
+import pandas as pd
+
+def create_updated_excel_with_results(original_excel, results_dict):
+    """
+    Creates a new Excel file with original columns + new results as additional columns at the end.
+
+    Parameters:
+    - original_excel: str -> Path to existing Excel file
+    - results_dict: dict -> {username: {col: val, ...}}
+
+    Returns:
+    - merged_df (pd.DataFrame) or None if failed
+    """
+    try:
+        # Load the original Excel as DataFrame
+        df = pd.read_excel(original_excel)
+
+        # Create new results DataFrame
+        results_df = pd.DataFrame.from_dict(results_dict, orient='index')
+
+        # Find the column containing 'pan'
+        username_column = next((col for col in df.columns if 'pan' in col.lower()), None)
+        if not username_column:
+            raise ValueError("No column with 'pan' found in original Excel")
+
+        # Save original column order
+        original_columns = df.columns.tolist()
+
+        # Set the index for joining
+        results_df.index.name = username_column
+        df.set_index(username_column, inplace=True)
+
+        # Merge with suffix if necessary (you can skip suffix if no conflicts expected)
+        merged_df = df.join(results_df, how='left', lsuffix='', rsuffix='_new')
+
+        # Reset index to restore the PAN column
+        merged_df.reset_index(inplace=True)
+
+        # Reorder columns to place PAN back in its original position and new ones at the end
+        final_columns = [col for col in original_columns if col in merged_df.columns] + \
+                        [col for col in merged_df.columns if col not in original_columns]
+
+        merged_df = merged_df[final_columns]
+
+        # Save to the same Excel (or change filename if you want to keep original)
+        merged_df.to_excel(original_excel, index=False)
+        print(f"✅ Excel updated and saved: '{original_excel}'")
+
+        return merged_df
+
+    except Exception as e:
+        import traceback
+        print(f"❌ Error: {e}")
+        print(traceback.format_exc())
+        return None
+
+
+# import json
+# with open(r'C:\Users\kavya\Documents\My_programming\buy-sell\myflaskapp\json\desco.json', 'r', encoding='utf-8') as f:
+    
+#     results_dict = json.load(f)
+# create_updated_excel_with_results(original_excel=r'C:\Users\kavya\Downloads\ajax_allot (1).xlsx', results_dict=results_dict)

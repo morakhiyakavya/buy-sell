@@ -29,6 +29,7 @@
                             <th>Type</th>
                             <th>Price</th>
                             <th>Quantity</th>
+                            <th>Amount</th>
                             <th>Timestamp</th>
                             {% if current_user.type == "buyer" or current_user.type == "admin" %}
                             <th>Seller</th> <!-- New column for actions -->
@@ -60,6 +61,7 @@
                                     data-bs-title="You have submitted {{transaction.items_processed}} ">{{
                                     transaction.details.quantity }}</a></td>
                             {% endif %}
+                            <td>{{ transaction.details.price * transaction.details.quantity }}</td>
                             <td>{{ moment(transaction.timestamp).format('Do MMMM YYYY, h:mm:ss a') }}</td>
                             {% if current_user.type == "buyer" or current_user.type == "admin" %}
                             <th> {{ transaction.seller.first_name.title() }} {{ transaction.seller.last_name.title() }}
@@ -85,14 +87,30 @@
         </div>
     </div>
     <!-- End of list of all transactions -->
+    <div id="datatable-buttons" class="pagination"></div>
 </div>
 {% endblock %}
 
 {% block current_user_scripts %}
 <script>
-    $(document).ready(function () {
-        var table = $('#data').DataTable();
-        fixedHeader: true
+$(document).ready(function () {
+        var table = $('#data').DataTable({
+            "pageLength": -1, // Display all rows by default
+            "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            "stateSave": true, // Save the state of the table
+
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>' +
+                '<"row"<"col-md-12"tr>>' +
+                '<"row"<"col-md-5"i><"col-md-7"p>>',
+            buttons: [
+                { extend: 'excel', className: 'btn btn-primary', text: 'Excel' },
+                { extend: 'pdf', className: 'btn btn-primary', text: 'Pdf' },
+                { extend: 'print', className: 'btn btn-primary', text: 'Print' }
+            ],
+        });
+
+    // Manually append buttons to your designated area
+    table.buttons().container().appendTo($('#datatable-buttons'));
     });
 
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')

@@ -54,14 +54,14 @@ from app.models import (
     Details,
     IPO,
 )
-from app.email import send_user_private_email, send_login_details
-from app.email import send_password_reset_email, request_account_deletion
+from app.my_email import send_user_private_email, send_login_details
+from app.my_email import send_password_reset_email, request_account_deletion
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 
 # Check and Write Allotment in Excel.
 from app.allotment import scrape_data_from_websites, driver_path, IPODetailsScraper
-from app.excel import process_excel_data, write_in_excel, process_excel
+from app.excel import process_excel_data, write_in_excel, process_excel, create_updated_excel_with_results
 
 from app import app, db, socketio
 from sqlalchemy.exc import IntegrityError
@@ -69,29 +69,39 @@ from sqlalchemy import inspect, MetaData
 import requests
 import threading
 import time
+import aiohttp
+from app.tor import renew_ip
+from app.linkin import search_on_pan, get_company_name
+from app.bigshare import big_company, big_pan
+from app.maashitalta import search_on_maashilta, mashilta_company
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
-@app.route('/checkup', methods=['GET'])
-def checkup():
-    return jsonify(status='healthy', message='The server is running smoothly!')
+# from app.bigshare import 
+# from app.cameo import 
 
-def check_server():
-    while True:
-        try:
-            response = requests.get('https://buy-sell-1tuu.onrender.com/checkup')  # Adjust to your deployment URL
-            if response.status_code == 200:
-                print("Server is healthy:", response.json())
-            else:
-                print("Server returned an error:", response.status_code)
-        except requests.exceptions.RequestException as e:
-            print("Error connecting to the server:", e)
-        random_time = randint(10, 50)  # Random time between 30 and 60 seconds
-        time.sleep(random_time)  # Wait for 40 seconds before the next check
-        # time.sleep(5000)  # Wait for 40 seconds before the next check
 
-# Start the background thread
-thread = threading.Thread(target=check_server)
-thread.daemon = True  # Allows the thread to exit when the main program exits
-thread.start()
+# @app.route('/checkup', methods=['GET'])
+# def checkup():
+#     return jsonify(status='healthy', message='The server is running smoothly!')
+
+# def check_server():
+#     while True:
+#         try:
+#             response = requests.get('https://buy-sell-1tuu.onrender.com/')  # Adjust to your deployment URL
+#             if response.status_code == 200:
+#                 print("Server is healthy:", response.json())
+#             else:
+#                 print("Server returned an error:", response.status_code)
+#         except requests.exceptions.RequestException as e:
+#             print("Error connecting to the server:", e)
+#         random_time = randint(10, 50)  # Random time between 30 and 60 seconds
+#         time.sleep(random_time)  # Wait for 40 seconds before the next check
+#         # time.sleep(5000)
+
+# # Start the background thread
+# thread = threading.Thread(target=check_server)
+# thread.daemon = True  # Allows the thread to exit when the main program exits
+# thread.start()
 
 
 # =========================================
@@ -2096,8 +2106,11 @@ def allotment(product_id, ipo, listing_On="bigshare"):
                     transaction_pans = pannum_trans(transactions)
                     for transaction_pan in transaction_pans:
                         usernames.append(transaction_pan.pan.pan_number)        
-            results = scrape_data_from_websites(
-                driver_path, listing_On, ipo, usernames, room, socketio, headless=True)
+            if listing_On != "linkin":
+                results = scrape_data_from_websites(
+                    driver_path, listing_On, ipo, usernames, room, socketio, headless=False)
+            # else :
+            #     results = search_on_pan(ipo, usernames)
             if os.path.exists("json_file/{ipo}"):
                 if not os.path.exists(f"json_file/{ipo}/{buyer_id}"):
                     with open(f"json_file/{ipo}/{buyer_id}", "w") as file:
@@ -2154,22 +2167,102 @@ def checking_allotment():
                 print("Usernames ->", type(usernames))
                 # # Scraping the website
                 print("Socket ->", socketio)
-                results = scrape_data_from_websites(
-                    driver_path, listing_On, ipo, usernames, room, socketio, headless=True
-                )
-                if os.path.exists("json"):
-                    if os.path.exists(f"json/{ipo}.json"):
-                        with open(f"json/{ipo}.json", "w") as file:
-                            json.dump(results, file)  # Save the results to a JSON file
+                if listing_On == "kfintech":
+                    results = scrape_data_from_websites(
+                        driver_path, listing_On, ipo, usernames, room, socketio, headless=False
+                    )
+                else: 
+                    if listing_On == "linkin":
+                        company_name = form.ipo.data.strip()
+                        company_id = get_company_name(company_name)
+                        results = {}
+                        # for username in usernames:
+                        #     results = search_on_pan(company_id, username)
+                        start_time = time.time()
+                        with ThreadPoolExecutor(max_workers=20) as executor:
+                            futures = {executor.submit(search_on_pan, company_id, u): u for u in usernames}
+                            
+                            for i, future in enumerate(as_completed(futures), 1):
+                                u = futures[future]  # Get the associated username/PAN
+                                result = future.result()
+                                for key, values in result.items():
+                                    print(f"The result for {i}: \n {result}")
+                                    if isinstance(values, dict) or isinstance(values, list):
+                                        # check if the values dict has a key Table1
+                                        if isinstance(values, dict) and "Table1" in values.keys():
+                                            print(f"Table1 found for {u}: {values['Table1']}")
+                                            results[u] = {'Error' : "Invalid PAN"}
+                                        else:
+                                            while isinstance(result, dict) and any(isinstance(v, dict) for v in result.values()):
+                                                # Go one level deeper (to the first nested dict)
+                                                result = next(v for v in result.values() if isinstance(v, dict))
+
+                                            results[u] = result
+                                    else:
+                                        print(f"Invalid data type for {u}: {values}")
+                                        results[u] = {'Error': 'No record found'}
+                                
+                                # Optionally renew IP every 50 users
+                                if i % 50 == 0:
+                                    renew_ip()
+                        end_time = time.time()
+                        print(f"Time taken for {len(usernames)} users: {end_time - start_time} seconds")
+                        # print("Results ->", results)
+                    elif listing_On == "bigshare":
+                        company_id = big_company(form.ipo.data.strip())
+                        results = {}
+                        start_time = time.time()
+                        with ThreadPoolExecutor(max_workers=20) as executor:
+                            futures = {executor.submit(big_pan, company_id, u): u for u in usernames}
+                            
+                            for i, future in enumerate(as_completed(futures), 1):
+                                u = futures[future]
+                                result = future.result()
+                                if result['DPID'] == "No data found":
+                                    results[u] = {'Error': 'No record found'}
+                                    print(f"No data found for {u}: {result['DPID']}")
+                                else:
+                                    results[u] = result                                 
+                            if i % 50 == 0:
+                                renew_ip()
+                        print("Results ->\n","---"*20,"\n", results)
+                        end_time = time.time()
+                        print(f"Time taken for {len(usernames)} users: {end_time - start_time} seconds")
+                    elif listing_On == "maashilta":
+                        print("Maashilta")
+                        company_id = mashilta_company(form.ipo.data.strip())
+                        results = {}
+                        start_time = time.time()
+                        with ThreadPoolExecutor(max_workers=20) as executor:
+                            futures = {executor.submit(search_on_maashilta, company_id, u): u for u in usernames}
+
+                            for i, future in enumerate(as_completed(futures), 1):
+                                u = futures[future]
+                                result = future.result()
+                                results[u] = result
+                                if i % 50 == 0:
+                                    renew_ip()
+                try:
+                    if os.path.exists("json"):
+                        if os.path.exists(f"json/{ipo}.json"):
+                            with open(f"json/{ipo}.json", "w") as file:
+                                json.dump(results, file)  # Save the results to a JSON file
+                        else:
+                            with open(f"json/{ipo}.json", "w") as file:
+                                json.dump(results[0], file)
                     else:
+                        os.makedirs("json")  # Create the folder if it does not exist
                         with open(f"json/{ipo}.json", "w") as file:
                             json.dump(results, file)
-                else:
-                    os.makedirs("json")  # Create the folder if it does not exist
-                    with open(f"json/{ipo}.json", "w") as file:
-                        json.dump(results, file)
+                except Exception as e:
+                    print("An error occurred while saving the JSON file:", str(e))
+                    print(f"Error type: {type(e).__name__}")
+                    pass
                 # Saving the results
-                write_in_excel(filepath, results, pan_Column)
+                if listing_On == 'kfintech':
+                    write_in_excel(filepath, results, pan_Column)
+                else :
+                    create_updated_excel_with_results(filepath, results)
                 file_ready = True
                 return download_updated_file(filepath)
             return render_template(
@@ -2183,6 +2276,12 @@ def checking_allotment():
             return flash_message()
     except Exception as e:
         print("An error occurred:", str(e))
+        print(f"Error type: {type(e).__name__}")
+        print(f"Error details: {e.args}")
+        # full error stack trace
+        import traceback
+        traceback.print_exc()
+
         # Handle the exception here or re-raise it if necessary
         return f"Error : {e}", 400
 
