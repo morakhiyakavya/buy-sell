@@ -1839,9 +1839,6 @@ def count_pan(transaction_id):
     return count
 
 
-
-
-
 @app.route("/delete-transaction/<int:id>", methods=["GET", "POST"])
 @login_required
 def delete_transaction(id):
@@ -2110,7 +2107,6 @@ def allotment(product_id, ipo, listing_On="bigshare"):
                 results = scrape_data_from_websites(
                     driver_path, listing_On, ipo, usernames, room, socketio, headless=False)
             # else :
-            #     results = search_on_pan(ipo, usernames)
             if os.path.exists("json_file/{ipo}"):
                 if not os.path.exists(f"json_file/{ipo}/{buyer_id}"):
                     with open(f"json_file/{ipo}/{buyer_id}", "w") as file:
@@ -2176,33 +2172,20 @@ def checking_allotment():
                         company_name = form.ipo.data.strip()
                         company_id = get_company_name(company_name)
                         results = {}
-                        # for username in usernames:
-                        #     results = search_on_pan(company_id, username)
                         start_time = time.time()
                         with ThreadPoolExecutor(max_workers=20) as executor:
                             futures = {executor.submit(search_on_pan, company_id, u): u for u in usernames}
                             
                             for i, future in enumerate(as_completed(futures), 1):
-                                u = futures[future]  # Get the associated username/PAN
-                                result = future.result()
-                                for key, values in result.items():
-                                    print(f"The result for {i}: \n {result}")
-                                    if isinstance(values, dict) or isinstance(values, list):
-                                        # check if the values dict has a key Table1
-                                        if isinstance(values, dict) and "Table1" in values.keys():
-                                            print(f"Table1 found for {u}: {values['Table1']}")
-                                            results[u] = {'Error' : "Invalid PAN"}
-                                        else:
-                                            while isinstance(result, dict) and any(isinstance(v, dict) for v in result.values()):
-                                                # Go one level deeper (to the first nested dict)
-                                                result = next(v for v in result.values() if isinstance(v, dict))
+                                u = futures[future]
+                                try:
+                                    result = future.result()
+                                    print(f"Result for {i} ({u}): {result}")
+                                    results[u] = result
+                                except Exception as e:
+                                    print(f"❌ Error processing {u}: {e}")
+                                    results[u] = {"Error": str(e)}
 
-                                            results[u] = result
-                                    else:
-                                        print(f"Invalid data type for {u}: {values}")
-                                        results[u] = {'Error': 'No record found'}
-                                
-                                # Optionally renew IP every 50 users
                                 if i % 50 == 0:
                                     renew_ip()
                         end_time = time.time()

@@ -88,7 +88,7 @@ def search_on_pan(clientid, pan, ifsc="", chkval="1"):
 
     if clientid is None:
         print("Error: No matching company found.")
-        return {"error": "Company not found"}
+        return {"Error": "Company not found"}
     
     token = generate_token()
     encrypted_token = encrypt_value(token)
@@ -106,23 +106,61 @@ def search_on_pan(clientid, pan, ifsc="", chkval="1"):
     response = make_request_through_tor(session, url, json=payload, headers=headers, post=True)
 
     if response.status_code != 200:
-        raise Exception(f"Error in SearchOnPan: {response.text}")
+        return {"Error": f"HTTP {response.status_code}: {response.text}"}
 
     try:
         json_data = response.json()
-        xml_string = json_data.get("d")  # Extract XML from JSON
-        data_dict = xmltodict.parse(xml_string)  # Parse XML
+        xml_string = json_data.get("d")
+        data_dict = xmltodict.parse(xml_string)
     except (json.JSONDecodeError, KeyError, xmltodict.expat.ExpatError):
         print("Error parsing response.")
-        return {"error": "Invalid response format"}
+        return {"Error": "Invalid response format"}
 
-    readable_dict = json.loads(json.dumps(data_dict, indent=2))
+    readable_dict = json.loads(json.dumps(data_dict))
 
-    return readable_dict
+    new_dataset = readable_dict.get("NewDataSet")
+
+    if new_dataset is None:
+        return {"Error": "No record found"}
+
+    if "Table1" in new_dataset:
+        return {"Error": "Invalid PAN"}
+
+    table_data = new_dataset.get("Table")
+
+    if isinstance(table_data, dict):
+        return table_data
+
+    if isinstance(table_data, list):
+    # Find the index of the "Shareholder" entry (if it exists and not already at index 1)
+        shareholder_index = next((i for i, item in enumerate(table_data) if item.get("PEMNDG") == "Shareholder"), None)
+
+        if shareholder_index is not None and shareholder_index != 1:
+            # Swap the entry at index 1 with the shareholder entry
+            table_data[shareholder_index], table_data[1] = table_data[1], table_data[shareholder_index]
+
+        flat_result = {}
+        for idx, entry in enumerate(table_data, 1):
+            for k, v in entry.items():
+                if idx == 1:
+                    flat_result[k] = v
+                else:
+                    flat_result[f"{k}_{idx}"] = v
+        return flat_result
+
+
+
+    return {"Error": "Unexpected Table format"}
 
 # Example: Search for PAN
-company = get_company_name("Belrise Industries Limited")
-print(search_on_pan(company, "DEWPG1078F"))
+# company = get_company_name("OSWAL")
+# print(search_on_pan(company, "OMOPS4188F"))
+# print(search_on_pan(company, "BKIPS5813G"))
+# print(search_on_pan(company, "HQTPS3086L"))
+# print(search_on_pan(company, "AWUPP67080"))
 
 # end_time = time.time()
 # print(f"Time taken: {end_time - start_time} seconds")
+
+def normalize_data(data):
+    pass

@@ -1,3 +1,5 @@
+*.txt
+*.png
 migrations/
 upload_folder/
 logs/
@@ -15,4 +17,3 @@ tree.txt
 json_file/
 app.db
 myflaskapp/app.db
-```
