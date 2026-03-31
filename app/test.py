@@ -1,174 +1,147 @@
-import re
-from bs4 import BeautifulSoup
+import math
+from typing import Dict, Any
 
-# Sample HTML content (replace it with your actual content)
-html_content = '''
-<div class="MuiTableContainer-root css-kge0eu">
-    <table class="MuiTable-root css-1owb465">
-        <tbody class="MuiTableBody-root css-1xnox0e">
-            <tr class="MuiTableRow-root css-15mmw0j">
-                <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                    <div
-                        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-1c4y56n">
-                        <div class="MuiCardContent-root css-1qw96cp">
-                            <div class="css-j7qwjs">
-                                <div class="MuiGrid-root MuiGrid-container css-yrcxbo">
-                                    <div class="MuiGrid-root css-1kgy3g2" style="justify-content: right;">
-                                        <div
-                                            class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorError MuiChip-filledError css-1oacwxg">
-                                            <span class="MuiChip-label MuiChip-labelSmall css-tavflp">Not
-                                                Allotted</span></div>
-                                    </div>
-                                </div>
-                                <table class="MuiTable-root css-1owb465">
-                                    <tbody class="MuiTableBody-root css-1xnox0e">
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Application Number:
-                                                </a><br><b>MB00000016379727</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Category: </a><br><b>Shareholder</b></td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Name: </a><br><b>MASTER. KAVYA SHRENIKBHAI
-                                                    SHAH</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                            </td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">DP ID Client ID: </a><br><b>12041XXXXXX77520</b>
-                                            </td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">PAN: </a><br><b>XXXXXX188F</b></td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Applied: </a><br><b>2782</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Allotted: </a><br><b>0</b></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-            <tr class="MuiTableRow-root css-15mmw0j">
-                <td class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                    <div
-                        class="MuiPaper-root MuiPaper-elevation MuiPaper-rounded MuiPaper-elevation1 MuiCard-root css-1c4y56n">
-                        <div class="MuiCardContent-root css-1qw96cp">
-                            <div class="css-j7qwjs">
-                                <div class="MuiGrid-root MuiGrid-container css-yrcxbo">
-                                    <div class="MuiGrid-root css-1kgy3g2" style="justify-content: right;">
-                                        <div
-                                            class="MuiChip-root MuiChip-filled MuiChip-sizeSmall MuiChip-colorError MuiChip-filledError css-1oacwxg">
-                                            <span class="MuiChip-label MuiChip-labelSmall css-tavflp">Not
-                                                Allotted</span></div>
-                                    </div>
-                                </div>
-                                <table class="MuiTable-root css-1owb465">
-                                    <tbody class="MuiTableBody-root css-1xnox0e">
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Application Number:
-                                                </a><br><b>N000000016602766</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Category: </a><br><b>Non Institutional</b></td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Name: </a><br><b>MASTER. KAVYA SHRENIKBHAI
-                                                    SHAH</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                            </td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">DP ID Client ID: </a><br><b>12041XXXXXX77520</b>
-                                            </td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">PAN: </a><br><b>XXXXXX188F</b></td>
-                                        </tr>
-                                        <tr class="MuiTableRow-root css-15mmw0j">
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Applied: </a><br><b>14338</b></td>
-                                            <td
-                                                class="MuiTableCell-root MuiTableCell-body MuiTableCell-sizeMedium css-qkqlx2">
-                                                <a style="color: grey;">Allotted: </a><br><b>0</b></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-'''
+def compute_category(data: Dict[str, Any], premium: float) -> Dict[str, Any]:
+    """
+    Compute all per‑category costings, totals and rate allocations.
+    Expects data keys:
+      SUB_1_FORMS, SUB_1_AVG_PRICE,
+      SUB_2_FORMS, SUB_2_AVG_PRICE,
+      SUB_3_FORMS, SUB_3_AVG_PRICE,
+      LOT_SIZE, REQUIRED, EXPECTATION, RATES/MARGIN
+    """
+    # 1) Validate required fields
+    for key in ("LOT_SIZE", "REQUIRED", "EXPECTATION", "RATES/MARGIN"):
+        if data.get(key) is None:
+            raise KeyError(f"{key} is required for this category")
 
-# Parse the HTML
-soup = BeautifulSoup(html_content, 'html.parser')
+    # 2) Total forms and individual costing
+    total_forms = sum(data[f"SUB_{i}_FORMS"] for i in (1, 2, 3))
+    costings = {
+        f"sub_{i}_cost": data[f"SUB_{i}_FORMS"] * data[f"SUB_{i}_AVG_PRICE"]
+        for i in (1, 2, 3)
+    }
 
-# Initialize result_data dictionary
-result_data = {}
+    # 3) Rate allocations
+    sub_1_rate = round(
+        premium * data["LOT_SIZE"] * data["REQUIRED"]
+        / data["EXPECTATION"]
+    )
+    sub_2_rate = round(
+        data["LOT_SIZE"] * (data["RATES/MARGIN"] / 100) * premium
+    )
 
-# Find all relevant divs
-divs = soup.find_all('div', class_='MuiCardContent-root css-1qw96cp')
-print(f"Found {len(divs)} divs with class 'MuiCardContent-root css-1qw96cp'")
+    return {
+        "total_forms": total_forms,
+        **costings,
+        "sub_1_rate": sub_1_rate,
+        "sub_2_rate": sub_2_rate,
+    }
 
-# Define the order of keys
-keys = [
-    'application_number',
-    'category',
-    'name',
-    'dp_id_client_id',
-    'pan',
-    'applied',
-    'allotted'
-]
 
-# Iterate over each div and extract data
-for i, div in enumerate(divs, start=1):
-    print(f"\nProcessing div {i}")
-    
-    # Extract bold text from the div
-    bold_texts = div.find_all('b')
-    print(f"Found {len(bold_texts)} bold elements in div {i}")
-    
-    # Initialize a dictionary to hold data for the current div
-    current_data = {}
-    
-    # Assign bold text to keys in the defined order
-    for index, bold in enumerate(bold_texts):
-        text = bold.get_text(strip=True)
-        if index < len(keys):
-            key = keys[index]
-            current_data[f"{key}_{i}"] = re.sub(r'\s+', ' ', text.strip())
-            print(f"Added to current_data: {key}_{i}: {text}")
-    
-    # Merge current data into result_data
-    result_data.update(current_data)
+def make_calculation(
+    company_data: Dict[str, Dict[str, Any]]
+) -> Dict[str, Any]:
+    """
+    Runs compute_category for Retail, SHNI, HNI (with full costings),
+    and handles SHARE purely as a total‑forms bucket.
+    Aggregates into expected / pending shares & costs.
+    """
+    premium = company_data.get("premium", 1.0)
 
-# Print the result_data dictionary
-print("\nFinal result_data:", result_data)
+    # --- 1) Per‑category breakdown for costed groups ---
+    costed_cats = ("Retail", "SHNI", "HNI")
+    results_by_cat: Dict[str, Dict[str, Any]] = {}
+    for cat in costed_cats:
+        results_by_cat[cat] = compute_category(company_data[cat], premium)
+
+    # --- 2) SHARE: totals only (no costings/rates) ---
+    share = company_data.get("SHARE", {})
+    share_total_forms = sum(share.get(f"SUB_{i}_FORMS", 0) for i in (1, 2, 3))
+    results_by_cat["SHARE"] = {
+        "total_forms": share_total_forms
+    }
+
+    # --- 3) Expected shares = sum of rounded allocations for Retail, SHNI, HNI ---
+    expected_share = sum(
+        math.ceil(
+            results_by_cat[cat]["total_forms"]
+            * company_data[cat]["LOT_SIZE"]
+            * company_data[cat]["REQUIRED"]
+            / company_data[cat]["EXPECTATION"]
+        )
+        for cat in costed_cats
+    )
+
+    # --- 4) Pending shares = SHARE total forms + expected_share ---
+    pending_share = share_total_forms + expected_share
+
+    # --- 5) Total costings (only Retail, SHNI, HNI) ---
+    expected_total_cost = sum(
+        sum(results_by_cat[cat][f"sub_{i}_cost"] for i in (1, 2, 3))
+        for cat in costed_cats
+    )
+    # We have no share‑costs, so pending_total_cost = expected_total_cost
+    pending_total_cost = expected_total_cost
+
+    # --- 6) Cost per share ---
+    expected_per_share_cost = expected_total_cost / expected_share
+    pending_per_share_cost = pending_total_cost / pending_share
+
+    return {
+        "results_by_category": results_by_cat,
+        "expected_share": expected_share,
+        "pending_share": pending_share,
+        "expected_total_cost": expected_total_cost,
+        "pending_total_cost": pending_total_cost,
+        "expected_per_share_cost": expected_per_share_cost,
+        "pending_per_share_cost": pending_per_share_cost,
+    }
+
+
+if __name__ == "__main__":
+    # === Example data (you can load this dict from Excel via pandas) ===
+    company_data = {
+        "Retail": {
+            "SUB_1_FORMS":  5, "SUB_1_AVG_PRICE":  10,
+            "SUB_2_FORMS":  0, "SUB_2_AVG_PRICE":   0,
+            "SUB_3_FORMS":  0, "SUB_3_AVG_PRICE":   0,
+            "LOT_SIZE":    63, "REQUIRED":     46782,
+            "EXPECTATION": 800000, "RATES/MARGIN": 80,
+        },
+        "SHNI": {
+            "SUB_1_FORMS":  0, "SUB_1_AVG_PRICE":   0,
+            "SUB_2_FORMS":  0, "SUB_2_AVG_PRICE":   0,
+            "SUB_3_FORMS":  0, "SUB_3_AVG_PRICE":   0,
+            "LOT_SIZE":   882, "REQUIRED":      1671,
+            "EXPECTATION":30000, "RATES/MARGIN": 80,
+        },
+        "HNI": {
+            "SUB_1_FORMS":  0, "SUB_1_AVG_PRICE":   0,
+            "SUB_2_FORMS":  0, "SUB_2_AVG_PRICE":   0,
+            "SUB_3_FORMS":  0, "SUB_3_AVG_PRICE":   0,
+            "LOT_SIZE":   882, "REQUIRED":      3342,
+            "EXPECTATION":10000, "RATES/MARGIN": 80,
+        },
+        "SHARE": {
+            "SUB_1_FORMS": 0, "SUB_1_AVG_PRICE": 0,
+            "SUB_2_FORMS":  0, "SUB_2_AVG_PRICE": 0,
+            "SUB_3_FORMS":  0, "SUB_3_AVG_PRICE": 0,
+            # no LOT_SIZE, REQUIRED, etc.
+        },
+        "premium": 23
+    }
+
+    results = make_calculation(company_data)
+
+    # Display
+    print("=== Results by Category ===")
+    for cat, rez in results["results_by_category"].items():
+        print(f"{cat}: {rez}")
+    print("\n=== Aggregates ===")
+    print(f"Expected Shares:      {results['expected_share']}")
+    print(f"Pending Shares:       {results['pending_share']}")
+    print(f"Expected Total Cost:  {results['expected_total_cost']}")
+    print(f"Pending Total Cost:   {results['pending_total_cost']}")
+    print(f"Cost per Expected:    {results['expected_per_share_cost']:.2f}")
+    print(f"Cost per Pending:     {results['pending_per_share_cost']:.2f}")

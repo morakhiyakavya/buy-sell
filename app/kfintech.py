@@ -1,142 +1,292 @@
-import re
-import base64
-import urllib.parse
-
 import requests
-from bs4 import BeautifulSoup
-from Crypto.Cipher  import AES
-from Crypto.Util.Padding import pad, unpad
-from PIL             import Image
-from io              import BytesIO
-from captcha import predict_captcha
-#     img.save("C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\captcha.png")
+try:
+    from app.tor import make_request_through_tor
+except ImportError:
+    from tor import make_request_through_tor
+import json
+import re
+import difflib
+import os
+from urllib.parse import quote_plus, urljoin
 
-# predict = predict_captcha(None, 'kfintech')
-# print(predict)
+API_URL = "https://0uz601ms56.execute-api.ap-south-1.amazonaws.com/prod/api/query"
 
-BASE = "https://rti.kfintech.com/ipostatus/"
+# cache for client list
+_CLIENT_LIST = None
 
-def aes_encrypt(plain_text: str, key_str: str) -> str:
-    """Encrypts the given plain text using AES-128-CBC with the provided key."""
-    key = key_str.encode('utf-8')  # Convert key to bytes
-    iv = key  # Using key as IV (not recommended for security, but matching given logic)
-    
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    padded_text = pad(plain_text.encode('utf-8'), AES.block_size)
-    encrypted_bytes = cipher.encrypt(padded_text)
-    
-    return base64.b64encode(encrypted_bytes).decode('utf-8')
-
-def aes_decrypt(encrypted_base64: str, key_str: str) -> str:
-    """Decrypts the given Base64-encoded AES-128-CBC ciphertext using the provided key."""
-    key = key_str.encode('utf-8')
-    iv = key  # Using key as IV
-    
-    encrypted_bytes = base64.b64decode(encrypted_base64)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    decrypted_bytes = unpad(cipher.decrypt(encrypted_bytes), AES.block_size)
-    
-    return decrypted_bytes.decode('utf-8')
-
-
-def aes_encrypt(plain_text: str, key_str: str) -> str:
+def fetch_client_list(js_url=None, local_json_path=None):
+    """Return a list of client dicts with keys 'clientId' and 'name'.
+    Tries in order:
+    - load local JSON file if provided/exists
+    - fetch and parse the KFintech JS file
+    Returns list or empty list on failure.
     """
-    AES‑128‑CBC encrypt & base64‑encode, using key_str both as key and IV.
-    (Matches kfintech’s JS logic.)
+    global _CLIENT_LIST
+    if _CLIENT_LIST is not None:
+        return _CLIENT_LIST
+
+    # try local JSON first
+    if local_json_path and os.path.exists(local_json_path):
+        try:
+            with open(local_json_path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+                _CLIENT_LIST = data
+                return _CLIENT_LIST
+        except Exception:
+            pass
+
+    # determine js_url: use provided, else try to discover current main.*.js from homepage
+    if not js_url:
+        try:
+            home = requests.get("https://ipostatus.kfintech.com/", timeout=10)
+            home.raise_for_status()
+            # try to find a script tag with src containing /static/js/main.<hash>.js
+            m = re.search(r"src=[\'\"]([^\'\"]*?/static/js/main\.[^\'\"]+\.js)[\'\"]", home.text)
+            if m:
+                js_url = m.group(1)
+                if js_url.startswith("/"):
+                    js_url = "https://ipostatus.kfintech.com" + js_url
+            else:
+                # fallback: search for any main.<hash>.js occurrence
+                m2 = re.search(r"(/static/js/main\.[^\'\"\s>]+\.js)", home.text)
+                if m2:
+                    js_url = "https://ipostatus.kfintech.com" + m2.group(1)
+                else:
+                    # last-resort fallback to a previously-seen filename
+                    js_url = "https://ipostatus.kfintech.com/static/js/main.fe1258b3.js"
+        except Exception:
+            # network or parsing error: fall back to provided js_url or known filename
+            js_url = js_url or "https://ipostatus.kfintech.com/static/js/main.fe1258b3.js"
+
+    # Normalize relative script URLs (e.g. './static/js/main.e2d1ff44.js')
+    base_host = "https://ipostatus.kfintech.com/"
+    js_url = (js_url or "").strip()
+    if js_url.startswith("//"):
+        js_url = "https:" + js_url
+    if not js_url.lower().startswith("http"):
+        js_url = urljoin(base_host, js_url)
+
+    print(f"Fetching client-list JS from: {js_url}")
+    try:
+        r = requests.get(js_url, timeout=15)
+        r.raise_for_status()
+        js_text = r.text
+        # First, try to find JSON.parse('...') or JSON.parse("...") that embeds the client-list
+        m_jsonparse = re.search(r"JSON\.parse\(\s*['\"](\s*\[\s*\{[^\]]*?clientId[^\]]*?\]\s*)['\"]\s*\)", js_text, re.DOTALL)
+        if m_jsonparse:
+            candidate = m_jsonparse.group(1)
+            try:
+                # unescape common JS escapes inside the string literal
+                candidate = candidate.encode('utf-8').decode('unicode_escape')
+            except Exception:
+                # if unescape fails, proceed with the raw candidate
+                pass
+        else:
+            # find an array of objects containing clientId
+            m = re.search(r"(\[\s*\{[^\]]*?clientId[^\]]*?\])", js_text, re.DOTALL)
+            if not m:
+                # fallback scanning around clientId
+                idx = js_text.find('clientId')
+                if idx == -1:
+                    return []
+                start = js_text.rfind('[', 0, idx)
+                end = js_text.find(']', idx)
+                if start == -1 or end == -1:
+                    return []
+                candidate = js_text[start:end+1]
+            else:
+                candidate = m.group(1)
+
+        # try to load as JSON
+        try:
+            data = json.loads(candidate)
+        except Exception:
+            # remove trailing commas and try again
+            cleaned = re.sub(r",\s*\]", "]", candidate)
+            cleaned = cleaned.replace("'", '"')
+            data = json.loads(cleaned)
+
+        # normalize entries to have clientId and name
+        clients = []
+        for item in data:
+            cid = item.get('clientId') or item.get('clientid') or item.get('clientID')
+            name = item.get('name') or item.get('label') or item.get('company')
+            if cid and name:
+                clients.append({'clientId': str(cid), 'name': name.strip()})
+
+        _CLIENT_LIST = clients
+        return _CLIENT_LIST
+    except Exception:
+        return []
+
+
+def get_client_id_for_ipo(ipo_name, cutoff=0.6):
+    """Fuzzy-match `ipo_name` against the client list and return the clientId (string).
+    Returns None if no good match is found.
     """
-    key = key_str.encode('utf‑8')
-    iv  = key
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    ct = cipher.encrypt(pad(plain_text.encode('utf‑8'), AES.block_size))
-    return base64.b64encode(ct).decode()
+    if not ipo_name:
+        return None
+    clients = fetch_client_list()
+    print(f"Matching IPO name '{ipo_name}' against {(clients)} clients")
+    if not clients:
+        return None
+    names = [c['name'] for c in clients]
+    # use difflib to find best match
+    matches = difflib.get_close_matches(ipo_name, names, n=3, cutoff=cutoff)
+    if matches:
+        best = matches[0]
+        for c in clients:
+            if c['name'] == best:
+                return c['clientId']
+    # try case-insensitive substring match
+    ipo_upper = ipo_name.strip().upper()
+    for c in clients:
+        if ipo_upper in c['name'].upper() or c['name'].upper() in ipo_upper:
+            return c['clientId']
+    return None
 
-def solve_captcha(session: requests.Session, img_url: str) -> str:
+
+def query_pan_status_tor(pan_list, client_id=None, ipo_name=None):
     """
-    Download the one‑time CAPTCHA and OCR it with Tesseract.
+    Query PAN status for a list of PANs using the new KFintech API, with Tor integration.
+    Returns a dict mapping PAN to response JSON or error.
     """
-    r = session.get(img_url)
-    r.raise_for_status()
-    img = Image.open(BytesIO(r.content))
-    # Tesseract psm=8 is good for single words
-    img.save("C:\\Users\\kavya\\Documents\\My_programming\\buy-sell\\myflaskapp\\app\\captcha.png")
+    results = {}
+    for pan in pan_list:
+        headers = {
+            "accept": "application/json, text/plain, */*",
+            "accept-language": "en-US,en;q=0.9",
+            "access-control-allow-origin": "*",
+            "client_id": client_id or None,
+            "origin": "https://ipostatus.kfintech.com",
+            "priority": "u=1, i",
+            "referer": "https://ipostatus.kfintech.com/",
+            "reqparam": pan,
+            "sec-ch-ua": '"Not;A=Brand";v="99", "Google Chrome";v="139", "Chromium";v="139"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "cross-site",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36"
+        }
+        session = requests.Session()
+        try:
+            tor = True
+            if tor:
+                # make_request_through_tor does not accept `params`, so embed them in the URL
+                q = f"type=pan&reqparam={quote_plus(pan)}"
+                url = f"{API_URL}?{q}"
+                response = make_request_through_tor(session, url, headers=headers)
+            else:
+                response = session.get(API_URL, headers=headers, params={"type": "pan", "reqparam": pan})
+            # print(f"PAN: {pan} => Status Code: {response.status_code}")
+            # print(f"Response Text: {response.text}")
+            if response.status_code == 200:
+                try:
+                    json_resp = response.json()
+                    # If the API returns {'data': [ {...} ]}, flatten to the inner dict
+                    if isinstance(json_resp, dict) and 'data' in json_resp and isinstance(json_resp['data'], list) and len(json_resp['data']) > 0 and isinstance(json_resp['data'][0], dict):
+                        # Use local variable for clearer ref
+                        data_list = json_resp['data']
 
-    predict = predict_captcha(None, 'kfintech')
-    print(predict)
-    return  predict
+                        try:
+                            if ipo_name and "icic" in ipo_name.lower():
+                                # ICIC Special: Push 'Shareholder' (90 shares) to the bottom (higher sort key)
+                                # Primary: Not 90 shares (0)
+                                # Secondary: 90 shares (1)
+                                # Tie-breaker: Shares Amount (Ascending)
+                                data_list.sort(key=lambda x: (
+                                    1 if int(float(x.get('App_Shares', 0) or 0)) == 90 else 0,
+                                    int(float(x.get('App_Shares', 0) or 0))
+                                ))
+                            else:
+                                # Default: Sort by App_Shares (ascending) to ensure consistency
+                                # HEURISTIC: Smallest application first (likely Retail)
+                                data_list.sort(key=lambda x: int(float(x.get('App_Shares', 0) or 0)))
+                        except Exception as e:
+                            print(f"Error sorting data list: {e}")
 
-# 3) Main flow
-def fetch_status(ipo_val, pan):
-    s = requests.Session()
-    s.headers.update({
-        "User-Agent": (
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) "
-            "Chrome/114.0.0.0 Safari/537.36"
-        )
-    })
-
-    # GET landing page
-    r = s.get(BASE); r.raise_for_status()
-    soup = BeautifulSoup(r.text, "html.parser")
-
-    # one‑time token
-    onclk = soup.find("a", id="btn_submit_query")["onclick"]
-    token = re.search(r"validate_all\('([^']+)'\)", onclk).group(1)
-
-    # ASP.NET hidden fields
-    vs = soup.find(id="__VIEWSTATE")         ["value"]
-    vg = soup.find(id="__VIEWSTATEGENERATOR")["value"]
-    ev = soup.find(id="__EVENTVALIDATION")   ["value"]
-
-    # CAPTCHA
-    cap_url = urllib.parse.urljoin(BASE, soup.find(id="captchaimg")["src"])
-    captcha = solve_captcha(s, cap_url)
-    print("Captcha:", captcha)
-
-    # encrypt PAN
-    pan_enc = aes_encrypt(pan, token)
-
-    # POST form
-    data = {
-      "__EVENTTARGET":        "btn_submit_query",
-      "__EVENTARGUMENT":      "",
-      "__LASTFOCUS":          "",
-      "__VIEWSTATE":          vs,
-      "__VIEWSTATEGENERATOR": vg,
-      "__EVENTVALIDATION":    ev,
-
-      "ddl_ipo":         ipo_val,
-      "query":           "pan",
-      "txt_pan":         pan_enc,
-      "txt_captcha":     captcha,
-      "_h_query":        "pan",
-      "encrypt_payload": "Y",
-      "req_src":         "",
-    }
-    post = s.post(BASE, data=data)
-    post.raise_for_status()
-    return post.text
+                        # Start with the first data record (after sorting)
+                        flat = dict(data_list[0])
+                        
+                        # Check for additional records and flatten them
+                        if len(data_list) > 1:
+                            for idx, record in enumerate(data_list[1:], start=2):
+                                if isinstance(record, dict):
+                                    for rk, rv in record.items():
+                                        flat[f"{rk}_{idx}"] = rv
+                        
+                        # Merge other top-level keys if they are not 'data' and not duplicated
+                        for k, v in json_resp.items():
+                            if k == 'data':
+                                continue
+                            if k not in flat:
+                                flat[k] = v
+                            else:
+                                # avoid overwriting keys from data; prefix if needed
+                                flat[f"top_{k}"] = v
+                        results[pan] = flat
+                    elif isinstance(json_resp, dict):
+                        # Already a dict but no 'data' list; use as-is
+                        results[pan] = json_resp
+                    else:
+                        # Unexpected structure; store raw text
+                        results[pan] = {"text": response.text}
+                except Exception:
+                    results[pan] = {"error": "Invalid JSON", "text": response.text}
+            else:
+                results[pan] = {"error": f"HTTP {response.status_code}", "text": response.text}
+        except Exception as e:
+            results[pan] = {"error": str(e)}
+            print(f"PAN: {pan} => Error: {e}")
+    return results
 
 
-# 4) Parse out the result
-def parse_result(html: str):
-    soup = BeautifulSoup(html, "html.parser")
-    print(soup.prettify())
-    no_results = soup.select_one("#grid_results td .badge.bg-danger")
-    if no_results:
-        return {"status":"Not Allotted"}
-    card = soup.select_one("#grid_results .result-card .card-body")
-    out = {}
-    for row in card.select(".successtxt2 .qvalue"):
-        # they come in order: appl no, name, client id, pan, applied, allotted
-        # you can map them however you like
-        print(row.get_text(strip=True))
-    return out
+def print_client_list(ipo_name=None):
+    """Print fetched clientId/name pairs and optionally fuzzy-match an IPO name.
 
+    Returns the list of clients (list of dicts). If ipo_name is provided, also
+    prints the best fuzzy-match clientId.
+    """
+    clients = fetch_client_list()
+    best = None
+    if ipo_name:
+        best = get_client_id_for_ipo(ipo_name)
+        if best:
+            print(f"Best match for IPO '{ipo_name}': clientId={best}")
+        else:
+            print(f"No clientId match found for IPO '{ipo_name}'")
+
+    print(f"Total clients fetched: {len(clients)}")
+    for c in clients:
+        print(f"clientId={c['clientId']}\tname={c['name']}")
+
+    return clients if not ipo_name else (clients, best)
+
+# Example usage
 if __name__ == "__main__":
-    # 1) Copy‑paste exactly an <option> value from the page’s IPO dropdown:
-    ddl = "ANTB~AnthemBio~0~17/07/2025~17/07/2025~EQT"
-    pan = "OMOPS4188F"
+    import sys
 
-    html = fetch_status(ddl, pan)
-    print(parse_result(html))
+    # If an argument is provided, treat it as an IPO name to fuzzy-match
+    if len(sys.argv) > 1:
+        ipo_name = " ".join(sys.argv[1:]).strip()
+        cid = get_client_id_for_ipo(ipo_name)
+        if cid:
+            print(f"Best match for IPO '{ipo_name}': clientId={cid}")
+        else:
+            print(f"No clientId match found for IPO '{ipo_name}'")
+        # Also print the full client list for debugging
+        clients = fetch_client_list()
+        print(f"\nTotal clients fetched: {len(clients)}")
+        for c in clients:
+            print(f"clientId={c['clientId']}	name={c['name']}")
+    else:
+        # No args: print all clientId and company names
+        clients = fetch_client_list()
+        print(f"Total clients fetched: {len(clients)}")
+        for c in clients:
+            print(f"clientId={c['clientId']}	name={c['name']}")
+        # Example PAN query left commented for convenience
+        # pan_list = ["OMOPS4188F"]  # Add more PANs as needed
+        # print(query_pan_status_tor(pan_list))

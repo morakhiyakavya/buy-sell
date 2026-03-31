@@ -1,0 +1,1092 @@
+[
+  {
+    "pan": "ABVFA3322P",
+    "result": {
+      "applicant_name": "MR. DINESHCHANDRA VALAMCHAND SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX5887",
+      "application_no": "2400024030208323",
+      "pan": "XXXXX3322P",
+      "allotment_date": "27-01-2025",
+      "address": "B-403 17B857115001 SHREEPAL RES NEAR SAURABH POLICE CHOWKY B/H TGB RESTUARANTPALADAJAN SURAT 395009",
+      "shares_applied": "3000.00",
+      "application_amount": "405000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "405000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "HQTPS3086L",
+    "result": {
+      "applicant_name": "MASTER. ARHAM PRIYANKKUMAR SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX8841",
+      "application_no": "229000030150794",
+      "pan": "XXXXX3086L",
+      "allotment_date": "27-01-2025",
+      "address": "B 403 SHREEPAL RESI B/H T G B RESTAURANT PAL L P SAVANI ROAD SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AIJPS0335D",
+    "result": {
+      "applicant_name": "MR. DINESHCHANDRA VALAMCHAND SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX5270",
+      "application_no": "229000030150748",
+      "pan": "XXXXX0335D",
+      "allotment_date": "27-01-2025",
+      "address": "B-403 SHREE PAL RESIDENCY BEHIND TGB RESTAURANT L P SAVANI ROAD PAL SURAT 395009",
+      "shares_applied": "3000.00",
+      "application_amount": "405000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "405000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AABHD3347Q",
+    "result": {
+      "applicant_name": "MR. DINESHCHANDRA VALAMCHAND SANGHAVI (HUF)",
+      "dp_client_id": "1204XXXXXXXX7197",
+      "application_no": "2400024030208045",
+      "pan": "XXXXX3347Q",
+      "allotment_date": "27-01-2025",
+      "address": "B-403-SHREEPAL RESIDENCY B/H TGB RESTURANT OPP SAURABH POLICE CHOKI SURAT 395009",
+      "shares_applied": "3000.00",
+      "application_amount": "405000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "405000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ADOPS3545D",
+    "result": {
+      "applicant_name": "MRS KALAVATIBEN D SANGHVI",
+      "dp_client_id": "1204XXXXXXXX1287",
+      "application_no": "229000030150752",
+      "pan": "XXXXX3545D",
+      "allotment_date": "27-01-2025",
+      "address": "B/804 SHANTRUNJAY TOWER NR NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "HQTPS3054Q",
+    "result": {
+      "applicant_name": "MASTER. NAMYA PRIYANKKUMAR SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX8991",
+      "application_no": "229000030150792",
+      "pan": "XXXXX3054Q",
+      "allotment_date": "27-01-2025",
+      "address": "B/403 SHREEPAL RESI NEAR T G B HOTEL PAL SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BNRPS5275G",
+    "result": {
+      "applicant_name": "PRIYANK D SANGHAVI",
+      "dp_client_id": "IN30XXXXXXXX8552",
+      "application_no": "MB00000028161065",
+      "pan": "XXXXX5275G",
+      "allotment_date": "27-01-2025",
+      "address": "B 403 SHREEPAL RESIDENCY B H TGB RESTAURANT NEAR SAURABH POLICE STATION PAL SURAT GUJARAT 395009",
+      "shares_applied": "3000.00",
+      "application_amount": "405000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "405000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AANHP4945G",
+    "result": {
+      "error": "No results found"
+    },
+    "status": "failed"
+  },
+  {
+    "pan": "BKTPD2212D",
+    "result": {
+      "applicant_name": "MRS. RUPALBEN PRIYANKKUMAR SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX9458",
+      "application_no": "MB00000028161398",
+      "pan": "XXXXX2212D",
+      "allotment_date": "27-01-2025",
+      "address": "B-403SHREEPAL RESIDENCY NR TGB RESTAURANT PAL  SURAT 395009",
+      "shares_applied": "3000.00",
+      "application_amount": "405000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "405000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "OBAPS4860K",
+    "result": {
+      "applicant_name": "MR. ARYA SHRENIKKUMAR SHAH",
+      "dp_client_id": "1204XXXXXXXX2106",
+      "application_no": "MB00000028163958",
+      "pan": "XXXXX4860K",
+      "allotment_date": "27-01-2025",
+      "address": "ARYA BUNGLOWS NEMINATH SOC NR JAIN TEMPLEDEESA BANASKANTHA 385535",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "OMOPS4184K",
+    "result": {
+      "applicant_name": "MASTER. NAKSHI SHRENIKBHAI SHAH",
+      "dp_client_id": "1204XXXXXXXX6951",
+      "application_no": "MB00000028163647",
+      "pan": "XXXXX4184K",
+      "allotment_date": "27-01-2025",
+      "address": "ARYA BUNGLOWS NEAR JAIN TEMPLE DISHA BANASKANTHA 385535",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "OMOPS4188F",
+    "result": {
+      "applicant_name": "MASTER. KAVYA SHRENIKBHAI SHAH",
+      "dp_client_id": "1204XXXXXXXX7520",
+      "application_no": "MB00000028163679",
+      "pan": "XXXXX4188F",
+      "allotment_date": "27-01-2025",
+      "address": "B 602 SHRI PARSHVA ORION NR ADANI GAS STATION PLADI CROSS ROAD AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AFQPS1220R",
+    "result": {
+      "applicant_name": "MR. SHRENIKKUMAR RAMESHCHANDRA SHAH",
+      "dp_client_id": "1204XXXXXXXX1016",
+      "application_no": "MB00000028163512",
+      "pan": "XXXXX1220R",
+      "allotment_date": "27-01-2025",
+      "address": "B-602 SHRI PARSHVA ORION FLAT PALDI CROSS ROAD NEAR ADANI C NG PUMP AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAUHS9182B",
+    "result": {
+      "applicant_name": "SHRENIKKUMAR RAMESHCHANDRA SHAH (HUF)",
+      "dp_client_id": "1204XXXXXXXX3832",
+      "application_no": "MB00000028163815",
+      "pan": "XXXXX9182B",
+      "allotment_date": "27-01-2025",
+      "address": "C-7ASOPALAV FLATOPP.CAMA HOTELKHANPUR KHANPURAHMEDABAD AHMEDABAD 380001",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ANDPS8030N",
+    "result": {
+      "applicant_name": "MRS. JYOTI SHRENIKKUMAR SHAH",
+      "dp_client_id": "1205XXXXXXXX4853",
+      "application_no": "MB00000028163601",
+      "pan": "XXXXX8030N",
+      "allotment_date": "27-01-2025",
+      "address": "B-602 SHRI PARSHVA ORION FLAT NEAR ADANI CNG PUMP PALDI CROSS ROAD AHMEDABAD CI AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BLLPS2620D",
+    "result": {
+      "applicant_name": "KSHITIJ NARESHKUMAR SHAH",
+      "dp_client_id": "IN30XXXXXXXX2057",
+      "application_no": "MB00000028163705",
+      "pan": "XXXXX2620D",
+      "allotment_date": "27-01-2025",
+      "address": "P-1 SIDDHGIRI APPARTMENT BEHIND NAVYUG COLLEGE RANDER ROAD SURAT CITY SURAT GUJARAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AALHK2852B",
+    "result": {
+      "applicant_name": "KSHITIJ NARESHBHAI SHAH HUF",
+      "dp_client_id": "IN30XXXXXXXX4779",
+      "application_no": "MB00000028163586",
+      "pan": "XXXXX2852B",
+      "allotment_date": "27-01-2025",
+      "address": "P-1-SIDDHGIRI APARTMENT B/H NAVYUG COLLEGE RANDER ROAD SURAT CITY SURAT GJ 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BQWPS2179F",
+    "result": {
+      "applicant_name": "MISS. RIDDHI KSHITIJ SHAH",
+      "dp_client_id": "1204XXXXXXXX1727",
+      "application_no": "MB00000028163770",
+      "pan": "XXXXX2179F",
+      "allotment_date": "27-01-2025",
+      "address": "P 1 SIDDHGIRI APPARTMENT BEHIND NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAMPH1131K",
+    "result": {
+      "applicant_name": "MRS. HINABEN NARESHKUMAR SHAH",
+      "dp_client_id": "1204XXXXXXXX1621",
+      "application_no": "MB00000028163291",
+      "pan": "XXXXX1131K",
+      "allotment_date": "27-01-2025",
+      "address": "P-1 SIDDHGIRI APPARTMENT BEHIND NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAGHN2817Q",
+    "result": {
+      "applicant_name": "NARESH B SHAH HUF",
+      "dp_client_id": "IN30XXXXXXXX0985",
+      "application_no": "0120038113499392",
+      "pan": "XXXXX2817Q",
+      "allotment_date": "27-01-2025",
+      "address": "P-1 SIDDHGIRI APPARTMENT B H NAVYUG COLLEGE RANDER ROAD SURAT GUJARAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ABEPN8329A",
+    "result": {
+      "applicant_name": "MR. NARESHKUMAR BABULAL SHAH",
+      "dp_client_id": "1204XXXXXXXX6152",
+      "application_no": "0120038113499390",
+      "pan": "XXXXX8329A",
+      "allotment_date": "27-01-2025",
+      "address": "P-1SIDDHGIRI APPARTMENT BEHIND NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "MFBPS3073R",
+    "result": {
+      "applicant_name": "MASTER. HARVEY KSHITIJ SHAH",
+      "dp_client_id": "1204XXXXXXXX6694",
+      "application_no": "MB00000028163780",
+      "pan": "XXXXX3073R",
+      "allotment_date": "27-01-2025",
+      "address": "P-1SIDDHGIRI APP B/HNAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "PZHPS8822R",
+    "result": {
+      "applicant_name": "MS. ZIVA KSHITIJ SHAH",
+      "dp_client_id": "1204XXXXXXXX4511",
+      "application_no": "MB00000028163934",
+      "pan": "XXXXX8822R",
+      "allotment_date": "27-01-2025",
+      "address": "P-1 SIDDHGIRI APPARTMENT RANDER ROAD BEHIND NAVYUG COLLEGE RANDER SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AANHD2455H",
+    "result": {
+      "applicant_name": "MR. DARSHAN NARESHKUMAR SHAH HUF",
+      "dp_client_id": "1204XXXXXXXX1112",
+      "application_no": "MB00000028163608",
+      "pan": "XXXXX2455H",
+      "allotment_date": "27-01-2025",
+      "address": "P 1 SIDDHGIRI APPARTMENT RANDER ROAD SURAT BEHIND NAVYUG COLLEGE SURAT SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ABAHR6667K",
+    "result": {
+      "applicant_name": "MR. RINAV CHANDRAKANT PUNIWALA HUF",
+      "dp_client_id": "1204XXXXXXXX4170",
+      "application_no": "MB00000028163505",
+      "pan": "XXXXX6667K",
+      "allotment_date": "27-01-2025",
+      "address": "E 303 GREEN ARISTO RESIDENCY NEAR SAMARPAN HEIGHTS CANAL ROAD SURAT SURAT 395005",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ALIPP3744P",
+    "result": {
+      "applicant_name": "MR. RINAV CHANDRAKANT PUNIWALA",
+      "dp_client_id": "1204XXXXXXXX9191",
+      "application_no": "MB00000028163638",
+      "pan": "XXXXX3744P",
+      "allotment_date": "27-01-2025",
+      "address": "E 303 GREEN ARISTO RESIDENCY CANAL ROAD NEAR SAMARPAN HEIGHTS SURAT 395005",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ALLPP4997K",
+    "result": {
+      "applicant_name": "MRS. NISHA RINAVKUMAR PUNIWALA",
+      "dp_client_id": "1204XXXXXXXX6513",
+      "application_no": "MB00000028163474",
+      "pan": "XXXXX4997K",
+      "allotment_date": "27-01-2025",
+      "address": "E303 GREEN ARISTO NR SAMARPAN SURAT SURAT GUJARAT SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "FUGPP4808E",
+    "result": {
+      "applicant_name": "MS. SHRUTI RINAV PUNIWALA",
+      "dp_client_id": "1204XXXXXXXX6663",
+      "application_no": "MB00000028163314",
+      "pan": "XXXXX4808E",
+      "allotment_date": "27-01-2025",
+      "address": "E303GREEN ARISTO NR SAMARPAN CANAL ROAD SURAT SURAT GUJARAT SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "HRPPP6757Q",
+    "result": {
+      "applicant_name": "MS. SHREYA RINAV PUNIWALA",
+      "dp_client_id": "1204XXXXXXXX6488",
+      "application_no": "MB00000028163534",
+      "pan": "XXXXX6757Q",
+      "allotment_date": "27-01-2025",
+      "address": "E 303 GREEN ARISTO NR SAMARPAN HEIGHTS  CANAL ROAD SURAT SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ABEPN8330M",
+    "result": {
+      "applicant_name": "MRS. NILIMA RAMANIK SHAH",
+      "dp_client_id": "1204XXXXXXXX3808",
+      "application_no": "MB00000028163523",
+      "pan": "XXXXX8330M",
+      "allotment_date": "27-01-2025",
+      "address": "P 1 SIDDHGIRI TWR RANDER RD NR NAVYUG COLLEGE P O BOX NAVYUG COLLEGE CITY SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "JPHPS1067A",
+    "result": {
+      "applicant_name": "MR. HARSH RAMANIK SHAH",
+      "dp_client_id": "1204XXXXXXXX3278",
+      "application_no": "MB00000028163892",
+      "pan": "XXXXX1067A",
+      "allotment_date": "27-01-2025",
+      "address": "P1 SIDDHGIRI TOWER NEAR NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ACHPR2237B",
+    "result": {
+      "applicant_name": "MR. RAMANIK BABULAL SHAH",
+      "dp_client_id": "1204XXXXXXXX4822",
+      "application_no": "MB00000028163842",
+      "pan": "XXXXX2237B",
+      "allotment_date": "27-01-2025",
+      "address": "B307 EKTA TERRACE MAHAVIR NGR KAMALA ASHISH TOWER KANDIVALI WEST MUMBAI 400067",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAOHR9013C",
+    "result": {
+      "applicant_name": "MR. RAMNIK B SHAH HUF",
+      "dp_client_id": "1204XXXXXXXX7906",
+      "application_no": "MB00000028164039",
+      "pan": "XXXXX9013C",
+      "allotment_date": "27-01-2025",
+      "address": "B 307 EKTA TERRACE MAHAVIR NAGAR KANDIVALI WEST MUMBAI MUMBAI 400067",
+      "shares_applied": "8000.00",
+      "application_amount": "1080000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "1080000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BVBPS5474F",
+    "result": {
+      "applicant_name": "MR UTSAV MAHENDRAKUMAR SHETH",
+      "dp_client_id": "1203XXXXXXXX3684",
+      "application_no": "920002939",
+      "pan": "XXXXX5474F",
+      "allotment_date": "27-01-2025",
+      "address": "A501 VENKATESH SHANTI BALAJI COMPLEX 150 FEET ROAD NEAR MIRABHAYNDAR FLYOVER BHAYANDAR THANE 401101",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "GLMPS9266K",
+    "result": {
+      "applicant_name": "MS VAIBHAVI UTSAV SHETH",
+      "dp_client_id": "1203XXXXXXXX3201",
+      "application_no": "920002949",
+      "pan": "XXXXX9266K",
+      "allotment_date": "27-01-2025",
+      "address": "3A 501 VENKATESH SHANTI 150 FEET RD BALAJI COMPLEX NR FLYOVER BHAYANDER WEST THANE 401101",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "ADSPS7681J",
+    "result": {
+      "applicant_name": "JYOTSANABEN MAHENDRAKUMAR SHETH",
+      "dp_client_id": "1203XXXXXXXX6481",
+      "application_no": "002E230126749321",
+      "pan": "XXXXX7681J",
+      "allotment_date": "27-01-2025",
+      "address": "S2 PANCHSHIL FLAT PALDI AHMEDABAD CITY AHMEDABAD GUJARAT AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AABHU5456M",
+    "result": {
+      "applicant_name": "UTSAV MAHENDRA SHETH HUF",
+      "dp_client_id": "IN30XXXXXXXX0315",
+      "application_no": "2400000030405730",
+      "pan": "XXXXX5456M",
+      "allotment_date": "27-01-2025",
+      "address": "A 501 VENKATESH SHANTI BALAJI COMPLEX 150 FEET ROAD NR MIRA BHAYANDAR FLYOVER BHAYANDAR W THANE 401101",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BFEPV2328Q",
+    "result": {
+      "applicant_name": "MEET BHARATKUMAR VAN",
+      "dp_client_id": "1203XXXXXXXX4512",
+      "application_no": "2510055573158132",
+      "pan": "XXXXX2328Q",
+      "allotment_date": "27-01-2025",
+      "address": "803 SARITA APPARTMENT NEAR RAYMOND SHOW ROOM SURAT CITYSURATKAILASNAGARSAGRAMPURA SURAT 395002",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BSWPP7682L",
+    "result": {
+      "applicant_name": "PRAVINKUMAR CHAMANLAL PADHIYAR",
+      "dp_client_id": "1203XXXXXXXX0498",
+      "application_no": "920004739",
+      "pan": "XXXXX7682L",
+      "allotment_date": "27-01-2025",
+      "address": "HIRABEN NI CHALI PASE SCW HIGHSCHOOL DISA MUKHYA DAK GHAR DEESA BANASKANTHA 385535",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "HRQPS4797L",
+    "result": {
+      "applicant_name": "MR. SANYAMKUMAR VINODBHAI SANGHAVI",
+      "dp_client_id": "1204XXXXXXXX7541",
+      "application_no": "012000006689190",
+      "pan": "XXXXX4797L",
+      "allotment_date": "27-01-2025",
+      "address": "H 1003 WESTERN SOMCHINTAMANI NR RAJHANS CINEMA PAL SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "CJRPM5254N",
+    "result": {
+      "applicant_name": "MR. JAINAM RAJESHKUMAR MODI",
+      "dp_client_id": "1203XXXXXXXX9547",
+      "application_no": "MB00000028162110",
+      "pan": "XXXXX5254N",
+      "allotment_date": "27-01-2025",
+      "address": "B 4TH FLOOR PRATIK PALACE APT KAJINUMEDAN GOPIPURA SURAT 395003",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BTSPM9207K",
+    "result": {
+      "applicant_name": "MRS. ALAKABEN RAJESHKUMAR MODI",
+      "dp_client_id": "1203XXXXXXXX2276",
+      "application_no": "MB00000028162149",
+      "pan": "XXXXX9207K",
+      "allotment_date": "27-01-2025",
+      "address": "FL NO E/102 BUI-E STUTI AVENUE OPP WERTERN-SOMCHINTANMANI SuratSuratPAL GAM SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "BTSPM9208G",
+    "result": {
+      "applicant_name": "MR. RAJESHKUMAR KIRTILAL MODI",
+      "dp_client_id": "1203XXXXXXXX2751",
+      "application_no": "MB00000028162177",
+      "pan": "XXXXX9208G",
+      "allotment_date": "27-01-2025",
+      "address": "FL.NO.E/102BUI-ESTUTI AVENUE OPPWERTERN-SOMCHINTAMANI SuratSuratPAL GAMPAL SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "CNTPS4981E",
+    "result": {
+      "applicant_name": "MRS CHETNABEN NAVINCHANDRA SHAH",
+      "dp_client_id": "1208XXXXXXXX5069",
+      "application_no": "DHNKRMAY10315",
+      "pan": "XXXXX4981E",
+      "allotment_date": "27-01-2025",
+      "address": "HNO 103 opposite jila seva sadan - 2  near surat tennis club athwalines Surat M Corp amizara appartment Surat SURAT 395001",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "COIPS9153J",
+    "result": {
+      "applicant_name": "MR ANANTKUMAR NAVINCHANDRA SHAH",
+      "dp_client_id": "1208XXXXXXXX2911",
+      "application_no": "MB00000028163919",
+      "pan": "XXXXX9153J",
+      "allotment_date": "27-01-2025",
+      "address": "S/o Navinchandra Shah D-202 River Side Park vasana Opp Lane Of APMC Market vasana Vasana Ahmedabad Opp Santabag Society AHMEDABAD 382460",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "FSXPS0862N",
+    "result": {
+      "applicant_name": "MRS MOXA ANANTKUMAR SHAH",
+      "dp_client_id": "1208XXXXXXXX5314",
+      "application_no": "DHNKRMAY10313",
+      "pan": "XXXXX0862N",
+      "allotment_date": "27-01-2025",
+      "address": "D-202 River Side Park Opp Lane Of Apmc Market Vasna Opp Santabag Society Ahmedabad City Ahmedabad AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AFOPS0049G",
+    "result": {
+      "applicant_name": "MR NAVINCHANDRA CHIMANLAL SHAH",
+      "dp_client_id": "1209XXXXXXXX8616",
+      "application_no": "MB00000028164448",
+      "pan": "XXXXX0049G",
+      "allotment_date": "27-01-2025",
+      "address": "103 amizara appartment athwalines opposite jila seva sadan   2   near surat tennis club Surat M Corp Surat Gujarat 395001 SURAT 395001",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "DKGPS6589P",
+    "result": {
+      "applicant_name": "MRS CHHAYABEN PIYUSHBHAI SHAH",
+      "dp_client_id": "1209XXXXXXXX8387",
+      "application_no": "MB00000028163303",
+      "pan": "XXXXX6589P",
+      "allotment_date": "27-01-2025",
+      "address": "E 702 Ashirwad Sky Vasna Nr  Maniratnam Bunglow Opp  Vasna Community Hall Ahmedabad City Ahmedabad City Paldi Ahmedabad Gujarat 380007 AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AQAPS4495D",
+    "result": {
+      "applicant_name": "PIYUSH SOMCHAND SHAH",
+      "dp_client_id": "1208XXXXXXXX7229",
+      "application_no": "MB00000028163300",
+      "pan": "XXXXX4495D",
+      "allotment_date": "27-01-2025",
+      "address": "E-702 Ashirwad Sky Nr Maniratnam Bunglow Opp Vasna Community Hall Vasna Paldi Ahmedabad City Ahmedabad City Ahmedabad AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAUHP4779F",
+    "result": {
+      "applicant_name": "M/S. PIYUSH SOMCHAND SHAH HUF .",
+      "dp_client_id": "1208XXXXXXXX6599",
+      "application_no": "MB00000028163665",
+      "pan": "XXXXX4779F",
+      "allotment_date": "27-01-2025",
+      "address": "E 702 ASHIRWAD SKY NR MANIRATAN BUNGLOW OPP VASANA COMMUNITY HALL AHMEDABAD 380007",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "AAIHN6450K",
+    "result": {
+      "applicant_name": "NAVINCHANDRA CHIMANLAL SHAH",
+      "dp_client_id": "IN30XXXXXXXX3825",
+      "application_no": "ACML780128550",
+      "pan": "XXXXX6450K",
+      "allotment_date": "27-01-2025",
+      "address": "403 AMIZARA APPT NR  SURAT TENNIS CLUB OPP JILLA SEVA SADAN 2 ATHWALINES SURAT 385001",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "APMPC2567H",
+    "result": {
+      "applicant_name": "MR. ALPESH SAKHARAM CHAUDHARI",
+      "dp_client_id": "1204XXXXXXXX8881",
+      "application_no": "KCCB0002389599",
+      "pan": "XXXXX2567H",
+      "allotment_date": "27-01-2025",
+      "address": "118 AMBIKAPARK SOCIETY NR RAMIPARK SOCEITY DINDOLI 4 UDHNA CHORASI SURAT 394210",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "APMPC2566G",
+    "result": {
+      "applicant_name": "MRS. SUREKHA ALPESH CHAUDHARI",
+      "dp_client_id": "1204XXXXXXXX8875",
+      "application_no": "KCCB0002389603",
+      "pan": "XXXXX2566G",
+      "allotment_date": "27-01-2025",
+      "address": "118 AMIKA PARK OPP RAMI PARK DINDOLI SURAT 394210",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "LEJPK8622J",
+    "result": {
+      "applicant_name": "MISS. NEELIMAKUMARI VARUNKUMAR RAJPUT",
+      "dp_client_id": "1204XXXXXXXX3244",
+      "application_no": "KCCB0002389607",
+      "pan": "XXXXX8622J",
+      "allotment_date": "27-01-2025",
+      "address": "WARD 09 GANGOR THANA KHAGARIA OLAPUR KHAGARIA 851204",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "DGSPR0238G",
+    "result": {
+      "applicant_name": "MRS. MALADEVI RAJPUTSING",
+      "dp_client_id": "1204XXXXXXXX1696",
+      "application_no": "KCCB0002389609",
+      "pan": "XXXXX0238G",
+      "allotment_date": "27-01-2025",
+      "address": "00 SHETRUNJAY TOWER A RANDER ROAD ADAJAN NAVYUG COLL SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "KQLPK2168E",
+    "result": {
+      "applicant_name": "MISS. SHALANI KUMARI",
+      "dp_client_id": "1204XXXXXXXX5458",
+      "application_no": "KCCB0002389613",
+      "pan": "XXXXX2168E",
+      "allotment_date": "27-01-2025",
+      "address": "TAWAR-A SHATRUNJAY TOWER NAVYUG COLLEGE RANDER ROAD SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "FJWPR7621Q",
+    "result": {
+      "applicant_name": "MASTER. DEVRAJ VARUNKUMAR RAJPUTSING",
+      "dp_client_id": "1204XXXXXXXX6812",
+      "application_no": "KCCB0002389619",
+      "pan": "XXXXX7621Q",
+      "allotment_date": "27-01-2025",
+      "address": "SHETRUNJAY TOWER A RANDER ROAD NAVYUG COLLEGE SURAT 395009",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  },
+  {
+    "pan": "APZPT0342J",
+    "result": {
+      "applicant_name": "MR. MAHENDRA HIMMATBHAI TARSARIYA",
+      "dp_client_id": "1204XXXXXXXX8337",
+      "application_no": "KCCB0002389627",
+      "pan": "XXXXX0342J",
+      "allotment_date": "27-01-2025",
+      "address": "B 42 AMBIKA NAGAR 2 SURAT SURAT SURAT 395004",
+      "shares_applied": "2000.00",
+      "application_amount": "270000",
+      "shares_allotted": "0",
+      "amount_adjusted": "0",
+      "amount_refunded": "270000",
+      "credit_date": "28/01/2025",
+      "status": "NOT ALLOTED"
+    },
+    "status": "success"
+  }
+]

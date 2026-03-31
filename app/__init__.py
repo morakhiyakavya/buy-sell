@@ -69,4 +69,10 @@ if not app.debug:
         app.logger.setLevel(logging.INFO)
         app.logger.info("Ipo Details")
 
-from app import routes, models, errors
+from app import models, errors
+from app.routes import bp as routes_bp
+app.register_blueprint(routes_bp, url_prefix='')
+
+from app.routes import register_endpoint_aliases
+register_endpoint_aliases(app)
+

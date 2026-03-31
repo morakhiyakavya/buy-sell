@@ -57,19 +57,30 @@ def wait_for_tor_connection():
             print("Waiting for Tor to be fully ready...")
             time.sleep(2)  # Wait before trying again
 
+LAST_RENEW_TIME = 0
+
 def renew_ip():
+    global LAST_RENEW_TIME
+    current_time = time.time()
+    
+    # Avoid renewing too frequently (e.g., maintain at least 10 seconds gap)
+    if current_time - LAST_RENEW_TIME < 10:
+        print(f"Skipping IP renewal; last renewal was {current_time - LAST_RENEW_TIME:.1f}s ago.")
+        return
+
     try:
         with Controller.from_port(port=9051) as controller:
             controller.authenticate(password='@kavya123.')  # Tor control password
             controller.signal(Signal.NEWNYM)  # Request a new Tor circuit
             time.sleep(5)  # Wait for the new circuit to establish
             print("New IP address requested through Tor.")
+            LAST_RENEW_TIME = time.time()
     except Exception as e:
         print(f"Error renewing Tor IP: {e}")
 
             
 # Function to make requests through Tor
-def make_request_through_tor(session,url = "http://httpbin.org/ip", headers=None, data=None, cookies=None, post = False, json = None, stream = False):
+def make_request_through_tor(session,url = "http://httpbin.org/ip", headers=None, data=None, cookies=None, post = False, json = None, stream = False, allow_redirects = True):
     run = run_as_admin(TOR_PATH)
     if run == True:
         pass
@@ -86,5 +97,6 @@ def make_request_through_tor(session,url = "http://httpbin.org/ip", headers=None
         }
         session.tor_proxy_set = True  # Mark that the proxy has been set
 
-    response = session.get(f'{url}', headers=headers, cookies=cookies,stream = stream) if not post else session.post(f'{url}', headers=headers, data=data, cookies=cookies, json=json, allow_redirects=True)
+    response = session.get(f'{url}', headers=headers, cookies=cookies, stream=stream, allow_redirects=allow_redirects) if not post else session.post(f'{url}', headers=headers, data=data, cookies=cookies, json=json, allow_redirects=allow_redirects)
     return response
+
