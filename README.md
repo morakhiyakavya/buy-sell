@@ -1,3 +1,8 @@
+<!-- TO run -->
+.venv\Scripts\activate
+`python -m flask run`
+
+
 # Web Scraping Hub
 
 Welcome to the Web Scraping Hub! This repository houses the codebase for our advanced web scraping system that targets five distinct websites. Utilizing sophisticated scraping techniques and a custom-built TensorFlow model to solve CAPTCHAs on two of these sites, our project not only scrapes data efficiently but does so while navigating complex web security measures.

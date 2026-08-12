@@ -152,6 +152,13 @@ def query_pan_status_tor(pan_list, client_id=None, ipo_name=None):
     Returns a dict mapping PAN to response JSON or error.
     """
     results = {}
+
+    def _safe_int(value):
+        try:
+            return int(float(value or 0))
+        except Exception:
+            return 0
+
     for pan in pan_list:
         headers = {
             "accept": "application/json, text/plain, */*",
@@ -191,19 +198,20 @@ def query_pan_status_tor(pan_list, client_id=None, ipo_name=None):
                         data_list = json_resp['data']
 
                         try:
-                            if ipo_name and "icic" in ipo_name.lower():
-                                # ICIC Special: Push 'Shareholder' (90 shares) to the bottom (higher sort key)
-                                # Primary: Not 90 shares (0)
-                                # Secondary: 90 shares (1)
-                                # Tie-breaker: Shares Amount (Ascending)
+                            if ipo_name and "sbi" in ipo_name.lower():
+                                # SBI shareholder special: keep 37-share records after the others,
+                                # and still push 90-share records toward the bottom of the non-37 group.
                                 data_list.sort(key=lambda x: (
-                                    1 if int(float(x.get('App_Shares', 0) or 0)) == 90 else 0,
-                                    int(float(x.get('App_Shares', 0) or 0))
+                                    1 if _safe_int(x.get('All_Shares')) == 37 else 0,
+                                    1 if _safe_int(x.get('App_Shares')) == 90 else 0,
+                                    _safe_int(x.get('App_Shares'))
                                 ))
                             else:
-                                # Default: Sort by App_Shares (ascending) to ensure consistency
-                                # HEURISTIC: Smallest application first (likely Retail)
-                                data_list.sort(key=lambda x: int(float(x.get('App_Shares', 0) or 0)))
+                                # Default: keep 37-share records after the others.
+                                data_list.sort(key=lambda x: (
+                                    1 if _safe_int(x.get('All_Shares')) == 37 else 0,
+                                    _safe_int(x.get('App_Shares'))
+                                ))
                         except Exception as e:
                             print(f"Error sorting data list: {e}")
 

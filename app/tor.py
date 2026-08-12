@@ -1,11 +1,17 @@
 import subprocess
 import time
-from stem import Signal
-import stem
-from stem.control import Controller
+try:
+    from stem import Signal
+    import stem
+    from stem.control import Controller
+    TOR_AVAILABLE = True
+except Exception:
+    # stem not installed or not usable in this environment; provide
+    # graceful fallbacks so the app can run without Tor.
+    TOR_AVAILABLE = False
 
-# Path to the Tor executable
-TOR_PATH = r"C:\Program Files (x86)\Tor Browser\Browser\TorBrowser\Tor\tor.exe"
+# Path to the Tor executable (optional)
+TOR_PATH = r"C:\Program Files (x86)\Tor Browser\Browser\Tor\tor.exe"
 TOR_RUNNING = False
 
 # Function to run a command as a specific user using subprocess
@@ -14,20 +20,24 @@ def run_as_admin(command):
     if TOR_RUNNING:
         return True
     try:
-        # check if the tor process is already running
-        try:
-            with Controller.from_port(port=9051) as controller:
-                controller.authenticate("@kavya123.")
-                print("Tor is already running.")
-                TOR_RUNNING = True
-                return True
-        except stem.SocketError:
-            print("Tor is not running. Starting Tor...")
+        if TOR_AVAILABLE:
+            # check if the tor process is already running
+            try:
+                with Controller.from_port(port=9051) as controller:
+                    controller.authenticate("@kavya123.")
+                    print("Tor is already running.")
+                    TOR_RUNNING = True
+                    return True
+            except Exception:
+                print("Tor is not running. Starting Tor...")
+        else:
+            # Tor not available in this environment
+            return False
         # Run the Tor process as the 'morakhiya' user using subprocess
         subprocess.run(
-    ['runas', '/user:kavya', '/savecred', command],
-    check=True
-)
+            ['runas', '/user:kavya', '/savecred', command],
+            check=True
+        )
         print("Tor is starting...")
     except subprocess.CalledProcessError as e:
         print(f"Error starting Tor: {e}")
@@ -35,6 +45,9 @@ def run_as_admin(command):
 # Function to wait for Tor to connect fully (bootstrapped 100%)
 def wait_for_tor_connection():
     """Wait until Tor is fully bootstrapped (100%)"""
+    if not TOR_AVAILABLE:
+        print("wait_for_tor_connection: Tor not available in this environment")
+        return
     # Try to connect to Tor's control port until successful
     while True:
         try:
@@ -42,7 +55,6 @@ def wait_for_tor_connection():
                 # Use the password to authenticate
                 controller.authenticate("@kavya123.")  # Authenticate with Tor control port
                 print("Authenticated with Tor Controller.")
-                
                 # Poll until Tor is fully bootstrapped (100%)
                 while True:
                     status = controller.get_info("status/bootstrap-phase")
@@ -52,7 +64,7 @@ def wait_for_tor_connection():
                         TOR_RUNNING = True
                         return
                     time.sleep(1)  # Wait 1 second before checking again
-        except stem.SocketError as e:
+        except Exception as e:
             print(f"Error connecting to Tor control port: {e}")
             print("Waiting for Tor to be fully ready...")
             time.sleep(2)  # Wait before trying again
@@ -62,12 +74,13 @@ LAST_RENEW_TIME = 0
 def renew_ip():
     global LAST_RENEW_TIME
     current_time = time.time()
-    
     # Avoid renewing too frequently (e.g., maintain at least 10 seconds gap)
     if current_time - LAST_RENEW_TIME < 10:
         print(f"Skipping IP renewal; last renewal was {current_time - LAST_RENEW_TIME:.1f}s ago.")
         return
-
+    if not TOR_AVAILABLE:
+        print("renew_ip: Tor not available in this environment")
+        return
     try:
         with Controller.from_port(port=9051) as controller:
             controller.authenticate(password='@kavya123.')  # Tor control password
@@ -78,17 +91,22 @@ def renew_ip():
     except Exception as e:
         print(f"Error renewing Tor IP: {e}")
 
-            
-# Function to make requests through Tor
 def make_request_through_tor(session,url = "http://httpbin.org/ip", headers=None, data=None, cookies=None, post = False, json = None, stream = False, allow_redirects = True):
+    # If Tor isn't available, fall back to a direct request using the
+    # provided session. This allows the app to function in environments
+    # without Tor installed.
+    if session is None:
+        raise ValueError("Session cannot be None.")
+
+    if not TOR_AVAILABLE:
+        return session.get(f'{url}', headers=headers, cookies=cookies, stream=stream, allow_redirects=allow_redirects) if not post else session.post(f'{url}', headers=headers, data=data, cookies=cookies, json=json, allow_redirects=allow_redirects)
+
     run = run_as_admin(TOR_PATH)
     if run == True:
         pass
     else:
         wait_for_tor_connection()
-    if session is None:
-        raise ValueError("Session cannot be None.")
-    
+
     # Ensure the session is set up for Tor proxy (do this only once during session initialization)
     if not hasattr(session, 'tor_proxy_set'):  # Check if the proxy has been set
         session.proxies = {
@@ -99,4 +117,3 @@ def make_request_through_tor(session,url = "http://httpbin.org/ip", headers=None
 
     response = session.get(f'{url}', headers=headers, cookies=cookies, stream=stream, allow_redirects=allow_redirects) if not post else session.post(f'{url}', headers=headers, data=data, cookies=cookies, json=json, allow_redirects=allow_redirects)
     return response
-

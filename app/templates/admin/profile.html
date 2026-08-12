@@ -1,49 +1,33 @@
 {% extends 'base.html' %}
 
 {% block current_user_content %}
-    <div class="container-fluid content">
-        {% include '_flash_message.html' %}
-        <h1 class="mb-4">{{ title }}</h1>
+<div class="container-fluid content">
+    {% include '_flash_message.html' %}
 
-        <div class="row">
-            <div class="col-sm-12 col-lg-6">
-              <div class="bg-white rounded-lg users p-5">
-                <p>
-                    <strong>First Name:</strong> {{ current_user.first_name }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Last Name:</strong> {{ current_user.last_name }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Username:</strong> {{ current_user.username }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Email:</strong> {{ current_user.email }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Phone Number:</strong> {{ current_user.phone_number }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Current Residence:</strong> {{ current_user.current_residence }} 
-                    <a href="#">Edit</a>
-                </p>
-                <p>
-                    <strong>Department:</strong> {{ current_user.department }}
-                </p>
-                {% if current_user.two_factor_enabled() %}
-                    <p><strong>2FA Status: </strong><span class="label label-info">Enabled</span></p>
-                {% else %}
-                    <p><strong>2FA Status: </strong><span class="label label-danger">Disabled</span></p>
-                {% endif %}
-                {% if current_user.department == 'Superadmin' %}
-                    <a href="#" class="btn btn-danger link_disabled">Delete Own Account</a>
-                {% endif %}
+    <div class="row">
+        <div class="col-12 col-xl-8">
+            <div class="bg-white rounded-lg users p-5">
+                <h1 class="mb-2">{{ title }}</h1>
+                <p class="text-muted mb-4">Simple admin overview with the most important account details.</p>
+
+                <div class="row g-3">
+                    <div class="col-md-6"><strong>Name:</strong> {{ current_user.first_name }} {{ current_user.last_name }}</div>
+                    <div class="col-md-6"><strong>Username:</strong> {{ current_user.username }}</div>
+                    <div class="col-md-6"><strong>Email:</strong> {{ current_user.email }}</div>
+                    <div class="col-md-6"><strong>Phone:</strong> {{ current_user.phone_number }}</div>
+                    <div class="col-md-6"><strong>Residence:</strong> {{ current_user.current_residence }}</div>
+                    <div class="col-md-6"><strong>Department:</strong> {{ current_user.department }}</div>
+                </div>
+
+                <hr class="my-4">
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-dark" href="{{ url_for('all_admins') }}">View Admins</a>
+                    <a class="btn btn-outline-dark" href="{{ url_for('all_buyers') }}">View Buyers</a>
+                    <a class="btn btn-outline-dark" href="{{ url_for('all_sellers') }}">View Sellers</a>
+                </div>
             </div>
-          </div>
+        </div>
     </div>
+</div>
 {% endblock %}

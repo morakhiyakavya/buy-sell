@@ -15,9 +15,11 @@ from app.forms import AllotmentForm
 from app.excel import process_excel_data, write_in_excel, process_excel, create_updated_excel_with_results
 from app.allotment import scrape_data_from_websites, driver_path
 from app.linkin import search_on_pan, get_company_name
+from app.mudrata import search_on_pan as mudrata_search_on_pan, get_company_name as mudrata_get_company_name
 from app.bigshare import big_company, big_pan
 from app.maashitalta import search_on_maashilta, mashilta_company
 from app.skyline import company_url, search_application
+from app.purva import purva_company, purva_pan
 from app.tor import renew_ip
 from app.models import Transaction, Seller
 from .transactions import pannum_trans
@@ -166,6 +168,7 @@ def checking_allotment():
             if form.validate_on_submit():
                 folder_path = os.path.join(os.path.dirname(__file__), "..", "upload_folder")
                 folder_path = os.path.abspath(folder_path)
+                os.makedirs(folder_path, exist_ok=True)
                 for filename in os.listdir(folder_path):
                     file_path = os.path.join(folder_path, filename)
                     if os.path.isfile(file_path):
@@ -277,6 +280,39 @@ def checking_allotment():
                                 time.sleep(0.5)
                                 if i % 50 == 0:
                                     renew_ip()
+                    elif listing_On == "purva":
+                        company_id = purva_company(form.ipo.data.strip())
+                        results = {}
+                        start_time = time.time()
+                        with ThreadPoolExecutor(max_workers=20) as executor:
+                            futures = {executor.submit(purva_pan, company_id, u): u for u in usernames}
+                            for i, future in enumerate(as_completed(futures), 1):
+                                u = futures[future]
+                                try:
+                                    result = future.result()
+                                    results[u] = result
+                                except Exception as e:
+                                    print(f"Error processing {u}: {e}")
+                                    results[u] = {"error": str(e)}
+                    elif listing_On == "mudrata":
+                        company_name = form.ipo.data.strip()
+                        company_id = mudrata_get_company_name(company_name)
+                        results = {}
+                        start_time = time.time()
+                        with ThreadPoolExecutor(max_workers=20) as executor:
+                            futures = {executor.submit(mudrata_search_on_pan, company_id, u): u for u in usernames}
+                            for i, future in enumerate(as_completed(futures), 1):
+                                u = futures[future]
+                                try:
+                                    result = future.result()
+                                    results[u] = result
+                                except Exception as e:
+                                    print(f"Error processing {u}: {e}")
+                                    results[u] = {"Error": str(e)}
+                                if i % 50 == 0:
+                                    renew_ip()
+                        end_time = time.time()
+                        print(f"Time taken for {len(usernames)} users: {end_time - start_time} seconds")
                     else:
                         company_id = mashilta_company(form.ipo.data.strip())
                         results = {}

@@ -1,11 +1,32 @@
 import pandas as pd
 import re
-import spacy
 import json
 import os
 
-# Load the spaCy model
-nlp = spacy.load("en_core_web_sm")
+# spaCy is optional for some heuristics. If it's unavailable (heavy
+# binary deps), fall back to a lightweight stub so the app can start.
+SPACY_AVAILABLE = True
+try:
+    import spacy
+    try:
+        nlp = spacy.load("en_core_web_sm")
+    except Exception:
+        # Model not installed or load failed; provide a safe stub
+        SPACY_AVAILABLE = False
+        class _DocStub:
+            def __init__(self, text):
+                self.ents = []
+
+        def nlp(text):
+            return _DocStub(text)
+except Exception:
+    SPACY_AVAILABLE = False
+    class _DocStub:
+        def __init__(self, text):
+            self.ents = []
+
+    def nlp(text):
+        return _DocStub(text)
 # Function to extract specific column data from an Excel file
 
     
