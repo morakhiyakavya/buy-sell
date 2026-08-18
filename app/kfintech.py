@@ -14,6 +14,40 @@ API_URL = "https://0uz601ms56.execute-api.ap-south-1.amazonaws.com/prod/api/quer
 # cache for client list
 _CLIENT_LIST = None
 
+
+def _extract_json_parse_string(js_text):
+    """Return the string literal passed to JSON.parse(...), if present."""
+    start = js_text.find("JSON.parse")
+    while start != -1:
+        open_paren = js_text.find("(", start)
+        if open_paren == -1:
+            return None
+
+        i = open_paren + 1
+        while i < len(js_text) and js_text[i].isspace():
+            i += 1
+
+        if i < len(js_text) and js_text[i] in ("'", '"'):
+            quote = js_text[i]
+            i += 1
+            buffer = []
+            while i < len(js_text):
+                ch = js_text[i]
+                if ch == "\\" and i + 1 < len(js_text):
+                    buffer.append(ch)
+                    i += 1
+                    buffer.append(js_text[i])
+                    i += 1
+                    continue
+                if ch == quote:
+                    return "".join(buffer)
+                buffer.append(ch)
+                i += 1
+
+        start = js_text.find("JSON.parse", open_paren + 1)
+    return None
+
+
 def fetch_client_list(js_url=None, local_json_path=None):
     """Return a list of client dicts with keys 'clientId' and 'name'.
     Tries in order:
@@ -30,7 +64,7 @@ def fetch_client_list(js_url=None, local_json_path=None):
         try:
             with open(local_json_path, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-                _CLIENT_LIST = data
+                _CLIENT_LIST = data if isinstance(data, list) else []
                 return _CLIENT_LIST
         except Exception:
             pass
@@ -71,48 +105,45 @@ def fetch_client_list(js_url=None, local_json_path=None):
         r = requests.get(js_url, timeout=15)
         r.raise_for_status()
         js_text = r.text
-        # First, try to find JSON.parse('...') or JSON.parse("...") that embeds the client-list
-        m_jsonparse = re.search(r"JSON\.parse\(\s*['\"](\s*\[\s*\{[^\]]*?clientId[^\]]*?\]\s*)['\"]\s*\)", js_text, re.DOTALL)
-        if m_jsonparse:
-            candidate = m_jsonparse.group(1)
-            try:
-                # unescape common JS escapes inside the string literal
-                candidate = candidate.encode('utf-8').decode('unicode_escape')
-            except Exception:
-                # if unescape fails, proceed with the raw candidate
-                pass
-        else:
-            # find an array of objects containing clientId
-            m = re.search(r"(\[\s*\{[^\]]*?clientId[^\]]*?\])", js_text, re.DOTALL)
-            if not m:
-                # fallback scanning around clientId
-                idx = js_text.find('clientId')
-                if idx == -1:
-                    return []
-                start = js_text.rfind('[', 0, idx)
-                end = js_text.find(']', idx)
-                if start == -1 or end == -1:
-                    return []
-                candidate = js_text[start:end+1]
-            else:
+
+        candidate = _extract_json_parse_string(js_text)
+        if not candidate:
+            m = re.search(r"(\[\s*\{.*?clientId.*?\]\s*\])", js_text, re.DOTALL)
+            if m:
                 candidate = m.group(1)
 
-        # try to load as JSON
+        if not candidate:
+            return []
+
+        try:
+            candidate = candidate.encode('utf-8').decode('unicode_escape')
+        except Exception:
+            pass
+
         try:
             data = json.loads(candidate)
         except Exception:
-            # remove trailing commas and try again
             cleaned = re.sub(r",\s*\]", "]", candidate)
             cleaned = cleaned.replace("'", '"')
-            data = json.loads(cleaned)
+            try:
+                data = json.loads(cleaned)
+            except Exception:
+                return []
 
-        # normalize entries to have clientId and name
+        if not isinstance(data, list):
+            return []
+
         clients = []
         for item in data:
+            if not isinstance(item, dict):
+                continue
             cid = item.get('clientId') or item.get('clientid') or item.get('clientID')
             name = item.get('name') or item.get('label') or item.get('company')
             if cid and name:
-                clients.append({'clientId': str(cid), 'name': name.strip()})
+                clients.append({'clientId': str(cid), 'name': str(name).strip()})
+
+        if not clients:
+            return []
 
         _CLIENT_LIST = clients
         return _CLIENT_LIST
