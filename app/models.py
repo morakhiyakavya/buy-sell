@@ -245,6 +245,7 @@ class TransactionPan(db.Model):
     application_number = db.Column(db.String(64), nullable=True)
     dp_id = db.Column(db.String(64), nullable=True)
     error = db.Column(db.String(64), nullable=True)
+    raw_response = db.Column(db.Text, nullable=True)
 
     __table_args__ = (db.UniqueConstraint('transaction_id', 'pan_id'),)
 
