@@ -1,4 +1,5 @@
 import random
+import threading
 # from app.tor import make_request_through_tor
 try :
     from app.tor import make_request_through_tor  # Import the make_request_through_tor function
@@ -15,9 +16,37 @@ from email.utils import parsedate_to_datetime
 
 session = requests.Session()
 
+_rate_limit_until = 0.0
+_rate_limit_delay = 0.0
+_rate_limit_lock = threading.Lock()
+
+
+def _check_and_wait_rate_limit():
+    global _rate_limit_until, _rate_limit_delay
+    with _rate_limit_lock:
+        target = _rate_limit_until
+        delay_val = _rate_limit_delay
+    now = time.time()
+    if target - now > 0.01:
+        wait_time = target - now
+        if abs(wait_time - delay_val) < 0.001:
+            wait_time = delay_val
+        print({'event': 'bigshare_rate_limit_pause', 'waiting_seconds': round(wait_time, 2)})
+        time.sleep(wait_time)
+
+
+def _set_rate_limit_pause(delay_seconds):
+    global _rate_limit_until, _rate_limit_delay
+    with _rate_limit_lock:
+        target = time.time() + delay_seconds
+        if target > _rate_limit_until:
+            _rate_limit_until = target
+            _rate_limit_delay = delay_seconds
+
 
 def _request_with_429_retry(send, max_attempts=3):
     for attempt in range(1, max_attempts + 1):
+        _check_and_wait_rate_limit()
         response = send()
         if response.status_code != 429 or attempt == max_attempts:
             return response
@@ -33,7 +62,7 @@ def _request_with_429_retry(send, max_attempts=3):
                 delay = 1
         delay = min(max(delay, 0), 60)
         print({'event': 'bigshare_rate_limit', 'attempt': attempt, 'retry_after_seconds': delay})
-        time.sleep(delay)
+        _set_rate_limit_pause(delay)
 
 # Function to get random user-agent
 def get_random_user_agent():
@@ -141,20 +170,14 @@ def fetch_bigshare_captcha():
         'image_length': len(image),
     })
 
-    # reader = easyocr.Reader(["en"], gpu=False)
-
     encoded_data = image.split(",", 1)[-1]
     image_bytes = base64.b64decode(encoded_data)
-    cap_time = int(time.time() * 1000)
-    captcha_path = Path(__file__).resolve().parent.parent / "app" / f"captcha-{cap_time}.png"
-    captcha_path.write_bytes(image_bytes)
-    print(f"Captcha image saved to {captcha_path}")
 
     recognition_started = time.perf_counter()
     texts = predict_captcha(
         driver=None,
         image_type="bigshare",
-        image_path=captcha_path
+        image_bytes=image_bytes
     )
     print({
         'event': 'bigshare_recognition',
@@ -162,15 +185,6 @@ def fetch_bigshare_captcha():
         'result_type': type(texts).__name__,
         'result_length': len(str(texts).strip()),
     })
-    # print(texts)
-    # print(" ".join(texts))
-
-    # delete the captcha image after processing
-    # try:
-    #     captcha_path.unlink()
-    #     print(f"Captcha image {captcha_path} deleted after processing.")
-    # except OSError as e:
-    #     print(f"Error occurred while deleting captcha image {captcha_path}: {e}")
 
     return {'token': token, 'image': image, 'captcha_text': texts}
 
@@ -248,5 +262,8 @@ def big_pan(company, pan, max_captcha_attempts=3):
     return {
         'error': 'Captcha failed after maximum retry attempts'
     }
-company = big_company("lumino")
-big_pan(company, "OMOPS4188F", max_captcha_attempts=3)
+
+
+if __name__ == "__main__":
+    company = big_company("lumino")
+    big_pan(company, "OMOPS4188F", max_captcha_attempts=3)

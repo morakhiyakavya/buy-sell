@@ -34,7 +34,37 @@ except Exception:
             raise RuntimeError("OnnxInferenceModel not available in this environment")
 
 # Changes are needed here
+import threading
+
 current_directory = Path(__file__).resolve().parent
+
+_LOADED_MODELS = {}
+_MODEL_LOCK = threading.Lock()
+
+
+def _get_model(image_type: str):
+    if image_type not in _LOADED_MODELS:
+        with _MODEL_LOCK:
+            if image_type not in _LOADED_MODELS:
+                if image_type == "bigshare":
+                    config_path = os.path.join(current_directory, "trial_bigshare", "configs.yaml")
+                    configs = BaseModelConfigs.load(config_path)
+                    model_path = os.path.join(os.path.dirname(config_path), configs.model_path)
+                    if not os.path.exists(model_path):
+                        raise FileNotFoundError(f"The model file was not found at {model_path}")
+                    _LOADED_MODELS["bigshare"] = ImageToWordModel(model_path=model_path, char_list=configs.vocab)
+                elif image_type == "kfintech":
+                    config_path = os.path.join(current_directory, "trial_kfintech", "configs.yaml")
+                    configs = BaseModelConfigs.load(config_path)
+                    model_path = os.path.join(os.path.dirname(config_path), configs.model_path)
+                    if not os.path.exists(model_path):
+                        raise FileNotFoundError(f"The model file was not found at {model_path}")
+                    _LOADED_MODELS["kfintech"] = ImageToWordModel(model_path=model_path, char_list=configs.vocab)
+                else:
+                    raise ValueError("image_type must be either 'bigshare' or 'kfintech'")
+    return _LOADED_MODELS[image_type]
+
+
 class ImageToWordModel(OnnxInferenceModel):
     def __init__(self, char_list: typing.Union[str, list], *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -70,127 +100,67 @@ class ImageToWordModel(OnnxInferenceModel):
 
         return text
 
-def predict_captcha(driver=None, image_type=None, image_path=None):
+
+def predict_captcha(driver=None, image_type=None, image_path=None, image_bytes=None):
     try:
         if not ML_AVAILABLE:
             print("predict_captcha: ML runtime unavailable, returning empty prediction")
             return ""
 
         # ---------------------------------------------------------
-        # 1. Get image either from a supplied path or from Selenium
+        # 1. Get image either from bytes, image_path, or Selenium
         # ---------------------------------------------------------
-        if image_path:
+        if image_bytes is not None:
+            nparr = np.frombuffer(image_bytes, np.uint8)
+            image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+            if image is None:
+                raise ValueError("OpenCV could not decode image from provided bytes")
+        elif image_path:
             img = os.path.abspath(image_path)
-
             if not os.path.exists(img):
                 raise FileNotFoundError(f"Captcha image not found: {img}")
-
             print(f"Reading captcha from: {img}")
-
+            image = cv2.imread(img)
+            if image is None:
+                raise ValueError(f"OpenCV could not read image: {img}")
         elif driver is not None:
             if image_type == "bigshare":
                 captcha = WebDriverWait(driver, 10).until(
                     EC.visibility_of_element_located((By.ID, "captcha"))
                 )
-
             elif image_type == "kfintech":
                 captcha = WebDriverWait(driver, 10).until(
                     EC.visibility_of_element_located((By.ID, "captchaimg"))
                 )
-
             else:
                 raise ValueError("Unknown image type")
 
             img = os.path.join(current_directory, "captcha.png")
-
             captcha.screenshot(img)
-
             print(f"Captcha screenshot saved to: {img}")
-
+            image = cv2.imread(img)
+            if image is None:
+                raise ValueError(f"OpenCV could not read image: {img}")
         else:
             raise ValueError(
-                "Either 'driver' or 'image_path' must be provided"
+                "Either 'image_bytes', 'image_path', or 'driver' must be provided"
             )
-
-        # ---------------------------------------------------------
-        # 2. Load image
-        # ---------------------------------------------------------
-        image = cv2.imread(img)
-
-        if image is None:
-            raise ValueError(f"OpenCV could not read image: {img}")
 
         print("Original image shape:", image.shape)
 
         # ---------------------------------------------------------
-        # 3. Load appropriate captcha model
+        # 2. Get cached model & preprocess image if needed
         # ---------------------------------------------------------
-        if image_type == "bigshare":
+        model = _get_model(image_type)
 
-            config_path = os.path.join(
-                current_directory,
-                "trial_bigshare",
-                "configs.yaml"
-            )
-
-            configs_bigshare = BaseModelConfigs.load(config_path)
-
-            configs_directory = os.path.dirname(config_path)
-
-            model_absolute_path = os.path.join(
-                configs_directory,
-                configs_bigshare.model_path
-            )
-
-            if not os.path.exists(model_absolute_path):
-                raise FileNotFoundError(
-                    f"The model file was not found at {model_absolute_path}"
-                )
-
-            model = ImageToWordModel(
-                model_path=model_absolute_path,
-                char_list=configs_bigshare.vocab
-            )
-
-            final_image = image
-
-        elif image_type == "kfintech":
-
+        if image_type == "kfintech":
             final_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             print("Gray image shape:", final_image.shape)
-
-            config_path = os.path.join(
-                current_directory,
-                "trial_kfintech",
-                "configs.yaml"
-            )
-
-            configs_kfintech = BaseModelConfigs.load(config_path)
-
-            configs_directory = os.path.dirname(config_path)
-
-            model_absolute_path = os.path.join(
-                configs_directory,
-                configs_kfintech.model_path
-            )
-
-            if not os.path.exists(model_absolute_path):
-                raise FileNotFoundError(
-                    f"The model file was not found at {model_absolute_path}"
-                )
-
-            model = ImageToWordModel(
-                model_path=model_absolute_path,
-                char_list=configs_kfintech.vocab
-            )
-
         else:
-            raise ValueError(
-                "image_type must be either 'bigshare' or 'kfintech'"
-            )
+            final_image = image
 
         # ---------------------------------------------------------
-        # 4. Convert grayscale images to 3 channels
+        # 3. Convert grayscale images to 3 channels
         # ---------------------------------------------------------
         image = (
             np.stack((final_image,) * 3, axis=-1)
@@ -200,7 +170,7 @@ def predict_captcha(driver=None, image_type=None, image_path=None):
         print("Model input image shape:", image.shape)
 
         # ---------------------------------------------------------
-        # 5. Predict
+        # 4. Predict
         # ---------------------------------------------------------
         prediction_text = model.predict(image)
 
@@ -211,3 +181,4 @@ def predict_captcha(driver=None, image_type=None, image_path=None):
     except Exception as e:
         print(f"Error in predict_captcha: {e}")
         return ""
+

@@ -256,7 +256,7 @@ def checking_allotment():
                         company_id = big_company(form.ipo.data.strip())
                         results = {}
                         start_time = time.time()
-                        with ThreadPoolExecutor(max_workers=20) as executor:
+                        with ThreadPoolExecutor(max_workers=6) as executor:
                             futures = {executor.submit(big_pan, company_id, u): u for u in usernames}
                             for i, future in enumerate(as_completed(futures), 1):
                                 u = futures[future]
