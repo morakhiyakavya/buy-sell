@@ -256,14 +256,17 @@ def checking_allotment():
                         company_id = big_company(form.ipo.data.strip())
                         results = {}
                         start_time = time.time()
-                        with ThreadPoolExecutor(max_workers=6) as executor:
-                            futures = {executor.submit(big_pan, company_id, u): u for u in usernames}
-                            for i, future in enumerate(as_completed(futures), 1):
-                                u = futures[future]
-                                result = future.result()
+                        for i, u in enumerate(usernames, 1):
+                            try:
+                                result = big_pan(company_id, u)
                                 results[u] = result
-                                if i % 50 == 0:
-                                    renew_ip()
+                            except Exception as e:
+                                print(f"Error processing {u}: {e}")
+                                results[u] = {"error": str(e)}
+                            if i % 50 == 0:
+                                renew_ip()
+                            if i < len(usernames):
+                                time.sleep(3)
                     elif listing_On == "skyline":
                         results = {}
                         start_time = time.time()
